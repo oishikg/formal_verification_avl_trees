@@ -27,7 +27,14 @@ Inductive ordinary_binary_tree (A : Type) : Type :=
 
 (* Coq formalization of polymorphic AVL tree implementation *)
 
-Inductive triple (A : Type) : Type :=
+Inductive heightened_binary_tree (A : Type) : Type :=
+  nat * binary_tree A
+
+with triple (A : Type) : Type :=
+       heightened_binary_tree A * A * heightened_binary_tree A
+with binary_tree (A : Type) : Type :=
+     | Leaf : binary_tree A
+     | Node : triple A. 
                        
 
 (* ********** *)

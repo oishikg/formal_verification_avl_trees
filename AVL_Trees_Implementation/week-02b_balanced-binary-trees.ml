@@ -31,11 +31,18 @@ type 'a ordinary_binary_tree = OLeaf
 (* ********** *)
 
 (* A data type for polymorphic binary trees indexed with their height: *)
-
+  
 type 'a heightened_binary_tree = int * 'a binary_tree
  and 'a triple = 'a heightened_binary_tree * 'a * 'a heightened_binary_tree
  and 'a binary_tree = Leaf
                     | Node of 'a triple;;
+
+
+(* An alternative data type implementation *)
+  
+type 'a heightened_binary_tree_alternative =
+  | 
+
 
 (* ********** *)
 
