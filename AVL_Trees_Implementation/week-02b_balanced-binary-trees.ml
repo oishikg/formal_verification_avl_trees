@@ -30,19 +30,77 @@ type 'a ordinary_binary_tree = OLeaf
 
 (* ********** *)
 
-(* A data type for polymorphic binary trees indexed with their height: *)
-  
+(* Professor Danvy's implementation of the data type *)
+(*
 type 'a heightened_binary_tree = int * 'a binary_tree
  and 'a triple = 'a heightened_binary_tree * 'a * 'a heightened_binary_tree
  and 'a binary_tree = Leaf
                     | Node of 'a triple;;
+ *)
 
 
-(* An alternative data type implementation *)
+(* An alternative data type implementation based off Filliâtre's implementation *)
   
-type 'a heightened_binary_tree_alternative =
-  | 
+type 'a heightened_binary_tree =
+  Leaf
+| Node of int * 'a heightened_binary_tree * 'a *
+            'a heightened_binary_tree
+;;
 
+(* Sanity check: simple height checking function *)
+
+let hbt0 = Leaf ;;
+  
+let hbt1 = Node (2,
+                 Leaf,
+                 1,
+                 Node (1,
+                       Leaf,
+                       2,
+                       Leaf ));;
+  
+let hbt2 = Node (3,
+                 Node (2,
+                       Node (1,
+                             Leaf,
+                             2,
+                             Leaf),
+                       3,
+                       Node (1,
+                             Leaf,
+                             4,
+                             Leaf )),
+                 5,
+                 Node (2,
+                       Node (1,
+                             Leaf,
+                             6,
+                             Leaf),
+                       8,
+                       Node (1,
+                             Leaf,
+                             9,
+                             Leaf)));; 
+
+
+let test_height candidate =
+  candidate hbt0 = 0
+  && 
+    candidate hbt1 = 2
+  &&
+    candidate hbt2 = 3
+(* etc. *)
+;;
+
+         
+let rec height (hbt : 'a heightened_binary_tree) : int =
+  match hbt with
+  | Leaf -> 0
+  | Node (h, hbt1, e, hbt2) ->
+     max (height hbt1) (height hbt2) + 1
+;;
+
+let _ = assert (test_height height) ;;
 
 (* ********** *)
 
@@ -53,26 +111,24 @@ type 'a heightened_binary_tree_alternative =
    to the corresponding heightened binary tree.
  *)
 
-
+(* rewrite these tests *)
 let test_obt_to_hbt candidate =
      (candidate OLeaf
-      = (0,
-         Leaf))
+      = Leaf)
   && (candidate (ONode (OLeaf,
                         1,
                         ONode (OLeaf,
                                2,
                                OLeaf)))
-      = (2, 
-         Node ((0, 
-                Leaf), 
-               1, 
-               (1, 
-                Node ((0, 
-                       Leaf), 
-                      2, 
-                      (0, 
-                       Leaf))))))
+      = Node (2,
+              Leaf,
+              1,
+              Node (1,
+                    Leaf,
+                    2,
+                    Leaf))
+                   
+     )
   && (candidate (ONode (ONode (OLeaf,
                                1,
                                ONode (OLeaf,
@@ -80,20 +136,17 @@ let test_obt_to_hbt candidate =
                                       OLeaf)),
                         3,
                         OLeaf))
-      = (3, 
-         Node ((2, 
-                Node ((0, 
-                       Leaf), 
-                      1, 
-                      (1, 
-                       Node ((0, 
-                              Leaf), 
-                             2, 
-                             (0, 
-                              Leaf))))), 
-               3, 
-               (0, 
-                Leaf))))
+      = Node (3,
+              Node (2,
+                    Leaf,
+                    1,
+                    Node (1,
+                          Leaf,
+                          2,
+                          Leaf)),
+              3,
+              Leaf)
+     )
   (* etc. *);;
 
 (* Solution for Exercise 0: *)
@@ -102,11 +155,19 @@ let obt_to_hbt obt_init =
   let rec traverse obt =
     match obt with
     | OLeaf ->
-       (0, Leaf)
+       Leaf 
     | ONode (obt1, e, obt2) ->
-       let (h1, bt1) as hbt1 = traverse obt1
-       and (h2, bt2) as hbt2 = traverse obt2
-       in (1 + max h1 h2, Node (hbt1, e, hbt2))
+       let hbt1 = traverse obt1
+       and hbt2 = traverse obt2
+       in match hbt1, hbt2 with
+          | Leaf, Leaf ->
+             Node (1, hbt1, e, hbt2)
+          | Leaf, Node (h2, _, _, _) ->
+             Node (h2 + 1, hbt1, e, hbt2)
+          | Node (h1, _, _, _), Leaf ->
+             Node (h1 + 1, hbt1, e, hbt2)
+          | Node (h1, _, _, _), Node (h2, _, _, _) ->
+             Node (max h1 h2 + 1, hbt1, e, hbt2)
   in traverse obt_init;;
 
 let () = assert (test_obt_to_hbt obt_to_hbt);;
@@ -114,8 +175,9 @@ let () = assert (test_obt_to_hbt obt_to_hbt);;
 (* ********** *)
 
 (* Added by Oishik Ganguly *)
-(* Heightened Binary Trees for testing *)
+(* write a module with tests in it *)
 
+  (*
 let hbt_0 = (0, Leaf)
 ;;
 
@@ -241,12 +303,14 @@ let hbt_5=
                   (0, Leaf)))))
 ;;
 
-
+   *)
 
 
 (* heightened binary trees with errors in them *)
 
 (* height errors *)
+
+  (*
 
 let hbt_with_height_error_0 =
   (4, 
@@ -352,7 +416,11 @@ let hbt_with_height_error_2 =
                                 Leaf)))))))))
 ;;
 
+   *)
+
 (* balancing error, i.e., the trees are unbalanced *)
+
+  (*
 let unbalanced_hbt_0 =
   (5, Node
         ((0, Leaf),
@@ -444,6 +512,9 @@ let unbalanced_hbt_3 =
                                      (0, Leaf)))))))))))
 ;;
 
+   *)
+
+  (*
 (* unordered binary trees *)
 let unordered_hbt_0 =
   (2, Node
@@ -498,6 +569,8 @@ n         (3, Node
                        14,
                        (0, Leaf)))))))
 ;;
+
+   *)
     
 
 (* ********** *)
