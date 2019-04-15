@@ -28,80 +28,114 @@ exception Bail_out;;
 type 'a ordinary_binary_tree = OLeaf
                              | ONode of 'a ordinary_binary_tree * 'a * 'a ordinary_binary_tree;;
 
-(* ********** *)
+
 
 (* Professor Danvy's implementation of the data type *)
-(*
+
 type 'a heightened_binary_tree = int * 'a binary_tree
  and 'a triple = 'a heightened_binary_tree * 'a * 'a heightened_binary_tree
  and 'a binary_tree = Leaf
-                    | Node of 'a triple;;
- *)
+                    | Node of 'a triple
+;;
 
 
-(* An alternative data type implementation based off Filliâtre's implementation *)
+(* An alternative data type implementation *)
   
-type 'a heightened_binary_tree =
-  Leaf
-| Node of int * 'a heightened_binary_tree * 'a *
-            'a heightened_binary_tree
+type 'a heightened_binary_tree_alternative =
+  ALeaf
+| ANode of int * 'a heightened_binary_tree_alternative * 'a *
+            'a heightened_binary_tree_alternative
 ;;
 
 (* Sanity check: simple height checking function *)
 
-let hbt0 = Leaf ;;
+let hbta0 = ALeaf ;;
   
-let hbt1 = Node (2,
-                 Leaf,
+let hbta1 = ANode (2,
+                 ALeaf,
                  1,
-                 Node (1,
-                       Leaf,
+                 ANode (1,
+                       ALeaf,
                        2,
-                       Leaf ));;
+                       ALeaf ));;
   
-let hbt2 = Node (3,
-                 Node (2,
-                       Node (1,
-                             Leaf,
+let hbta2 = ANode (3,
+                 ANode (2,
+                       ANode (1,
+                             ALeaf,
                              2,
-                             Leaf),
+                             ALeaf),
                        3,
-                       Node (1,
-                             Leaf,
+                       ANode (1,
+                             ALeaf,
                              4,
-                             Leaf )),
+                             ALeaf )),
                  5,
-                 Node (2,
-                       Node (1,
-                             Leaf,
+                 ANode (2,
+                       ANode (1,
+                             ALeaf,
                              6,
-                             Leaf),
+                             ALeaf),
                        8,
-                       Node (1,
-                             Leaf,
+                       ANode (1,
+                             ALeaf,
                              9,
-                             Leaf)));; 
+                             ALeaf)));; 
 
 
 let test_height candidate =
-  candidate hbt0 = 0
+  candidate hbta0 = 0
   && 
-    candidate hbt1 = 2
+    candidate hbta1 = 2
   &&
-    candidate hbt2 = 3
+    candidate hbta2 = 3
 (* etc. *)
 ;;
 
          
-let rec height (hbt : 'a heightened_binary_tree) : int =
-  match hbt with
-  | Leaf -> 0
-  | Node (h, hbt1, e, hbt2) ->
+let rec height (hbta : 'a heightened_binary_tree_alternative) : int =
+  match hbta with
+  | ALeaf -> 0
+  | ANode (h, hbt1, e, hbt2) ->
      max (height hbt1) (height hbt2) + 1
 ;;
 
 let _ = assert (test_height height) ;;
 
+(* ********** *)
+
+(* function to convert heightened_binary_tree to heightened_binary_tree_alternative *)
+
+let  hbt_to_hbta (hbt : 'a heightened_binary_tree) =
+  let rec traverse hbt =
+    match hbt with
+    | (0, Leaf) -> ALeaf
+    | (h, Node (hbt1, e, hbt2)) ->
+       let hbta1 = traverse hbt1
+       and hbta2 = traverse hbt2 in
+       ANode (h, hbta1, e, hbta2)
+  in
+  traverse hbt
+;;
+                            
+(*function to convert heightened_binary_tree_alternative to heightened_binary_tree*)     
+let hbta_to_hbt (hbta : 'a heightened_binary_tree_alternative) =
+  let rec traverse hbta =
+    match hbta with
+    | ALeaf -> (0, Leaf)
+    | ANode (h, hbta1, e, hbta2) ->
+       let hbt1 = traverse hbta1
+       and hbt2 = traverse hbta2 in
+       (h, Node(hbt1, e, hbt2))
+  in
+  traverse hbta
+;;
+
+(* to do : 
+ * write tests for these functions
+ * prove that they are isomorphic *)
+
+  
 (* ********** *)
 
 (* From ordinary binary tree to heightened binary tree: *)
