@@ -133,8 +133,43 @@ Axiom transitivity_of_comparisons:
     compare x z = r.
 
 Definition compare_int (i j : nat) : comparison := 
-  if i <n j then Lt else if i =n= j then Eq else Gt. 
+  if i <n j then Lt else if i =n= j then Eq else Gt.
 
+Axiom some_x_equal_some_y:
+  forall (A : Type)
+         (x y : A),
+    Some x = Some y <-> x = y.
+
+Lemma diff_equal_0_implies_equal:
+  forall (x y : nat),
+    x - y = 0 -> x = y.
+Proof.
+Admitted.
+(* figure this out *)
+
+Lemma diff_equal_1_implies_greater_by_1:
+  forall (x y : nat),
+    x - y = 1 -> x = y + 1.
+Proof.
+Admitted.
+
+Lemma or_implication:
+  forall (A B C : Prop),
+    ((A \/ B) -> C) -> ((A -> C) /\ (B -> C)).
+Proof. 
+  intros A B C H_abc.
+  split.
+  - intro H_a.
+    apply H_abc.
+    Search (_ \/ _).
+    Check (or_introl).
+    apply (or_introl).
+    exact H_a.
+  - intro H_b.
+    apply H_abc.
+    apply (or_intror).
+    exact H_b.
+Qed.
 
 (* ********** Section 1: Different AVL tree type definitions  ********** *)
 
@@ -1437,9 +1472,9 @@ Definition insert_hbt
   end.
 
 Compute (test_insert_hbt insert_hbt).
-(* The tests work!spliffgfhgfh *)
+(* The tests work! *)
 
-(* ***** Section 5.3: Theorems concerning insert ***** *)
+(* ***** Section 5.3: The specifications  ***** *)
 
 Definition specification_of_insert_hbt_helper
            (A : Type)
@@ -1461,7 +1496,6 @@ Definition specification_of_insert_hbt_helper
     /\
     (is_ordered_hbt A hbt' compare = true).
 
-Check (insert_bt_helper).
 Definition specification_of_insert_bt_helper 
            (A : Type)
            (compare : A -> A -> comparison)
@@ -1485,7 +1519,6 @@ Definition specification_of_insert_bt_helper
     /\
     (is_ordered_hbt A hbt' compare = true).
 
-Check (insert_t_helper).
 Definition specification_of_insert_t_helper
            (A : Type)
            (compare : A -> A -> comparison)
@@ -1509,14 +1542,11 @@ Definition specification_of_insert_t_helper
     /\
     (is_ordered_hbt A hbt' compare = true).
 
-(* This should probably be a definition *)
-Lemma some_x_equal_some_y:
-  forall (A : Type)
-         (x y : A),
-    Some x = Some y <-> x = y.
-Proof.         
-Admitted.
+(* ***** *)
 
+(* ***** Section 5.4: Lemmas concerning soundness ***** *)
+
+(* Given a triple that is sound, its binary trees should also be sound *)
 Lemma triple_sound_implies_hbts_sound:
   forall (A : Type)
          (h_hbt : nat)
@@ -1569,347 +1599,47 @@ Proof.
   discriminate.
 Qed.
 
-Lemma triple_balanced_implies_hbts_balanced:
+(* If the helper function to check soundness for hbts returns some hbt, then 
+ * the helper function to check soundness for bts should give the same hbt *)
+Lemma traverse_to_check_soundness_hbt_bt_same:
   forall (A : Type)
-         (h_hbt : nat)
-         (hbt1 : heightened_binary_tree A)
-         (e : A)
-         (hbt2 : heightened_binary_tree A),
-    is_balanced_hbt A (HNode A h_hbt (Node A (Triple A hbt1 e hbt2))) = true ->
-    is_balanced_hbt A hbt1 = true /\ is_balanced_hbt A hbt2 = true.
+         (h h_hbt : nat)
+         (bt : binary_tree A),
+    traverse_to_check_soundness_hbt A (HNode A h bt) = Some h_hbt ->
+    traverse_to_check_soundness_bt A bt = Some h_hbt.
 Proof.
-  (* same structure as above, write later *)
-Admitted.
+  intros A h h_hbt bt H.
+  rewrite -> (unfold_traverse_to_check_soundness_hbt A h bt) in H.
+  case (traverse_to_check_soundness_bt A bt) as [h_ret | ]  eqn : C_soundness.
+  case (h_ret =n= h) as [ | ] eqn : C_equal_heights.
+  Check (beq_nat_true).
+  apply (beq_nat_true h_ret h) in C_equal_heights.
+  rewrite <- C_equal_heights in H.
+  exact H.
 
-Lemma list_ordered_implies_reduced_list_ordered:
-  forall (A : Type)
-         (compare : A -> A -> comparison)         
-         (x : A)
-         (xs : list A),
-    is_ordered_list A (x :: xs) compare = true ->
-    is_ordered_list A xs compare = true.
-Proof.
-  intros A compare x xs H_xxs.
-  unfold is_ordered_list in H_xxs.
-  case xs as [ | x' xs''] eqn : C_xs.
-  unfold is_ordered_list.
-  reflexivity.
-
-  rewrite -> (unfold_is_ordered_cons_cons A x x' xs'') in H_xxs.
-  case (compare x x') as [ | | ] eqn : C_comp_x_x'.
-  unfold is_ordered_list.
-  exact H_xxs.
   discriminate.
+
   discriminate.
 Qed.
 
-Lemma appended_lists_ordered_implies_middle_reduced_list_ordered:
+(* If the helper function to check soundness for bts returns some hbt, then 
+ * the helper function to check soundness for ts should give the same hbt *)
+Lemma traverse_to_check_soundness_bt_t_same:
   forall (A : Type)
-         (compare : A -> A -> comparison)
-         (xs : list A)
-         (e : A)
-         (ys : list A),
-    is_ordered_list A (xs ++ e :: ys) compare = true ->
-    is_ordered_list A (xs ++ ys) compare = true.
-Proof.
-  intros A compare xs e ys H_xyys.
-  induction xs as [ | x xs' IH_xs'].
-
-  - Search (nil ++ _ = _).
-    rewrite -> (app_nil_l ys).
-    rewrite -> (app_nil_l (e :: ys)) in H_xyys.
-    exact (list_ordered_implies_reduced_list_ordered A compare e ys H_xyys).
-
-  - rewrite <- (app_comm_cons xs' (e :: ys) x) in H_xyys.
-    rewrite <- (app_comm_cons xs' ys x).
-
-    assert (H_ordered_sublist : is_ordered_list A (xs' ++ e :: ys) compare = true).
-    exact (list_ordered_implies_reduced_list_ordered
-             A
-             compare
-             x
-             (xs' ++ e :: ys)
-             H_xyys).
-
-    assert (IH_we_need : is_ordered_list A (xs' ++ ys) compare = true).
-    exact (IH_xs' H_ordered_sublist).
-    unfold is_ordered_list.
-        
-    case xs' as [ | x' xs''] eqn : C_xs'.
-
-    + unfold is_ordered_list.
-      rewrite -> (app_nil_l ys).
-      unfold is_ordered_list in H_xyys.
-      rewrite -> (app_nil_l (e :: ys)) in H_xyys.
-      rewrite -> (app_nil_l ys) in IH_we_need.
-      rewrite -> (unfold_is_ordered_cons_cons A x e ys compare) in H_xyys.
-      case (compare x e) as [ | | ] eqn : C_comp_x_e.
-      
-      case ys as [ | y ys'] eqn : C_ys.
-      exact (unfold_is_ordered_cons_nil A x compare).
-
-      rewrite -> (app_nil_l (e :: y :: ys')) in H_ordered_sublist.
-      unfold is_ordered_list in H_ordered_sublist.
-      rewrite -> (unfold_is_ordered_cons_cons A e y ys' compare) in H_ordered_sublist.
-      case (compare e y) as [ | | ] eqn : C_comp_e_y.
-
-      assert (H_x_lt_y : compare x y = Lt).
-      Check (transitivity_of_comparisons A x e y compare Lt C_comp_x_e C_comp_e_y).
-      exact (transitivity_of_comparisons A x e y compare Lt C_comp_x_e C_comp_e_y).
-
-      rewrite -> (unfold_is_ordered_cons_cons A x y  ys' compare).
-      case (compare x y) as [ | | ] eqn : C_comp_x_y.
-      unfold is_ordered_list in IH_we_need.
-      exact IH_we_need.
-
-      discriminate.
-      discriminate.
-      discriminate.
-      discriminate.
-      discriminate.
-      discriminate.
-
-    + rewrite <- (app_comm_cons xs'' ys x').
-      rewrite <- (app_comm_cons xs'' ys x') in IH_we_need.
-      rewrite <- (app_comm_cons xs'' (e :: ys) x') in H_ordered_sublist.
-      unfold is_ordered_list in H_xyys.
-      rewrite <- (app_comm_cons xs'' (e :: ys) x') in H_xyys.
-      rewrite -> (unfold_is_ordered_cons_cons A x x' (xs'' ++ ys) compare).
-      rewrite -> (unfold_is_ordered_cons_cons A x x' (xs'' ++ e :: ys) compare)
-        in H_xyys.
-      case (compare x x') as [ | | ] eqn : C_comp_x_x'.
-      unfold is_ordered_list in IH_we_need.
-      exact IH_we_need.
-
-      discriminate.
-
-      discriminate.
-Qed.
-
-Definition get_head_in_list (A : Type) (xs : list A) :=
-  match xs with
-  | nil =>
-    nil
-  | x :: _ =>
-    (x :: nil)
-  end.
-
-Lemma appended_lists_ordered_implies_left_reduced_list_ordered:   
-  forall (A : Type)
-         (compare : A -> A -> comparison)
-         (xs ys : list A),
-    is_ordered_list A (xs ++ ys) compare = true ->
-    is_ordered_list A (get_head_in_list A xs ++ ys) compare = true.
-Proof.
-  intros A compare xs ys H_xy.
-  induction xs as [ | x xs' IH_xs'].
-
-  - rewrite -> (app_nil_l ys) in H_xy.
-    unfold get_head_in_list.
-    rewrite -> (app_nil_l ys).
-    exact H_xy.
-
-  - rewrite <- (app_comm_cons xs' ys x) in H_xy.
-
-    assert (IH_we_need :
-              is_ordered_list A (get_head_in_list A xs' ++ ys) compare = true).
-    Check (list_ordered_implies_reduced_list_ordered).
-    Check (list_ordered_implies_reduced_list_ordered
-             A compare x (xs' ++ ys) H_xy).
-    exact (IH_xs' (list_ordered_implies_reduced_list_ordered
-             A compare x (xs' ++ ys) H_xy)).
-
-    case xs' as [ | x' xs''] eqn : C_xs'.
-    
-    + unfold get_head_in_list.
-      rewrite <- (app_comm_cons nil ys x).
-      exact H_xy.
-
-    + unfold get_head_in_list.
-      unfold get_head_in_list in IH_xs'.
-      rewrite <- (app_comm_cons nil ys x).
-      rewrite -> (app_nil_l ys).
-      unfold get_head_in_list in IH_we_need.
-      rewrite <- (app_comm_cons nil ys x') in IH_we_need.
-      rewrite -> (app_nil_l ys) in IH_we_need.
-      
-      rewrite <- (app_comm_cons xs'' ys x') in H_xy.
-      unfold is_ordered_list in H_xy.
-      rewrite -> (unfold_is_ordered_cons_cons
-                    A x x' (xs'' ++ ys) compare) in H_xy.
-      case (compare x x') as [ | | ] eqn : C_comp_x_x'.
-      case ys as [ | y ys'] eqn : C_ys.
-      
-      * unfold is_ordered_list.
-        rewrite -> (unfold_is_ordered_cons_nil).
-        reflexivity.
-
-      * unfold is_ordered_list in IH_we_need.
-        rewrite -> (unfold_is_ordered_cons_cons A x' y ys' compare) in IH_we_need.
-        case (compare x' y) as [ | | ] eqn : C_comp_x'_y.
-        Check (transitivity_of_comparisons).
-        Check (transitivity_of_comparisons A x x' y compare Lt
-                                           C_comp_x_x' C_comp_x'_y).
-        assert (H_x_lt_y : compare x y = Lt).
-        exact (transitivity_of_comparisons A x x' y compare Lt
-                                           C_comp_x_x' C_comp_x'_y).
-        unfold is_ordered_list.
-        rewrite -> (unfold_is_ordered_cons_cons A x y ys' compare).
-        case (compare x y) as [ | | ] eqn : C_comp_x_y.
-
-        exact IH_we_need.
-
-        discriminate.
-
-        discriminate.
-
-        discriminate.
-
-        discriminate.
-
-      * discriminate.
-
-      * discriminate.
-Qed.
-
-Lemma append_lists_ordered_implies_lists_ordered:
-  forall (A : Type)
-         (compare : A -> A -> comparison)
-         (xs ys : list A),
-    is_ordered_list A (xs ++ ys) compare = true ->
-    (is_ordered_list A xs compare = true)
-    /\
-    (is_ordered_list A ys compare = true).
-Proof.
-  intros A compare xs ys H_xy.
-  split.
-  
-  - induction xs as [ | x xs' IH_xs'].
-    unfold is_ordered_list.
-    reflexivity.
-
-    Check (app_comm_cons).
-    rewrite <- (app_comm_cons xs' ys x) in H_xy.
-    
-    assert (H_ordered_xs' : is_ordered_list A (xs' ++ ys) compare = true).
-    exact (list_ordered_implies_reduced_list_ordered A compare x (xs' ++ ys) H_xy).
-
-    assert (IH_we_need : is_ordered_list A xs' compare = true).
-    exact (IH_xs' H_ordered_xs').
-    
-    unfold is_ordered_list.
-    case xs' as [ | x' xs''] eqn : C_xs'.
-    exact (unfold_is_ordered_cons_nil A x compare).
-
-    unfold is_ordered_list in IH_we_need.
-    rewrite -> (unfold_is_ordered_cons_cons A x x' xs'' compare).
-    unfold is_ordered_list in H_xy.
-    rewrite <- (app_comm_cons xs'' ys x') in H_xy.
-    rewrite -> (unfold_is_ordered_cons_cons A x x' (xs'' ++ ys) compare) in H_xy.
-    case (compare x x') as [ | | ] eqn : C_comp_x_x'.
-    exact IH_we_need.
-
-    discriminate.
-
-    discriminate.
-    
-  - induction ys as [ | y ys' IH_ys']. 
-    unfold is_ordered_list.
-    reflexivity.
-
-    assert (IH_we_need : is_ordered_list A ys' compare = true).
-    Check (appended_lists_ordered_implies_middle_reduced_list_ordered
-             A compare xs y ys' H_xy).
-    exact (IH_ys' (appended_lists_ordered_implies_middle_reduced_list_ordered
-             A compare xs y ys' H_xy)).
-
-    unfold is_ordered_list. 
-    case ys' as [ | y' ys''].
-
-    rewrite -> (unfold_is_ordered_cons_nil A y compare).
-    reflexivity.
-    
-    unfold is_ordered_list in IH_we_need.
-    rewrite -> (unfold_is_ordered_cons_cons A y y' ys'' compare).
-    Check (appended_lists_ordered_implies_left_reduced_list_ordered
-             A compare xs (y :: y' :: ys'') H_xy).
-    assert (H_xy_new :
-              is_ordered_list A (get_head_in_list A xs ++ y :: y' :: ys'') compare
-              = true).
-    exact (appended_lists_ordered_implies_left_reduced_list_ordered
-             A compare xs (y :: y' :: ys'') H_xy).
-    case xs as [ | x' xs''] eqn : C_xs.
-    
-    + unfold get_head_in_list in H_xy_new.
-      rewrite -> (app_nil_l (y :: y' :: ys'')) in H_xy_new.
-      unfold is_ordered_list in H_xy_new.
-      rewrite -> (unfold_is_ordered_cons_cons A y y' ys'' compare) in H_xy_new.
-      case (compare y y') as [ | | ] eqn : C_comp_y_y'.
-
-      exact H_xy_new.
-
-      discriminate.
-
-      discriminate.
-
-    + unfold get_head_in_list in H_xy_new.
-      rewrite <- (app_comm_cons nil (y :: y' :: ys'') x') in H_xy_new.
-      rewrite -> (app_nil_l (y :: y' :: ys'')) in H_xy_new.
-      unfold is_ordered_list in H_xy_new.
-      rewrite -> (unfold_is_ordered_cons_cons A x' y (y' :: ys'') compare)
-        in H_xy_new.
-      case (compare x' y) as [ | | ] eqn : C_comp_x'_y. 
-      rewrite -> (unfold_is_ordered_cons_cons A y y' ys'' compare)
-        in H_xy_new.
-      case (compare y y') as [ | | ] eqn : C_comp_y_y'.
-
-      exact IH_we_need.
-
-      discriminate.
-
-      discriminate.
-
-      discriminate.
-
-      discriminate.
-Qed.
-
-Lemma triple_ordered_implies_hbts_ordered:
-  forall (A : Type)
-         (compare : A -> A -> comparison)
          (h_hbt : nat)
-         (hbt1 : heightened_binary_tree A)
-         (e : A)
-         (hbt2 : heightened_binary_tree A),
-    is_ordered_hbt A (HNode A h_hbt (Node A (Triple A hbt1 e hbt2))) compare = true ->
-    is_ordered_hbt A hbt1 compare = true /\ is_ordered_hbt A hbt2 compare = true.
+         (t : triple A),
+    traverse_to_check_soundness_bt A (Node A t) = Some h_hbt ->
+    traverse_to_check_soundness_t A t = Some h_hbt.
 Proof.
-  intros A compare h_hbt hbt1 e hbt2 H_ordered_hbt.
-  unfold is_ordered_hbt in H_ordered_hbt.
-  rewrite -> (unfold_hbt_to_list A h_hbt (Node A (Triple A hbt1 e hbt2)))
-    in H_ordered_hbt.
-  rewrite -> (unfold_bt_to_list_node A (Triple A hbt1 e hbt2))
-    in H_ordered_hbt.
-  rewrite -> (unfold_t_to_list A hbt1 hbt2 e) in H_ordered_hbt.
-  destruct (append_lists_ordered_implies_lists_ordered
-              A
-              compare
-              (hbt_to_list A hbt1)
-              (e :: hbt_to_list A hbt2)
-              H_ordered_hbt) as [H_hbt1_list_ord H_e_hbt2_list_ord].
-  assert (H_hbt2_list_ord :
-            is_ordered_list A (hbt_to_list A hbt2) compare = true).
-  exact (list_ordered_implies_reduced_list_ordered
-           A compare e (hbt_to_list A hbt2) H_e_hbt2_list_ord).
-  split.
-
-  - unfold is_ordered_hbt.
-    exact H_hbt1_list_ord.
-
-  - unfold is_ordered_hbt.
-    exact H_hbt2_list_ord.
+  intros A h_hbt t H.
+  rewrite -> (unfold_traverse_to_check_soundness_bt_node A t) in H.
+  case (traverse_to_check_soundness_t A t) as [h_ret | ] eqn : C_h.
+  exact H.
+  discriminate.
 Qed.
 
+(* This is an important lemma: it provides the condition for which sound hbts 
+ * imply soundness of a triple that they are part of *)
 Lemma hbts_sound_implies_triple_sound_weak:
     forall (A : Type)
            (h_hbt : nat)
@@ -1938,45 +1668,28 @@ Proof.
   case (traverse_to_check_soundness_hbt A hbt1) as [h1_ret | ] eqn : C_check_hbt1.
   case (traverse_to_check_soundness_hbt A hbt2) as [h2_ret | ] eqn : C_check_hbt2.
   (* the proof shouldn't be too hard from here on; return to this later *)
-  Admitted.
+Admitted.
 
+(* ***** *)
 
-Lemma traverse_to_check_soundness_hbt_bt_same:
-  forall (A : Type)
-         (h h_hbt : nat)
-         (bt : binary_tree A),
-    traverse_to_check_soundness_hbt A (HNode A h bt) = Some h_hbt ->
-    traverse_to_check_soundness_bt A bt = Some h_hbt.
-Proof.
-  intros A h h_hbt bt H.
-  rewrite -> (unfold_traverse_to_check_soundness_hbt A h bt) in H.
-  case (traverse_to_check_soundness_bt A bt) as [h_ret | ]  eqn : C_soundness.
-  case (h_ret =n= h) as [ | ] eqn : C_equal_heights.
-  Check (beq_nat_true).
-  apply (beq_nat_true h_ret h) in C_equal_heights.
-  rewrite <- C_equal_heights in H.
-  exact H.
+(* ***** Section 5.5: Balancedness lemmas ***** *)
 
-  discriminate.
-
-  discriminate.
-Qed.
-
-Lemma traverse_to_check_soundness_bt_t_same:
+(* Given a balanced triple, its constituent hbts should also be balanced *)
+Lemma triple_balanced_implies_hbts_balanced:
   forall (A : Type)
          (h_hbt : nat)
-         (t : triple A),
-    traverse_to_check_soundness_bt A (Node A t) = Some h_hbt ->
-    traverse_to_check_soundness_t A t = Some h_hbt.
+         (hbt1 : heightened_binary_tree A)
+         (e : A)
+         (hbt2 : heightened_binary_tree A),
+    is_balanced_hbt A (HNode A h_hbt (Node A (Triple A hbt1 e hbt2))) = true ->
+    is_balanced_hbt A hbt1 = true /\ is_balanced_hbt A hbt2 = true.
 Proof.
-  intros A h_hbt t H.
-  rewrite -> (unfold_traverse_to_check_soundness_bt_node A t) in H.
-  case (traverse_to_check_soundness_t A t) as [h_ret | ] eqn : C_h.
-  exact H.
-  discriminate.
-Qed.
+  (* same structure as above, write later *)
+Admitted.
 
-
+(* If the helper function to check the balancedness of an hbt returns some hbt,
+ * then the helper function to check the balancedness of the bt returns the same
+ * hbt *)
 Lemma traverse_to_check_balanced_hbt_bt_same:
   forall (A : Type)
          (h h_hbt : nat)
@@ -1991,6 +1704,9 @@ Proof.
   discriminate.
 Qed.
 
+(* If the helper function to check the balancedness of an bt returns some hbt,
+ * then the helper function to check the balancedness of the t returns the same
+ * hbt *)
 Lemma traverse_to_check_balanced_bt_t_same:
   forall (A : Type)
          (h_hbt : nat)
@@ -2005,7 +1721,9 @@ Proof.
   discriminate.
 Qed.
 
-
+(* The relationship between the helper functions for soundness and balancedness. The
+ * statement of the proof allows us to use the heightened_binary_tree_mutual_induction
+ * principle *)
 Lemma relating_soundness_and_balancedness:
   forall (A : Type),
     (forall (hbt : heightened_binary_tree A)
@@ -2110,6 +1828,8 @@ Proof.
     discriminate.
 Qed.
 
+(* This lemma relates the projected height of an hbt to that returned by the helper
+ * function for soundness *)
 Lemma relating_soundness_and_projection:
   forall (A : Type)
          (hbt : heightened_binary_tree A)
@@ -2127,26 +1847,14 @@ Proof.
   apply (beq_nat_true h_ret h_given) in C_equal_heights.  
   apply (some_x_equal_some_y nat h_given h) in H_traverse_sound.
   exact H_traverse_sound.
-  
 
   discriminate.
 
   discriminate.
 Qed.
 
-Lemma diff_equal_0_implies_equal:
-  forall (x y : nat),
-    x - y = 0 -> x = y.
-Proof.
-Admitted.
-(* figure this out *)
-
-Lemma diff_equal_1_implies_greater_by_1:
-  forall (x y : nat),
-    x - y = 1 -> x = y + 1.
-Proof.
-  Admitted.
-  
+(* Essential lemma to related height differences between 2 trees and the 
+ * differ_by_one defintion *)  
 Lemma relating_compare_int_and_differ_by_one:
   forall (ha hb : nat),
     ((compare_int (ha - hb) 2 = Lt)
@@ -2221,7 +1929,8 @@ Proof.
       discriminate.
 Qed.
 
-
+(* The most important lemma for balancedness: it provides the conditions for which
+ * balanced hbts imply a balanced triple *)
 Lemma hbts_balanced_implies_triple_balanced_weak:
     forall (A : Type)
            (h_hbt : nat)
@@ -2302,22 +2011,352 @@ Proof.
   - discriminate.
 Qed.
 
-Lemma or_implication:
-  forall (A B C : Prop),
-    ((A \/ B) -> C) -> ((A -> C) /\ (B -> C)).
-Proof. 
-  intros A B C H_abc.
+(* ***** *)
+
+(* ***** Section 5.6: Lemmas for orderedness ***** *)
+
+(* If a given list (x :: xs) is ordered, then so is the list xs *)
+Lemma list_ordered_implies_reduced_list_ordered:
+  forall (A : Type)
+         (compare : A -> A -> comparison)         
+         (x : A)
+         (xs : list A),
+    is_ordered_list A (x :: xs) compare = true ->
+    is_ordered_list A xs compare = true.
+Proof.
+  intros A compare x xs H_xxs.
+  unfold is_ordered_list in H_xxs.
+  case xs as [ | x' xs''] eqn : C_xs.
+  unfold is_ordered_list.
+  reflexivity.
+
+  rewrite -> (unfold_is_ordered_cons_cons A x x' xs'') in H_xxs.
+  case (compare x x') as [ | | ] eqn : C_comp_x_x'.
+  unfold is_ordered_list.
+  exact H_xxs.
+  discriminate.
+  discriminate.
+Qed.
+
+(* If a list of the form (xs ++ e :: ys) is ordered, then so is the list 
+ * (xs ++ ys) ordered *)
+Lemma appended_lists_ordered_implies_middle_reduced_list_ordered:
+  forall (A : Type)
+         (compare : A -> A -> comparison)
+         (xs : list A)
+         (e : A)
+         (ys : list A),
+    is_ordered_list A (xs ++ e :: ys) compare = true ->
+    is_ordered_list A (xs ++ ys) compare = true.
+Proof.
+  intros A compare xs e ys H_xyys.
+  induction xs as [ | x xs' IH_xs'].
+
+  - Search (nil ++ _ = _).
+    rewrite -> (app_nil_l ys).
+    rewrite -> (app_nil_l (e :: ys)) in H_xyys.
+    exact (list_ordered_implies_reduced_list_ordered A compare e ys H_xyys).
+
+  - rewrite <- (app_comm_cons xs' (e :: ys) x) in H_xyys.
+    rewrite <- (app_comm_cons xs' ys x).
+
+    assert (H_ordered_sublist : is_ordered_list A (xs' ++ e :: ys) compare = true).
+    exact (list_ordered_implies_reduced_list_ordered
+             A
+             compare
+             x
+             (xs' ++ e :: ys)
+             H_xyys).
+
+    assert (IH_we_need : is_ordered_list A (xs' ++ ys) compare = true).
+    exact (IH_xs' H_ordered_sublist).
+    unfold is_ordered_list.
+        
+    case xs' as [ | x' xs''] eqn : C_xs'.
+
+    + unfold is_ordered_list.
+      rewrite -> (app_nil_l ys).
+      unfold is_ordered_list in H_xyys.
+      rewrite -> (app_nil_l (e :: ys)) in H_xyys.
+      rewrite -> (app_nil_l ys) in IH_we_need.
+      rewrite -> (unfold_is_ordered_cons_cons A x e ys compare) in H_xyys.
+      case (compare x e) as [ | | ] eqn : C_comp_x_e.
+      
+      case ys as [ | y ys'] eqn : C_ys.
+      exact (unfold_is_ordered_cons_nil A x compare).
+
+      rewrite -> (app_nil_l (e :: y :: ys')) in H_ordered_sublist.
+      unfold is_ordered_list in H_ordered_sublist.
+      rewrite -> (unfold_is_ordered_cons_cons A e y ys' compare) in H_ordered_sublist.
+      case (compare e y) as [ | | ] eqn : C_comp_e_y.
+
+      assert (H_x_lt_y : compare x y = Lt).
+      Check (transitivity_of_comparisons A x e y compare Lt C_comp_x_e C_comp_e_y).
+      exact (transitivity_of_comparisons A x e y compare Lt C_comp_x_e C_comp_e_y).
+
+      rewrite -> (unfold_is_ordered_cons_cons A x y  ys' compare).
+      case (compare x y) as [ | | ] eqn : C_comp_x_y.
+      unfold is_ordered_list in IH_we_need.
+      exact IH_we_need.
+
+      discriminate.
+      
+      discriminate.
+      
+      discriminate.
+      
+      discriminate.
+      
+      discriminate.
+      
+      discriminate.
+
+    + rewrite <- (app_comm_cons xs'' ys x').
+      rewrite <- (app_comm_cons xs'' ys x') in IH_we_need.
+      rewrite <- (app_comm_cons xs'' (e :: ys) x') in H_ordered_sublist.
+      unfold is_ordered_list in H_xyys.
+      rewrite <- (app_comm_cons xs'' (e :: ys) x') in H_xyys.
+      rewrite -> (unfold_is_ordered_cons_cons A x x' (xs'' ++ ys) compare).
+      rewrite -> (unfold_is_ordered_cons_cons A x x' (xs'' ++ e :: ys) compare)
+        in H_xyys.
+      case (compare x x') as [ | | ] eqn : C_comp_x_x'.
+      unfold is_ordered_list in IH_we_need.
+      exact IH_we_need.
+
+      discriminate.
+
+      discriminate.
+Qed.
+
+(* A definition that aids in construction of the next lemma *)
+Definition get_head_in_list (A : Type) (xs : list A) :=
+  match xs with
+  | nil =>
+    nil
+  | x :: _ =>
+    (x :: nil)
+  end.
+
+(* Given a list (xs ++ ys) that is ordered, any element of xs concatenated to ys
+ * should also give an ordered list. This idea is captured most easily by dealing 
+ * with the head of the list *)
+Lemma appended_lists_ordered_implies_left_reduced_list_ordered:   
+  forall (A : Type)
+         (compare : A -> A -> comparison)
+         (xs ys : list A),
+    is_ordered_list A (xs ++ ys) compare = true ->
+    is_ordered_list A (get_head_in_list A xs ++ ys) compare = true.
+Proof.
+  intros A compare xs ys H_xy.
+  induction xs as [ | x xs' IH_xs'].
+
+  - rewrite -> (app_nil_l ys) in H_xy.
+    unfold get_head_in_list.
+    rewrite -> (app_nil_l ys).
+    exact H_xy.
+
+  - rewrite <- (app_comm_cons xs' ys x) in H_xy.
+
+    assert (IH_we_need :
+              is_ordered_list A (get_head_in_list A xs' ++ ys) compare = true).
+    Check (list_ordered_implies_reduced_list_ordered).
+    Check (list_ordered_implies_reduced_list_ordered
+             A compare x (xs' ++ ys) H_xy).
+    exact (IH_xs' (list_ordered_implies_reduced_list_ordered
+             A compare x (xs' ++ ys) H_xy)).
+
+    case xs' as [ | x' xs''] eqn : C_xs'.
+    
+    + unfold get_head_in_list.
+      rewrite <- (app_comm_cons nil ys x).
+      exact H_xy.
+
+    + unfold get_head_in_list.
+      unfold get_head_in_list in IH_xs'.
+      rewrite <- (app_comm_cons nil ys x).
+      rewrite -> (app_nil_l ys).
+      unfold get_head_in_list in IH_we_need.
+      rewrite <- (app_comm_cons nil ys x') in IH_we_need.
+      rewrite -> (app_nil_l ys) in IH_we_need.
+      
+      rewrite <- (app_comm_cons xs'' ys x') in H_xy.
+      unfold is_ordered_list in H_xy.
+      rewrite -> (unfold_is_ordered_cons_cons
+                    A x x' (xs'' ++ ys) compare) in H_xy.
+      case (compare x x') as [ | | ] eqn : C_comp_x_x'.
+      case ys as [ | y ys'] eqn : C_ys.
+      
+      * unfold is_ordered_list.
+        rewrite -> (unfold_is_ordered_cons_nil).
+        reflexivity.
+
+      * unfold is_ordered_list in IH_we_need.
+        rewrite -> (unfold_is_ordered_cons_cons A x' y ys' compare) in IH_we_need.
+        case (compare x' y) as [ | | ] eqn : C_comp_x'_y.
+        Check (transitivity_of_comparisons).
+        Check (transitivity_of_comparisons A x x' y compare Lt
+                                           C_comp_x_x' C_comp_x'_y).
+        assert (H_x_lt_y : compare x y = Lt).
+        exact (transitivity_of_comparisons A x x' y compare Lt
+                                           C_comp_x_x' C_comp_x'_y).
+        unfold is_ordered_list.
+        rewrite -> (unfold_is_ordered_cons_cons A x y ys' compare).
+        case (compare x y) as [ | | ] eqn : C_comp_x_y.
+
+        exact IH_we_need.
+
+        discriminate.
+
+        discriminate.
+
+        discriminate.
+
+        discriminate.
+
+      * discriminate.
+
+      * discriminate.
+Qed.
+
+(* Finally, we arrive at our crucial lemma: if (xs ++ ys) is ordered, then both xs
+ * and ys should also be ordered! *)
+Lemma append_lists_ordered_implies_lists_ordered:
+  forall (A : Type)
+         (compare : A -> A -> comparison)
+         (xs ys : list A),
+    is_ordered_list A (xs ++ ys) compare = true ->
+    (is_ordered_list A xs compare = true)
+    /\
+    (is_ordered_list A ys compare = true).
+Proof.
+  intros A compare xs ys H_xy.
   split.
-  - intro H_a.
-    apply H_abc.
-    Search (_ \/ _).
-    Check (or_introl).
-    apply (or_introl).
-    exact H_a.
-  - intro H_b.
-    apply H_abc.
-    apply (or_intror).
-    exact H_b.
+  
+  - induction xs as [ | x xs' IH_xs'].
+    unfold is_ordered_list.
+    reflexivity.
+
+    Check (app_comm_cons).
+    rewrite <- (app_comm_cons xs' ys x) in H_xy.
+    
+    assert (H_ordered_xs' : is_ordered_list A (xs' ++ ys) compare = true).
+    exact (list_ordered_implies_reduced_list_ordered A compare x (xs' ++ ys) H_xy).
+
+    assert (IH_we_need : is_ordered_list A xs' compare = true).
+    exact (IH_xs' H_ordered_xs').
+    
+    unfold is_ordered_list.
+    case xs' as [ | x' xs''] eqn : C_xs'.
+    exact (unfold_is_ordered_cons_nil A x compare).
+
+    unfold is_ordered_list in IH_we_need.
+    rewrite -> (unfold_is_ordered_cons_cons A x x' xs'' compare).
+    unfold is_ordered_list in H_xy.
+    rewrite <- (app_comm_cons xs'' ys x') in H_xy.
+    rewrite -> (unfold_is_ordered_cons_cons A x x' (xs'' ++ ys) compare) in H_xy.
+    case (compare x x') as [ | | ] eqn : C_comp_x_x'.
+    exact IH_we_need.
+
+    discriminate.
+
+    discriminate.
+    
+  - induction ys as [ | y ys' IH_ys']. 
+    unfold is_ordered_list.
+    reflexivity.
+
+    assert (IH_we_need : is_ordered_list A ys' compare = true).
+    Check (appended_lists_ordered_implies_middle_reduced_list_ordered
+             A compare xs y ys' H_xy).
+    exact (IH_ys' (appended_lists_ordered_implies_middle_reduced_list_ordered
+             A compare xs y ys' H_xy)).
+
+    unfold is_ordered_list. 
+    case ys' as [ | y' ys''].
+
+    rewrite -> (unfold_is_ordered_cons_nil A y compare).
+    reflexivity.
+    
+    unfold is_ordered_list in IH_we_need.
+    rewrite -> (unfold_is_ordered_cons_cons A y y' ys'' compare).
+    Check (appended_lists_ordered_implies_left_reduced_list_ordered
+             A compare xs (y :: y' :: ys'') H_xy).
+    assert (H_xy_new :
+              is_ordered_list A (get_head_in_list A xs ++ y :: y' :: ys'') compare
+              = true).
+    exact (appended_lists_ordered_implies_left_reduced_list_ordered
+             A compare xs (y :: y' :: ys'') H_xy).
+    case xs as [ | x' xs''] eqn : C_xs.
+    
+    + unfold get_head_in_list in H_xy_new.
+      rewrite -> (app_nil_l (y :: y' :: ys'')) in H_xy_new.
+      unfold is_ordered_list in H_xy_new.
+      rewrite -> (unfold_is_ordered_cons_cons A y y' ys'' compare) in H_xy_new.
+      case (compare y y') as [ | | ] eqn : C_comp_y_y'.
+
+      exact H_xy_new.
+
+      discriminate.
+
+      discriminate.
+
+    + unfold get_head_in_list in H_xy_new.
+      rewrite <- (app_comm_cons nil (y :: y' :: ys'') x') in H_xy_new.
+      rewrite -> (app_nil_l (y :: y' :: ys'')) in H_xy_new.
+      unfold is_ordered_list in H_xy_new.
+      rewrite -> (unfold_is_ordered_cons_cons A x' y (y' :: ys'') compare)
+        in H_xy_new.
+      case (compare x' y) as [ | | ] eqn : C_comp_x'_y. 
+      rewrite -> (unfold_is_ordered_cons_cons A y y' ys'' compare)
+        in H_xy_new.
+      case (compare y y') as [ | | ] eqn : C_comp_y_y'.
+
+      exact IH_we_need.
+
+      discriminate.
+
+      discriminate.
+
+      discriminate.
+
+      discriminate.
+Qed.
+
+(* If a triple is ordered, then the hbts in it should also be ordered *)
+Lemma triple_ordered_implies_hbts_ordered:
+  forall (A : Type)
+         (compare : A -> A -> comparison)
+         (h_hbt : nat)
+         (hbt1 : heightened_binary_tree A)
+         (e : A)
+         (hbt2 : heightened_binary_tree A),
+    is_ordered_hbt A (HNode A h_hbt (Node A (Triple A hbt1 e hbt2))) compare = true ->
+    is_ordered_hbt A hbt1 compare = true /\ is_ordered_hbt A hbt2 compare = true.
+Proof.
+  intros A compare h_hbt hbt1 e hbt2 H_ordered_hbt.
+  unfold is_ordered_hbt in H_ordered_hbt.
+  rewrite -> (unfold_hbt_to_list A h_hbt (Node A (Triple A hbt1 e hbt2)))
+    in H_ordered_hbt.
+  rewrite -> (unfold_bt_to_list_node A (Triple A hbt1 e hbt2))
+    in H_ordered_hbt.
+  rewrite -> (unfold_t_to_list A hbt1 hbt2 e) in H_ordered_hbt.
+  destruct (append_lists_ordered_implies_lists_ordered
+              A
+              compare
+              (hbt_to_list A hbt1)
+              (e :: hbt_to_list A hbt2)
+              H_ordered_hbt) as [H_hbt1_list_ord H_e_hbt2_list_ord].
+  assert (H_hbt2_list_ord :
+            is_ordered_list A (hbt_to_list A hbt2) compare = true).
+  exact (list_ordered_implies_reduced_list_ordered
+           A compare e (hbt_to_list A hbt2) H_e_hbt2_list_ord).
+  split.
+
+  - unfold is_ordered_hbt.
+    exact H_hbt1_list_ord.
+
+  - unfold is_ordered_hbt.
+    exact H_hbt2_list_ord.
 Qed.
 
 (* Function to check if a given element is Lt every element in a list *)
@@ -2410,8 +2449,8 @@ Proof.
   unfold_tactic list_lt_e.
 Qed.
 
-
-
+(* The most important lemma: provides the condition for which two ordered lists
+ * xs, ys, when appended, are also ordered *) 
 Lemma lists_ordered_implies_append_lists_ordered_weak:
   forall (A : Type)
          (compare : A -> A -> comparison)
@@ -2468,51 +2507,13 @@ Proof.
     exact IH_we_need.
 Qed.
 
+(* ***** *)
 
-Lemma hbts_ordered_implies_triple_ordered_weak:
-  forall (A : Type)
-         (compare : A -> A -> comparison)
-         (h : nat)
-         (hbt1 : heightened_binary_tree A)
-         (e : A)
-         (hbt2 : heightened_binary_tree A),
-    is_ordered_hbt A hbt1 compare = true ->
-    is_ordered_hbt A hbt2 compare = true->
-    is_ordered_hbt A 
-                   (HNode A h
-                          (Node A (Triple A hbt1 e hbt2)))
-                   compare = true.
-Proof.
-  intros A compare h hbt1 e hbt2 H_ordered_hbt1 H_ordered_hbt2.
-  unfold is_ordered_hbt.
-  unfold is_ordered_list.
-  Check (unfold_hbt_to_list).
-  rewrite -> (unfold_hbt_to_list A h
-                                 (Node A (Triple A hbt1 e hbt2))).
-  rewrite -> (unfold_bt_to_list_node A
-                                     (Triple A hbt1 e hbt2)).
-  rewrite -> (unfold_t_to_list A hbt1 hbt2 e).
-  unfold is_ordered_hbt in H_ordered_hbt1.
-  unfold is_ordered_hbt in H_ordered_hbt2.
-  unfold is_ordered_list in H_ordered_hbt1.
-  unfold is_ordered_list in H_ordered_hbt2.
-  case (hbt_to_list A hbt2) as [ | e2 e2s'] eqn : C_hbt2_list.
-  case (hbt_to_list A hbt1) as [ | e1 e1s'] eqn : C_hbt1_list.
-  - Search (nil ++ _ = _).
-    rewrite -> (app_nil_l (e :: nil)).
-    Check (unfold_is_ordered_cons_nil).
-    exact (unfold_is_ordered_cons_nil A e compare).
-
-  - Check (app_comm_cons).
-    Check (app_comm_cons e1s' (e :: nil) e1).
-    rewrite <- (app_comm_cons e1s' (e :: nil) e1).
-    Check (unfold_is_ordered_cons_cons).
-    Check (vwe_need_this).
-    Abort.  
+(* ***** 
+        Section 5.7: The main theorem: implementations meet their specifications
+ * *****)
 
 
-
-(* Check (heightened_binary_tree_mutual_induction). *)
 Lemma the_helper_functions_meet_their_specifications:
   forall (A : Type)
          (compare : A -> A -> comparison)
@@ -2853,9 +2854,6 @@ Proof.
 
 
         
-
-
-
 
 Definition specifiction_of_insert_hbt
            (A : Type)
