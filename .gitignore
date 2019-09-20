@@ -1,7 +1,4 @@
 *~
 *\#
-./AVL_Trees_Implementation/week-01b_balanced-binary-trees.ml
-./AVL_Trees_Implementation/week-03a_balanced-binary-trees-visually.ml
-./AVL_Trees_Implementation/week-10a_exercises.ml
-./AVL_Trees_Implementation/week-11b_bubble-sort.ml
+./AVL_Trees_Implementation/misc/*
 ./Coq_files/misc/* 

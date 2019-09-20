@@ -37,7 +37,7 @@ type 'a heightened_binary_tree = int * 'a binary_tree
  and 'a binary_tree = Leaf
                     | Node of 'a triple
 ;;
-
+ 
 
 (* An alternative data type implementation *)
   
@@ -106,16 +106,13 @@ let _ = assert (test_height height) ;;
 
 (* function to convert heightened_binary_tree to heightened_binary_tree_alternative *)
 
-let  hbt_to_hbta (hbt : 'a heightened_binary_tree) =
-  let rec traverse hbt =
-    match hbt with
-    | (0, Leaf) -> ALeaf
-    | (h, Node (hbt1, e, hbt2)) ->
-       let hbta1 = traverse hbt1
-       and hbta2 = traverse hbt2 in
-       ANode (h, hbta1, e, hbta2)
-  in
-  traverse hbt
+let rec  hbt_to_hbta (hbt : 'a heightened_binary_tree) =
+  match hbt with
+  | (0, Leaf) -> ALeaf
+  | (h, Node (hbt1, e, hbt2)) ->
+     let hbta1 = hbt_to_hbta hbt1
+     and hbta2 = hbt_to_hbta hbt2 in
+     ANode (h, hbta1, e, hbta2)
 ;;
                             
 (*function to convert heightened_binary_tree_alternative to heightened_binary_tree*)     

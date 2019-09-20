@@ -535,39 +535,41 @@ let test_is_sound_hbt (cand : 'a heightened_binary_tree -> bool) : bool =
   and t6 = (cand hbt_with_height_error_2 = false)
   in (t0 && t1 && t2 && t3 && t4 && t5 && t6)
 ;;
-  
 
-
-(* Function to test if a heightened_binary_tree is sound *) 
-let is_sound_hbt ((h_init, bt_init) : 'a heightened_binary_tree) : bool =
-  (* Helper function to traverse an 'a binary_tree *) 
-  let rec traverse_to_check_soundness_bt (bt : 'a binary_tree) : int option =
+let is_sound_hbt (hbt : 'a heightened_binary_tree) =
+  let rec get_height_hbt ((h_init, bt_init) : 'a heightened_binary_tree) =
+    match get_height_bt bt_init with
+    | None ->
+       None
+    | Some h ->
+       if h = h_init
+       then Some h
+       else None 
+  and get_height_bt (bt : 'a binary_tree) = 
     match bt with
     | Leaf ->
-       Some 0 
-    | Node ((h1, bt1), e, (h2, bt2)) ->
-       match traverse_to_check_soundness_bt bt1 with
+       Some 0
+    | Node t ->
+       get_height_t t
+  and get_height_t ((hbt1, _, hbt2) : 'a triple) =
+    match get_height_hbt hbt1 with
+    | None ->
+       None
+    | Some h1 ->
+       match get_height_hbt hbt2 with
        | None ->
           None
-       | Some h1' ->
-          if h1' = h1
-          then
-            match traverse_to_check_soundness_bt bt2 with
-            | None -> None
-            | Some h2' ->
-               if h2' = h2
-               then Some (1 + max h1 h2)
-               else None 
-          else None
-  in match traverse_to_check_soundness_bt bt_init with
-     | None ->
+       | Some h2 ->
+          Some (1 + max h1 h2)
+  in match get_height_hbt hbt with
+     | Some _ ->
+        true
+     | _ ->
         false
-     | Some h ->
-        h = h_init
 ;;
 
-let _ =  assert (test_is_sound_hbt is_sound_hbt) ;;
-
+let _ = assert (test_is_sound_hbt is_sound_hbt);;
+  
 (* Unit tests for is_sound_hbta *)
 let test_is_sound_hbta (cand : 'a heightened_binary_tree_alternative -> bool) : bool =
   let t0 = (cand (hbt_to_hbta hbt_0) = true)
@@ -640,29 +642,32 @@ let test_is_balanced_hbt (cand : 'a heightened_binary_tree -> bool)  =
 ;;
   
 (* Function to check if a heightened_binary_tree is balanced *)
-let is_balanced_hbt ((_, bt_init) : 'a heightened_binary_tree) : bool =
-  (* Helper function to traverse a binary_tree to check soundness *) 
-  let rec traverse_to_check_balanced_bt (bt : 'a binary_tree) : int option =
+let is_balanced_hbt (hbt : 'a heightened_binary_tree) : bool =
+  let rec traverse_to_check_balanced_hbt ((h, bt) : 'a heightened_binary_tree) =
+    traverse_to_check_balanced_bt bt
+  and traverse_to_check_balanced_bt bt =
     match bt with
     | Leaf ->
-       Some 0 
-    | Node ((_, bt1), e, (_, bt2)) ->
-       match traverse_to_check_balanced_bt bt1 with
+       Some 0
+    | Node t ->
+       traverse_to_check_balanced_t t
+  and traverse_to_check_balanced_t ((hbt1, _, hbt2) : 'a triple) =
+    match traverse_to_check_balanced_hbt hbt1 with
+    | None ->
+       None
+    | Some h1 ->
+       match traverse_to_check_balanced_hbt hbt2 with
        | None ->
           None
-       | Some h1' ->
-          match traverse_to_check_balanced_bt bt2 with
-          | None ->
-             None
-          | Some h2' ->
-             if differ_by_one h1' h2'
-             then Some (1 + max h1' h2')
-             else None 
-  in  match traverse_to_check_balanced_bt bt_init with
-      | None ->
-         false
-      | Some _ ->
-         true
+       | Some h2 ->
+          if differ_by_one h1 h2
+          then Some (1 + max h1 h2)
+          else None
+  in match traverse_to_check_balanced_hbt hbt with
+     | Some _ ->
+        true
+     | None ->
+        false
 ;;
 
 let _ = assert (test_is_balanced_hbt is_balanced_hbt);;
@@ -716,30 +721,31 @@ let _ = assert (test_is_balanced_hbta is_balanced_hbta);;
 
 (* Our strategy to check for in-orderedness will involve flattening trees into 
  * lists; we do so as follows: *)
-
-(* Helper function to flatten a binary tree *) 
-let rec flatten_binary_tree (bt : 'a binary_tree) (es : 'a list) : 'a list = 
-    match bt with
-    | Leaf ->
-       es
-    | Node ((_, bt1), e, (_, bt2)) ->
-       flatten_binary_tree bt1 (e :: flatten_binary_tree bt2 es)
-;;
   
 (* Function to map a heightened_binary_tree into the in-order list of its elements *)
-let hbt_to_list ((h, bt) : 'a heightened_binary_tree) : 'a list =
-  flatten_binary_tree bt [];;
+let rec hbt_to_list ((_, bt) : 'a heightened_binary_tree) : 'a list =
+    bt_to_list bt
+  and bt_to_list (bt : 'a binary_tree) =
+    match bt with
+    | Leaf ->
+       []
+    | Node t ->
+       t_to_list t
+  and t_to_list ((hbt1, e, hbt2) : 'a triple) =
+    (hbt_to_list hbt1) @ e :: (hbt_to_list hbt2)
+;;
+
 
 (* Function to map a heightened_binary_tree_alternative into the in-order
  * list of its elements *)
 let hbta_to_list (hbta_init : 'a heightened_binary_tree_alternative) : 'a list =
-  let rec flatten_hbta_helper hbta es =
+  let rec flatten_hbta_helper hbta =
     match hbta with
     | ALeaf ->
-       es 
+       []
     | ANode (_, hbta1, e, hbta2) ->
-       flatten_hbta_helper hbta1 (e :: (flatten_hbta_helper hbta2 es))
-  in flatten_hbta_helper hbta_init []
+       (flatten_hbta_helper hbta1) @ e :: (flatten_hbta_helper hbta2)
+  in flatten_hbta_helper hbta_init 
 ;;
 
 (* We will also need some way of comparing the elements of a list. The assumption is
@@ -847,10 +853,9 @@ let is_ordered_hbta (hbta : 'a heightened_binary_tree_alternative)
 
 let _ = assert (test_is_ordered_hbta is_ordered_hbta);;
 
-(* ********** *)
-
 (*
-The three independent properties of AVL trees: 
+Note on The three independent properties of AVL trees: 
+
 (i) Soundness: The notion that the height of each sub-tree is correct. 
 (ii) Balancedness: The notion that for each node, the height difference between 
 its sub-trees is at most 1. 
@@ -862,7 +867,84 @@ See the coq file for a formalization of this notion
 
 (* ********** *)
 
+(* ********** Operations on AVL Trees: Lookup ********** *)
+
+(* Unit tests for occurs_hbt *)
+let test_occurs_hbt candidate =
+  let t0 = (candidate compare_int 2 hbt_1 = true)
+  and t1 = (candidate compare_int 20 hbt_2 = false)
+  and t2 = (candidate compare_int 9 hbt_3 = false)
+  and t3 = (candidate compare_int 11 hbt_4 = true)
+  and t4 = (candidate compare_int 32 hbt_5 = false)
+  in (t0 && t1 && t2 && t3 && t4)
+;;
+
+(* Function to check whether an element occurs in a heightened_binary_tree *)
+let occurs_hbt (compare : 'a -> 'a -> comparison)
+               (e : 'a)
+               (hbt : 'a heightened_binary_tree) : bool = 
+  let rec traverse_to_check_occurs_bt bt =
+    match bt with
+    | Leaf ->
+       false
+    | Node ((_, bt1), e', (_, bt2)) ->
+       match compare e e' with
+       | Lt ->
+          traverse_to_check_occurs_bt bt1
+       | Gt ->
+          traverse_to_check_occurs_bt bt2
+       | Eq ->
+          true
+  in
+  match hbt with
+  | (_, Leaf) ->
+     false
+  | (_, bt) ->
+     traverse_to_check_occurs_bt bt
+;;
+
+let () = assert (test_occurs_hbt occurs);;
+
+(* Unit tests for occurs_hbta *)
+let test_occurs_hbta candidate =
+  let t0 = (candidate compare_int 2 (hbt_to_hbta hbt_1) = true)
+  and t1 = (candidate compare_int 20 (hbt_to_hbta hbt_2) = false)
+  and t2 = (candidate compare_int 9 (hbt_to_hbta hbt_3) = false)
+  and t3 = (candidate compare_int 11 (hbt_to_hbta hbt_4) = true)
+  and t4 = (candidate compare_int 32 (hbt_to_hbta hbt_5) = false)
+  in (t0 && t1 && t2 && t3 && t4)
+;;
+
+(* Function to check whether an element occurs in a heightened_binary_tree_alternative *)
+let rec occurs_hbta (compare : 'a -> 'a -> comparison)
+                (e : 'a)
+                (hbta : 'a heightened_binary_tree_alternative) : bool = 
+  match hbta with
+  | ALeaf ->
+     false
+  | ANode (_, hbta1, e', hbta2) ->
+     match compare e e' with
+     | Lt ->
+        occurs_hbta compare e hbta1
+     | Eq ->
+        true
+     | Gt ->
+        occurs_hbta compare e hbta2
+;;
+
+
+(* Exercise D:
+   justify why occurs_listless, when applied to an ordered and balanced tree,
+   returns a Boolean,
+   and does so in logarithmically many recursive calls
+   wrt. the number of nodes in the given tree.
+   (Huh, try not to paraphrase the code...)
+
+Because at each recursive call, the sub-tree in which the search is conducted gets halved. 
+*)
+
 (* ********** *)
+
 
 (* Comparing two heightened binary trees eagerly for equality: *)
 
@@ -914,145 +996,46 @@ let lazy_equal_heightened_binary_tree compare ((h1, _) as hbt1 : 'a heightened_b
 
 (* ********** *)
 
-(* Testing whether an element occurs in a heightened binary tree:
-*)
-let test_occurs candidate =
-     (candidate compare_int 10 (obt_to_hbt OLeaf)
-      = false)
-  && (candidate compare_int 10 (obt_to_hbt (ONode (OLeaf,
-                                                   10,
-                                                   OLeaf)))
-      = true)
-  && (candidate compare_int 10 (obt_to_hbt (ONode (OLeaf,
-                                                   20,
-                                                   OLeaf)))
-      = false)
-  && (candidate compare_int 2 hbt_1 = true)
-  && (candidate compare_int 20 hbt_3 = false)
-  && (candidate compare_int 9 hbt_4 = true)
-  && (candidate compare_int 11 hbt_5 = true)
-  && (candidate compare_int 32 hbt_5 = false)
-;;
-(* etc. *);;
-
-(* Exercise 6:
-   extend this unit-test function with more unit tests.
-*)
-
-let occurs compare e (hbt : 'a heightened_binary_tree) =
-  let rec visit es =
-    match es with
-    | [] ->
-       false
-    | e' :: es' ->
-       (match compare e e' with
-        | Eq ->
-           true
-        | _ ->
-           visit es')
-  in visit (hbt_to_list hbt);;
-
-let () = assert (test_occurs occurs);;
-
-(* Exercise 7:
-   implement a listless version of occurs,
-   i.e., a version that does not construct an intermediary list.
-*)
-
-let occurs_listless compare e (hbt : 'a heightened_binary_tree) =
-  let rec traverse bt =
-    match bt with
-    | Leaf -> false
-    | Node ((_, bt1), e', (_, bt2)) ->
-       match compare e e' with
-       | Lt -> traverse bt1
-       | Gt -> traverse bt2
-       | Eq -> true
-  in
-  match hbt with
-  | (_, Leaf) -> false
-  | (_, bt) -> traverse bt
-;;
-
-
-let () = assert (test_occurs occurs_listless);;
-
-
-(* Solution for Exercise 7: *)
-
-let occurs_listless compare e (hbt : 'a heightened_binary_tree) =
-  let rec climb_hbt (h, t) =
-    climb_bt t
-  and climb_bt t =
-    match t with
-    | Leaf ->
-       false
-    | Node (hbt1, e', hbt2) ->
-       (match compare e e' with
-        | Lt ->
-           climb_hbt hbt1
-        | Eq ->
-           true
-        | Gt ->
-           climb_hbt hbt2)
-  in climb_hbt hbt;;
-
-let () = assert (test_occurs occurs_listless);;
-
-(* Exercise D:
-   justify why occurs_listless, when applied to an ordered and balanced tree,
-   returns a Boolean,
-   and does so in logarithmically many recursive calls
-   wrt. the number of nodes in the given tree.
-   (Huh, try not to paraphrase the code...)
-
-Because at each recursive call, the sub-tree in which the search is conducted gets halved. 
-*)
-
-(* ********** *)
-
 (* Inserting an element in a heightened binary tree:
 *)
 
-let hbt_empty = obt_to_hbt OLeaf;;
+let hbt_empty = hbt_0;;
 
 let test_insert_int candidate =
-  (is_sound    show_int
-               (candidate show_int compare_int 1 (candidate show_int compare_int 2 hbt_empty)))
-  && (is_balanced show_int
-                  (candidate show_int compare_int 1 (candidate show_int compare_int 2 hbt_empty)))
-  && (is_ordered  show_int
-                  compare_int
-                  (candidate show_int compare_int 1 (candidate show_int compare_int 2 hbt_empty)))
+  (is_sound_hbt
+     (candidate compare_int 1 (candidate compare_int 2 hbt_empty)))
+  && (is_balanced_hbt 
+        (candidate compare_int 1 (candidate compare_int 2 hbt_empty)))
+  && (is_ordered_hbt
+        (candidate compare_int 1 (candidate compare_int 2 hbt_empty))
+        compare_int)
   &&
-    (is_sound    show_int
-                 (candidate show_int compare_int 2 (candidate show_int compare_int 1 hbt_empty)))
-  && (is_balanced show_int
-                  (candidate show_int compare_int 2 (candidate show_int compare_int 1 hbt_empty)))
-  && (is_ordered  show_int
-                  compare_int
-                  (candidate show_int compare_int 2 (candidate show_int compare_int 1 hbt_empty)))
+    (is_sound_hbt    
+       (candidate compare_int 2 (candidate compare_int 1 hbt_empty)))
+  && (is_balanced_hbt 
+        (candidate compare_int 2 (candidate compare_int 1 hbt_empty)))
+  && (is_ordered_hbt  
+        (candidate compare_int 2 (candidate compare_int 1 hbt_empty))
+        compare_int)
   &&
-    (lazy_equal_heightened_binary_tree compare_int
-                                       (candidate show_int compare_int 1 (candidate show_int compare_int 2 hbt_empty))
-                                       (candidate show_int compare_int 2 (candidate show_int compare_int 1 hbt_empty)))
-  && (is_sound show_int  (candidate show_int compare_int 15 hbt_1))
-  && (is_balanced show_int  (candidate show_int compare_int 15 hbt_1))
-  && (is_ordered  show_int compare_int (candidate show_int compare_int 15 hbt_1))
+    (equal_heightened_binary_tree
+       compare_int
+       (candidate compare_int 1 (candidate compare_int 2 hbt_empty))
+       (candidate compare_int 2 (candidate compare_int 1 hbt_empty)))
+  && (is_sound_hbt
+        (candidate compare_int 15 hbt_1))
+  && (is_balanced_hbt
+        (candidate compare_int 15 hbt_1))
+  && (is_ordered_hbt
+        (candidate compare_int 15 hbt_1)
+        compare_int)
 ;;
-
-
-
-      
-
-
-
 
   
 (* The following naive function might return an imbalanced tree:
 *)
 
-let insert_first_shot show_yourself compare e (hbt : 'a heightened_binary_tree) =
+let insert_first_shot compare e (hbt : 'a heightened_binary_tree) =
   let rec climb_hbt (h, bt) =
     climb_bt bt
   and climb_bt bt =
@@ -1218,19 +1201,15 @@ exception Imbalanced;;
 
 exception Unsatisfied_assumption;;
 
-let rotate_right show_yourself ((_, bt1) as hbt1) e ((h2, bt2) as hbt2) =
+let rotate_right ((_, bt1) as hbt1) e ((h2, bt2) as hbt2) =
   match bt1 with
   | Leaf ->
-     let () = Printf.printf "rotate_right outer impossible case: %s\n"
-                            (show_heightened_binary_tree show_yourself hbt1)
-     in raise Unsatisfied_assumption
+     raise Unsatisfied_assumption
   | Node (((h11, bt11) as hbt11), e1, ((h12, bt12) as hbt12)) ->
      if h11 + 1 = h12
      then match bt12 with
           | Leaf ->
-             let () = Printf.printf "rotate_right inner impossible case: %s\n"
-                                    (show_heightened_binary_tree show_yourself hbt12)
-             in raise Unsatisfied_assumption
+             raise Unsatisfied_assumption
           | Node (((h121, bt121) as hbt121), e12, ((h122, bt122) as hbt122)) ->
              let new_h1 = 1 + max h11 h121
              and new_h2 = 1 + max h122 h2
@@ -1259,19 +1238,15 @@ let rotate_right show_yourself ((_, bt1) as hbt1) e ((h2, bt2) as hbt2) =
    (Huh, try not to paraphrase the code...)
 *)
 
-let rotate_left show_yourself ((h1, bt1) as hbt1) e ((_, bt2) as hbt2) =
+let rotate_left ((h1, bt1) as hbt1) e ((_, bt2) as hbt2) =
   match bt2 with
   | Leaf ->
-     let () = Printf.printf "rotate_left outer impossible case: %s\n"
-                            (show_heightened_binary_tree show_yourself hbt2)
-     in raise Unsatisfied_assumption
+     raise Unsatisfied_assumption
   | Node (((h21, bt21) as hbt21), e2, ((h22, bt22) as hbt22)) ->
      if h21 = h22 + 1
      then match bt21 with
           | Leaf ->
-             let () = Printf.printf "rotate_left inner impossible case: %s\n"
-                                    (show_heightened_binary_tree show_yourself hbt21)
-             in raise Unsatisfied_assumption
+             raise Unsatisfied_assumption
           | Node (((h211, bt211) as hbt211), e21, ((h212, bt212) as hbt212)) ->
              let new_h1 = 1 + max h1 h211
              and new_h2 = 1 + max h212 h22
@@ -1299,37 +1274,34 @@ let rotate_left show_yourself ((h1, bt1) as hbt1) e ((_, bt2) as hbt2) =
    returns a balanced tree.
    (Huh, try not to paraphrase the code...)
 *)
-
-let insert show_yourself compare x (hbt : 'a heightened_binary_tree) =
-  let rec climb_hbt (h, bt) =
-    climb_bt h bt
-  and climb_bt h bt =
+let insert compare x (hbt : 'a heightened_binary_tree) =
+  let rec climb_hbt (_, bt) =
+    climb_bt bt
+  and climb_bt bt =
     match bt with
     | Leaf ->
        (1, Node ((0, Leaf), x, (0, Leaf)))
-    | Node (((h1, bt1) as hbt1), e, ((h2, bt2) as hbt2)) ->
-       if h = 1 + max h1 h2 && differ_by_one h1 h2 (* sanity check *)
-       then match compare x e with
-            | Lt ->
-               let ((h1', bt1') as hbt1') = climb_bt h1 bt1
-               in if h1' - h2 = 2
-                  then rotate_right show_yourself hbt1' e hbt2
-                  else (1 + max h1' h2, Node (hbt1', e, hbt2))
-            | Eq ->
-               raise Bail_out
-            | Gt ->
-               let ((h2', bt2') as hbt2') = climb_bt h2 bt2
-               in if h2' - h1 = 2
-                  then rotate_left show_yourself hbt1 e hbt2'
-                  else (1 + max h1 h2', Node (hbt1, e, hbt2'))
-       else let () = Printf.printf "insert %s in imbalanced given subtree: %s\n"
-                                   (show_yourself x)
-                                   (show_heightened_binary_tree show_yourself (h, bt))
-            in raise Imbalanced
+    | Node (hbt1, e, hbt2) ->
+       climb_t hbt1 e hbt2
+  and climb_t ((h1, bt1) as hbt1) e ((h2, bt2) as hbt2) = 
+    match compare x e with
+    | Lt ->
+       let ((h1', bt1') as hbt1') = climb_hbt hbt1
+       in if h1' - h2 = 2
+          then rotate_right hbt1' e hbt2
+          else (1 + max h1' h2, Node (hbt1', e, hbt2))
+    | Eq ->
+       raise Bail_out
+    | Gt ->
+       let ((h2', bt2') as hbt2') = climb_hbt hbt2
+       in if h2' - h1 = 2
+          then rotate_left hbt1 e hbt2'
+          else (1 + max h1 h2', Node (hbt1, e, hbt2'))
   in try climb_hbt hbt
      with
      | Bail_out ->
         hbt;;
+
 
 (* Exercise G:
    justify why insert, when applied to an element and a balanced tree,
@@ -1339,7 +1311,8 @@ let insert show_yourself compare x (hbt : 'a heightened_binary_tree) =
    (Huh, try not to paraphrase the code...)
 *)
 
-let () = assert (test_insert_int insert);;
+let _ = assert (test_insert_int insert);;
+
 
 (* Exercise 10:
    we want more useful information out of the unit-test function than a Boolean.
