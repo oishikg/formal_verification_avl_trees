@@ -1,7 +1,0 @@
-        OCaml version 4.02.3
-
-exception Not_implemented_yet;;
-# exception Not_implemented_yet
-# let silent = ref false;;
-val silent : bool ref = {contents = false}
-# 
