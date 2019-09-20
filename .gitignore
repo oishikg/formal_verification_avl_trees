@@ -1,4 +1,4 @@
 *~
 *\#
-./AVL_Trees_Implementation/misc/*
-./Coq_files/misc/* 
+AVL_Trees_Implementation/misc/*
+Coq_files/misc/* 
