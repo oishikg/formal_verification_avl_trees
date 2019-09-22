@@ -1229,44 +1229,42 @@ Definition rotate_right_bt
   | Leaf =>
     None
   | Node (Triple (HNode h11 bt11) e1 (HNode h12 bt12)) =>
-    if h11 + 1 =n= h12
-    then
+    match compare_int (h11 + 1 ) h12 with
+    | Eq => 
       match bt12 with
       | Leaf =>
         None
       | Node (Triple (HNode h121 bt121) e12 (HNode h122 bt122)) =>
-        let new_h1 := 1 + max h11 h121 in
-        let new_h2 := 1 + max h122 h2 in
         Some (HNode A
-                    (1 + max new_h1 new_h2)
+                    (1 + max (1 + max h11 h121) (1 + max h122 h2))
                     (Node A (Triple A
                                     (HNode A
-                                           new_h1
+                                           (1 + max h11 h121)
                                            (Node A (Triple A
                                                            (HNode A h11 bt11)
                                                            e1
                                                            (HNode A h121 bt121))))
                                     e12
                                     (HNode A
-                                           new_h2
+                                           (1 + max h122 h2)
                                            (Node A (Triple A
                                                            (HNode A h122 bt122)
                                                            e
                                                            (HNode A h2 bt2)))))))
       end
-    else
-      let new_h2 := 1 + max h12 h2 in
+    | _ => 
       Some (HNode A
-                  (1 + max h11 new_h2)
+                  (1 + max h11 (1 + max h12 h2))
                   (Node A (Triple A
                                   (HNode A h11 bt11)
                                   e1
                                   (HNode A
-                                         new_h2
+                                         (1 + max h12 h2)
                                          (Node A (Triple A
                                                          (HNode A h12 bt12)
                                                          e
                                                          (HNode A h2 bt2)))))))
+    end
   end.
     
 Definition rotate_right_hbt
@@ -1292,43 +1290,41 @@ Definition rotate_left_bt
   | Leaf =>
     None
   | Node (Triple (HNode h21 bt21) e2 (HNode h22 bt22)) =>
-    if h21 =n= h22 + 1
-    then
+    match compare_int h21 (h22 + 1) with
+    | Eq => 
       match bt21 with
       | Leaf =>
         None
       | Node (Triple (HNode h211 bt211) e21 (HNode h212 bt212)) =>
-        let new_h1 := 1 + max h1 h211 in
-        let new_h2 := 1 + max h212 h22 in
         Some (HNode A
-                    (1 + max new_h1 new_h2)
+                    (1 + max (1 + max h1 h211) (1 + max h212 h22))
                     (Node A (Triple A
                                     (HNode A
-                                           new_h1
+                                           (1 + max h1 h211)
                                            (Node A (Triple A
                                                            (HNode A h1 bt1)
                                                            e
                                                            (HNode A h211 bt211))))
                                     e21
                                     (HNode A
-                                           new_h2
+                                           (1 + max h212 h22)
                                            (Node A (Triple A
                                                            (HNode A h212 bt212)
                                                            e2
                                                            (HNode A h22 bt22)))))))
       end
-    else
-      let new_h1 := 1 + max h1 h21 in
-      Some (HNode A (1 + max new_h1 h22)
+    | _ => 
+      Some (HNode A (1 + max (1 + max h1 h21) h22)
                   (Node A (Triple A
                                   (HNode A
-                                         new_h1
+                                         (1 + max h1 h21)
                                          (Node A (Triple A
                                                          (HNode A h1 bt1)
                                                          e
                                                          (HNode A h21 bt21))))
                                   e2
                                   (HNode A h22 bt22))))
+    end
   end.
 
 Definition rotate_left_hbt
@@ -2191,6 +2187,151 @@ Proof.
   reflexivity.
 Qed.
 
+
+
+Lemma insertion_impossible_case:
+  forall (A : Type)
+         (compare : A -> A -> comparison)
+         (x : A) 
+         (hbt0 : heightened_binary_tree A)
+         (hbt'' : heightened_binary_tree A),
+    insert_hbt_helper A compare x hbt0 = Some hbt'' ->
+    traverse_to_check_ordered_hbt A hbt'' compare <> TNone (A * A).
+Proof.                                                                    
+    intros A compare x  hbt0 hbt'' H_ins.
+    unfold not.
+    induction hbt'' as [h'' bt''].
+    rewrite -> (unfold_traverse_to_check_ordered_hbt A h'' bt'' compare).
+    case bt'' as [ | t''].
+    
+    induction hbt0 as [h0 bt0].
+    rewrite -> (unfold_insert_hbt_helper A compare x h0 bt0) in H_ins.
+    case bt0 as [ | t0].
+    rewrite -> (unfold_insert_bt_helper_leaf A compare) in H_ins.
+    discriminate.
+    induction t0 as [ hbt01 e0 hbt02].
+    rewrite -> (unfold_insert_bt_helper_node A compare x h0 (Triple A hbt01 e0 hbt02))
+      in H_ins.
+    rewrite -> (unfold_insert_t_helper A compare x h0 hbt01 e0 hbt02) in H_ins.
+    case (compare x e0) as [ | | ] eqn : C_comp_x_e0.
+    case (insert_hbt_helper A compare x hbt01) as [ hbt01_ret | ]  eqn : C_ins_hbt01.
+    induction hbt01_ret as [h01_ret bt_01_ret].
+    case (compare_int (h01_ret - project_height_hbt A hbt02) 2)
+         as [ | | ] eqn : C_h_diff.
+    rewrite -> (some_x_equal_some_y
+                  (heightened_binary_tree A)
+                  (HNode A (1 + max h01_ret (project_height_hbt A hbt02))
+                         (Node A (Triple A (HNode A h01_ret bt_01_ret) e0 hbt02)))
+                  (HNode A h'' (Leaf A))) in H_ins.
+    discriminate.
+    unfold rotate_right_hbt in H_ins.
+    induction hbt02 as [h02 bt02]. 
+    unfold rotate_right_bt in H_ins.
+    case (bt_01_ret) as [ t01 | ].
+    discriminate.
+    induction t as [ hbt011 e01 hbt012].
+    induction hbt011 as [h011 bt011].
+    induction hbt012 as [h012 bt012].
+    case (compare_int (h011 + 1) h012) as [ | | ].
+    rewrite -> some_x_equal_some_y in H_ins.
+    discriminate.
+    case bt012 as [ | t012].
+    discriminate.
+    induction t012 as [ hbt0121 e012 hbt0122 ].
+    induction hbt0121 as [ h0121 bt0121 ].
+    induction hbt0122 as [ h0122 bt0122 ].
+    rewrite -> some_x_equal_some_y in H_ins.
+    discriminate.
+    discriminate.
+    discriminate.
+    discriminate.
+    discriminate.
+    
+    case (insert_hbt_helper A compare x hbt02) as [hbt02_ret | ].
+    induction hbt02_ret as [h02_ret bt02_ret].
+    case (compare_int (h02_ret - project_height_hbt A hbt01) 2) as [ | | ].
+    rewrite -> some_x_equal_some_y in H_ins.
+    discriminate.
+    unfold rotate_left_hbt in H_ins.
+    induction hbt01 as [h01 bt01].
+    unfold rotate_left_bt in H_ins.
+    case bt02_ret as [ | t02].
+    discriminate.
+    induction t02 as [hbt021 e2 hbt022].
+    induction hbt021 as [h021 bt021].
+    induction hbt022 as [h022 bt022].
+    case (compare_int h021 (h022 + 1)) as [ | | ].
+    rewrite -> some_x_equal_some_y in H_ins.
+    discriminate.
+    case bt021 as [ | t021 ].
+    discriminate.
+    induction t021 as [hbt0211 e21 hbt0212].
+    induction hbt0211 as [h0211 bt0211].
+    induction hbt0212 as [h0212 bt0212].
+    rewrite -> some_x_equal_some_y in H_ins.
+    discriminate.
+    rewrite -> some_x_equal_some_y in H_ins.
+    discriminate.
+    discriminate.
+    discriminate.
+
+    intro H_check_ord.
+    rewrite -> (unfold_traverse_to_check_ordered_bt_node A t'' compare)
+      in H_check_ord.
+    induction t'' as [hbt1'' e hbt2''].
+    rewrite -> (unfold_traverse_to_check_ordered_t A hbt1'' e hbt2'' compare)
+      in H_check_ord.
+    case (traverse_to_check_ordered_hbt A hbt1'' compare) as [ | | (min1, max1)].
+    discriminate.
+    case (traverse_to_check_ordered_hbt A hbt2'' compare) as [ | | (min2, max2)].
+    discriminate.
+    discriminate.
+    case (compare e min2) as [ | | ].
+    discriminate.
+    discriminate.
+    discriminate.
+    case (compare max1 e) as [ | | ].
+    case (traverse_to_check_ordered_hbt A hbt2'' compare) as [ | | (min2, max2)].
+    discriminate.
+    discriminate.
+    case (compare e min2) as [ | | ].
+    discriminate.
+    discriminate.
+    discriminate.
+    discriminate.
+    discriminate.
+Qed.
+
+Lemma insertion_impossible_case_implies_true:
+  forall (A : Type)
+         (hbt hbt' : heightened_binary_tree A)
+         (compare : A -> A -> comparison)
+         (x : A)
+         (P : Prop),
+    insert_hbt_helper A compare x hbt = Some hbt' ->
+    traverse_to_check_ordered_hbt A hbt' compare = TNone (A * A) ->
+    P.
+Proof.
+  intros A hbt hbt' compare x P H_insertion H_traverse.
+  induction hbt' as [h' bt'].
+  assert (H_impossible_case : 
+            traverse_to_check_ordered_hbt A (HNode A h' bt')  compare <>
+            TNone (A * A)).
+    exact (insertion_impossible_case
+             A
+             compare x hbt (HNode A h' bt')
+             H_insertion).
+    unfold not in H_impossible_case.
+    assert (H_false : False).
+    exact (H_impossible_case H_traverse).
+    exact (False_ind
+             P
+             H_false).
+Qed.
+    
+
+
+
 Lemma insertion_implies_node:
   forall (A : Type)
          (compare : A -> A -> comparison),
@@ -2262,29 +2403,90 @@ Proof.
     case (traverse_to_check_ordered_hbt A hbt2 compare)
          as [ | | (min_hbt2, max_hbt2)] eqn : C_check_ord_hbt2.
     discriminate.
-
-    assert (H_impossible_leaf_case_for_inserted_tree:
-              (forall (hbt0 : heightened_binary_tree A)
-                      (hbt'' : heightened_binary_tree A),
-                  insert_hbt_helper A compare x hbt0 = Some hbt'' ->
-                  traverse_to_check_ordered_hbt A hbt'' compare <> TNone (A * A))).
-    
-    intros hbt0 hbt'' H_ins.
-    unfold not.
-    induction hbt'' as [h'' bt''].
-    rewrite -> (unfold_traverse_to_check_ordered_hbt A h'' bt'' compare).
-    case bt'' as [ | t''].
-    
-    induction hbt0 as [h0 bt0].
-    rewrite -> (unfold_insert_hbt_helper A compare x h0 bt0) in H_ins.
-    case bt0 as [ | t0].
-    rewrite -> (unfold_insert_bt_helper_leaf A compare) in H_ins.
+    exact (insertion_impossible_case_implies_true
+             A hbt1 (HNode A h1' bt1') compare x
+             ((t_max' = x \/ t_max' = t_max) /\ (t_min' = x \/ t_min' = t_min))
+             C_insert_hbt1
+             C_check_ord_hbt').
+    exact (insertion_impossible_case_implies_true
+             A hbt1 (HNode A h1' bt1') compare x
+             ((t_max' = x \/ t_max' = t_max) /\ (t_min' = x \/ t_min' = t_min))
+             C_insert_hbt1
+             C_check_ord_hbt').
+    case (compare max_hbt' e) as [ | | ] eqn : C_comp_max_hbt'_e.
+    case (traverse_to_check_ordered_hbt A hbt2 compare) as
+        [ | | (min2, max2)] eqn : C_check_ord_hbt2.
     discriminate.
-    induction t0 as [ hbt01 e0 hbt02].
-    rewrite -> (unfold_insert_bt_helper_node A compare x h0 (Triple A hbt01 e0 hbt02))
-      in H_ins.
-    rewrite -> (unfold_insert_t_helper A compare x h0 hbt01 e0 hbt02) in H_ins.
-    case (insert_hbt_helper A compare x hbt01) as [ hbt01_ret | ]  eqn : C_ins_hbt01.
+
+  (* Case where hbt1' has a min and max: unfold H_ord_t and case analyse *)
+    rewrite -> (unfold_traverse_to_check_ordered_t A hbt1 e hbt2 compare)
+            in H_ord_t.
+    case (traverse_to_check_ordered_hbt A hbt1 compare)
+      as [ | | (min1, max1)] eqn : C_check_ord_hbt1.
+    discriminate.
+    rewrite -> C_check_ord_hbt2 in H_ord_t.
+    assert (H_equalities:
+              min_hbt' = x /\ max_hbt' = x).
+    exact (insertion_implies_leaf
+             A compare
+             hbt1
+             (HNode A h1' bt1')
+             x min_hbt' max_hbt'
+             C_insert_hbt1
+             C_check_ord_hbt'
+             C_check_ord_hbt1).
+    rewrite -> tsome_x_equal_tsome_y in H_ord_hbt'.
+    rewrite -> tsome_x_equal_tsome_y in H_ord_t.
+    rewrite -> pairwise_equality in H_ord_hbt'.
+    rewrite -> pairwise_equality in H_ord_t.
+    split.
+    destruct H_ord_hbt' as [_ H_t_max'].
+    destruct H_ord_t as [_ H_t_max].
+    rewrite -> H_t_max in H_t_max'.
+    rewrite -> H_t_max'.
+    Search (_ \/ _ -> _).
+    Search (_ \/ _).
+    apply or_intror.
+    reflexivity.
+    destruct H_ord_hbt' as [H_min_hbt' _].
+    destruct H_equalities as [H_x _].
+    rewrite -> H_min_hbt' in H_x.
+    apply or_introl.
+    exact H_x.
+
+    assert (H_equals_trivial:
+              TSome (A * A) (min1, max1) = TSome (A * A) (min1, max1)).
+    reflexivity.
+    
+    assert (H_equalities_from_ind_h :
+                (max_hbt' = x \/ max_hbt' = max1) /\ (min_hbt' = x \/ min_hbt' = min1)).
+      exact (H_hbt1 (HNode A h1' bt1')
+                    x min1 min_hbt' max1 max_hbt'
+                    C_insert_hbt1
+                    C_check_ord_hbt'
+                    H_equals_trivial).
+      
+    case (compare max1 e) as [ | | ] eqn : C_comp_max1_e.
+    rewrite -> C_check_ord_hbt2 in H_ord_t; 
+    do 1  (destruct H_equalities_from_ind_h as [_ [H_min_x | _ ]];
+      rewrite -> tsome_x_equal_tsome_y in H_ord_t;
+      rewrite -> tsome_x_equal_tsome_y in H_ord_hbt';
+      rewrite -> pairwise_equality in H_ord_t;
+      rewrite -> pairwise_equality in H_ord_hbt';
+      destruct H_ord_hbt' as [H_min_hbt' H_t_max'];
+      destruct H_ord_t as [_ H_e];
+      split;
+      apply or_intror;
+      rewrite <- H_t_max';
+      rewrite <- H_e;
+      reflexivity;
+      apply or_introl;
+      rewrite <- H_min_hbt';
+      rewrite -> H_min_x;
+      reflexivity).
+
+      Focus 6.
+      
 
 
   (* proof for hbt, with bt as inductive hypothesis *)
