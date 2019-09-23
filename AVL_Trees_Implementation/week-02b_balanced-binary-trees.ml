@@ -1623,6 +1623,8 @@ let insert show_yourself compare x (hbt : 'a heightened_binary_tree) =
      | Bail_out ->
         hbt;;
 
+insert (
+
 (* Exercise G:
    justify why insert, when applied to an element and a balanced tree,
    returns a ordered and balanced tree containing this element,
