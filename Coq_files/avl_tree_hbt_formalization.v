@@ -2374,7 +2374,7 @@ Proof.
   case (insert_hbt_helper A compare x hbt1) as [ hbt1'| ] eqn : C_insert_hbt1.
   induction hbt1' as [h1' bt1'].
   case (compare_int (h1' - project_height_hbt A hbt2) 2) as [ | | ] eqn : C_comp_heights.
-
+ 
   - rewrite -> (some_x_equal_some_y
                   (heightened_binary_tree A)
                   (HNode A (1 + max h1' (project_height_hbt A hbt2))
@@ -2398,97 +2398,256 @@ Proof.
                e
                hbt2) in H_ord_hbt'.
     case (traverse_to_check_ordered_hbt A (HNode A h1' bt1') compare)
-         as [ | | (min_hbt', max_hbt')] eqn : C_check_ord_hbt'.
-    discriminate.
-    case (traverse_to_check_ordered_hbt A hbt2 compare)
-         as [ | | (min_hbt2, max_hbt2)] eqn : C_check_ord_hbt2.
-    discriminate.
-    exact (insertion_impossible_case_implies_true
+      as [ | | (min_hbt', max_hbt')] eqn : C_check_ord_hbt'.
+    (* unordered insertion subtree *)
+    + discriminate.
+
+    (* impossible case: insertion subtree as leaf *)
+    + case (traverse_to_check_ordered_hbt A hbt2 compare)
+        as [ | | (min_hbt2, max_hbt2)] eqn : C_check_ord_hbt2.
+      discriminate.
+      exact (insertion_impossible_case_implies_true
              A hbt1 (HNode A h1' bt1') compare x
              ((t_max' = x \/ t_max' = t_max) /\ (t_min' = x \/ t_min' = t_min))
              C_insert_hbt1
              C_check_ord_hbt').
-    exact (insertion_impossible_case_implies_true
-             A hbt1 (HNode A h1' bt1') compare x
-             ((t_max' = x \/ t_max' = t_max) /\ (t_min' = x \/ t_min' = t_min))
-             C_insert_hbt1
-             C_check_ord_hbt').
-    case (compare max_hbt' e) as [ | | ] eqn : C_comp_max_hbt'_e.
-    case (traverse_to_check_ordered_hbt A hbt2 compare) as
-        [ | | (min2, max2)] eqn : C_check_ord_hbt2.
-    discriminate.
+      exact (insertion_impossible_case_implies_true
+               A hbt1 (HNode A h1' bt1') compare x
+               ((t_max' = x \/ t_max' = t_max) /\ (t_min' = x \/ t_min' = t_min))
+               C_insert_hbt1
+               C_check_ord_hbt').
 
-  (* Case where hbt1' has a min and max: unfold H_ord_t and case analyse *)
-    rewrite -> (unfold_traverse_to_check_ordered_t A hbt1 e hbt2 compare)
-            in H_ord_t.
-    case (traverse_to_check_ordered_hbt A hbt1 compare)
-      as [ | | (min1, max1)] eqn : C_check_ord_hbt1.
-    discriminate.
-    rewrite -> C_check_ord_hbt2 in H_ord_t.
-    assert (H_equalities:
-              min_hbt' = x /\ max_hbt' = x).
-    exact (insertion_implies_leaf
-             A compare
-             hbt1
-             (HNode A h1' bt1')
-             x min_hbt' max_hbt'
-             C_insert_hbt1
-             C_check_ord_hbt'
-             C_check_ord_hbt1).
-    rewrite -> tsome_x_equal_tsome_y in H_ord_hbt'.
-    rewrite -> tsome_x_equal_tsome_y in H_ord_t.
-    rewrite -> pairwise_equality in H_ord_hbt'.
-    rewrite -> pairwise_equality in H_ord_t.
-    split.
-    destruct H_ord_hbt' as [_ H_t_max'].
-    destruct H_ord_t as [_ H_t_max].
-    rewrite -> H_t_max in H_t_max'.
-    rewrite -> H_t_max'.
-    Search (_ \/ _ -> _).
-    Search (_ \/ _).
-    apply or_intror.
-    reflexivity.
-    destruct H_ord_hbt' as [H_min_hbt' _].
-    destruct H_equalities as [H_x _].
-    rewrite -> H_min_hbt' in H_x.
-    apply or_introl.
-    exact H_x.
+      (* insertion subtree is ordered, has max' and min' *)
+    + case (compare max_hbt' e) as [ | | ] eqn : C_comp_max_hbt'_e.
+      case (traverse_to_check_ordered_hbt A hbt2 compare) as
+          [ | | (min2, max2)] eqn : C_check_ord_hbt2.
+ 
+      (* hbt2 is unordered *)
+      * discriminate.
 
-    assert (H_equals_trivial:
-              TSome (A * A) (min1, max1) = TSome (A * A) (min1, max1)).
-    reflexivity.
+      (* hbt2 is a leaf: make use of inductive hypothesis for hbt1 *)
+      * rewrite -> (unfold_traverse_to_check_ordered_t A hbt1 e hbt2 compare)
+          in H_ord_t.
+        case (traverse_to_check_ordered_hbt A hbt1 compare)
+          as [ | | (min1, max1)] eqn : C_check_ord_hbt1.
+ 
+        (* hbt1 was unordered *)
+        { discriminate. }
+
+        (* hbt1 was a leaf: use lemmas defined earlier *)
+        {
+          rewrite -> C_check_ord_hbt2 in H_ord_t.
+          assert (H_equalities:
+                    min_hbt' = x /\ max_hbt' = x).
+          exact (insertion_implies_leaf
+                   A compare
+                   hbt1
+                   (HNode A h1' bt1')
+                   x min_hbt' max_hbt'
+                   C_insert_hbt1
+                   C_check_ord_hbt'
+                   C_check_ord_hbt1).
+          rewrite -> tsome_x_equal_tsome_y in H_ord_hbt'.
+          rewrite -> tsome_x_equal_tsome_y in H_ord_t.
+          rewrite -> pairwise_equality in H_ord_hbt'.
+          rewrite -> pairwise_equality in H_ord_t.
+          split.
+          destruct H_ord_hbt' as [_ H_t_max'].
+          destruct H_ord_t as [_ H_t_max].
+          rewrite -> H_t_max in H_t_max'.
+          rewrite -> H_t_max'.
+          apply or_intror.
+          reflexivity.
+          destruct H_ord_hbt' as [H_min_hbt' _].
+          destruct H_equalities as [H_x _].
+          rewrite -> H_min_hbt' in H_x.
+          apply or_introl.
+          exact H_x.
+        }
+
+        (* hbt1 was an ordered subtree with min1 and max1 *)
+        {
+          case (compare max1 e) as [ | | ] eqn : C_comp_max1_e.
+
+          (* max1 < e *)
+          - assert (H_equals_trivial:
+                      TSome (A * A) (min1, max1) = TSome (A * A) (min1, max1)).
+            reflexivity.
+            
+            assert (H_equalities_from_ind_h :
+                      (max_hbt' = x \/ max_hbt' = max1) /\ (min_hbt' = x \/ min_hbt' = min1)).
+            exact (H_hbt1 (HNode A h1' bt1')
+                          x min1 min_hbt' max1 max_hbt'
+                          C_insert_hbt1
+                          C_check_ord_hbt'
+                          H_equals_trivial).
+            rewrite -> C_check_ord_hbt2 in H_ord_t.
+            (* Note: (A \/ B) -> C <-> (A -> C) /\ (B -> C). So the following 
+             * destruct will necessitate two proofs, one with A as the hypothesis,
+             * and one with B *)
+            destruct H_equalities_from_ind_h as [_ [H_min_x | H_min_min1]].
+
+            (* H_min_x as hypothesis *)
+            + rewrite -> tsome_x_equal_tsome_y in H_ord_t.
+              rewrite -> tsome_x_equal_tsome_y in H_ord_hbt'.
+              rewrite -> pairwise_equality in H_ord_t.
+              rewrite -> pairwise_equality in H_ord_hbt'.
+              destruct H_ord_hbt' as [H_min_hbt' H_t_max'].
+              destruct H_ord_t as [_ H_e].
+              split.
+              apply or_intror.
+              rewrite <- H_t_max'.
+              rewrite <- H_e.
+              reflexivity.
+              apply or_introl.
+              rewrite <- H_min_hbt'.
+              rewrite -> H_min_x.
+              reflexivity.
+
+            (* H_min_min1 as hypothesis *)
+            + rewrite -> tsome_x_equal_tsome_y in H_ord_hbt'.
+              rewrite -> tsome_x_equal_tsome_y in H_ord_t.
+              rewrite -> pairwise_equality in H_ord_hbt'.
+              rewrite -> pairwise_equality in H_ord_t.
+              destruct H_ord_hbt' as [H_t_min'  H_t_max'].
+              destruct H_ord_t as [H_t_min H_t_max].
+              split.
+              apply or_intror.
+              rewrite <- H_t_max'.
+              rewrite <- H_t_max.
+              reflexivity.
+              apply or_intror.
+              rewrite <- H_t_min.
+              rewrite <- H_t_min'.
+              exact H_min_min1.
+            
+            (* max1 = e : impossible case *)
+          - discriminate.
+
+            (* max1 > e : impossible case *)
+          - discriminate.
+        }
+
+      (* hbt2 is a node with a min2 and max2: once again, we unfold H_ord_t, and 
+       * do a case analysis on hbt1  *)
+      * rewrite -> (unfold_traverse_to_check_ordered_t A hbt1 e hbt2 compare)
+          in H_ord_t.
+        case (traverse_to_check_ordered_hbt A hbt1 compare)
+          as [ | | (min1, max1)] eqn : C_check_ord_hbt1.
+ 
+        (* hbt1 was unordered *)
+        { discriminate. }
+
+        (* hbt1 was a leaf: use lemmas defined earlier *)
+        {
+          rewrite -> C_check_ord_hbt2 in H_ord_t.
+          assert (H_equalities:
+                    min_hbt' = x /\ max_hbt' = x).
+          exact (insertion_implies_leaf
+                   A compare
+                   hbt1
+                   (HNode A h1' bt1')
+                   x min_hbt' max_hbt'
+                   C_insert_hbt1
+                   C_check_ord_hbt'
+                   C_check_ord_hbt1).
+          case (compare e min2 ) as [ | | ] eqn : C_comp_e_min2.
+
+          (* e < min2 *) 
+          + rewrite -> tsome_x_equal_tsome_y in H_ord_hbt'.
+            rewrite -> tsome_x_equal_tsome_y in H_ord_t.
+            rewrite -> pairwise_equality in H_ord_hbt'.
+            rewrite -> pairwise_equality in H_ord_t.
+            split.
+            destruct H_ord_hbt' as [_ H_t_max'].
+            destruct H_ord_t as [_ H_t_max].
+            rewrite -> H_t_max in H_t_max'.
+            rewrite -> H_t_max'.
+            apply or_intror.
+            reflexivity.
+            destruct H_ord_hbt' as [H_min_hbt' _].
+            destruct H_equalities as [H_x _].
+            rewrite -> H_min_hbt' in H_x.
+            apply or_introl.
+            exact H_x.
+
+          (* e = min2: impossible case *)
+          + discriminate.
+
+          (* e > min2 : impossible case *)
+          + discriminate.
+        }
+
+        (* hbt1 is a node with a max1 and min1 *)
+        {
+          rewrite -> C_check_ord_hbt2 in H_ord_t.
+          case (compare max1 e ) as [ | | ] eqn : C_comp_max1_e.
+
+          (* max1 < e *)
+          -  case (compare e min2 ) as [ | | ] eqn : C_comp_e_min2.
+
+             (* e < min2 *)
+             + rewrite -> tsome_x_equal_tsome_y in H_ord_t.
+               rewrite -> tsome_x_equal_tsome_y in H_ord_hbt'.
+               rewrite -> pairwise_equality in H_ord_t.
+               rewrite -> pairwise_equality in H_ord_hbt'.
+               destruct H_ord_hbt' as [H_t_min' H_t_max' ].
+               destruct H_ord_t as [H_t_min H_t_max].
+
+               assert (H_equals_trivial:
+                         TSome (A * A) (min1, max1) = TSome (A * A) (min1, max1)).
+               reflexivity.
+            
+            assert (H_equalities_from_ind_h :
+                      (max_hbt' = x \/ max_hbt' = max1) /\ (min_hbt' = x \/ min_hbt' = min1)).
+            exact (H_hbt1 (HNode A h1' bt1')
+                          x min1 min_hbt' max1 max_hbt'
+                          C_insert_hbt1
+                          C_check_ord_hbt'
+                          H_equals_trivial).
+            split.
+            apply or_intror.
+            rewrite <- H_t_max'.
+            rewrite <- H_t_max.
+            reflexivity.
+
+            destruct H_equalities_from_ind_h as [_ [H_min_hbt'_is_x
+                                                   | H_min_hbt'_is_min1]].
+            (* With H_min_hbt'_is_x as hypothesis *) 
+               * apply or_introl.
+                 rewrite <- H_t_min'.
+                 rewrite -> H_min_hbt'_is_x.
+                 reflexivity.
+               (* Wiht H_min_hbt'_is_min1 as hypothesis *)
+               * apply or_intror.
+                 rewrite -> H_t_min in H_min_hbt'_is_min1.
+                 rewrite <- H_t_min'.
+                 rewrite <- H_min_hbt'_is_min1.
+                 reflexivity.
+             (* e = min2 : impossible case *)
+             + discriminate.
+
+             (* e > min2 : impossible case *)
+             + discriminate.
+               
+          (* max1 = e :  impossible case *)
+          - discriminate.
+            
+          (* max1 >  e : impossible case *)
+          - discriminate.
+        }
+
+      * discriminate.
+
+      * discriminate.
+
+        Focus 4.
+  - 
+        
+
+
     
-    assert (H_equalities_from_ind_h :
-                (max_hbt' = x \/ max_hbt' = max1) /\ (min_hbt' = x \/ min_hbt' = min1)).
-      exact (H_hbt1 (HNode A h1' bt1')
-                    x min1 min_hbt' max1 max_hbt'
-                    C_insert_hbt1
-                    C_check_ord_hbt'
-                    H_equals_trivial).
-      
-    case (compare max1 e) as [ | | ] eqn : C_comp_max1_e.
-    rewrite -> C_check_ord_hbt2 in H_ord_t; 
-    do 1  (destruct H_equalities_from_ind_h as [_ [H_min_x | _ ]];
-      rewrite -> tsome_x_equal_tsome_y in H_ord_t;
-      rewrite -> tsome_x_equal_tsome_y in H_ord_hbt';
-      rewrite -> pairwise_equality in H_ord_t;
-      rewrite -> pairwise_equality in H_ord_hbt';
-      destruct H_ord_hbt' as [H_min_hbt' H_t_max'];
-      destruct H_ord_t as [_ H_e];
-      split;
-      apply or_intror;
-      rewrite <- H_t_max';
-      rewrite <- H_e;
-      reflexivity;
-      apply or_introl;
-      rewrite <- H_min_hbt';
-      rewrite -> H_min_x;
-      reflexivity).
-
-      Focus 6.
-      
-
-
+    
   (* proof for hbt, with bt as inductive hypothesis *)
   - intros h bt H_ind_bt hbt' x min min' max max' H_insert_hbt H_ord_hbt' H_ord_hbt.
     rewrite -> (unfold_insert_hbt_helper A compare x h bt) in H_insert_hbt.
