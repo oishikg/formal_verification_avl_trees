@@ -4,4 +4,4 @@ AVL_Trees_Implementation/misc/*
 Coq_files/misc/*
 *.vo
 *.glob
-
+*.d
