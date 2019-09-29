@@ -1,0 +1,5 @@
+-R ./ Hbt
+./Paraphernalia/paraphernalia.v
+./Implementation/hbt.v
+./Lemmas/lemmas.v
+./Theorems/theorems.v
