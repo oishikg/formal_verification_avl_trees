@@ -1,8 +1,7 @@
-Ltac unfold_tactic name := intros; unfold name; (* fold name; *) reflexivity.
-
 Require Import Arith Bool List.
-
 Require Export Arith Bool List.
+
+Ltac unfold_tactic name := intros; unfold name; (* fold name; *) reflexivity.
 
 (* Equality of natural numbers *)
 Notation "A =n= B" :=

@@ -1,478 +1,10 @@
-(* ********** Imports ********** *)
 Require Import Hbt.Implementation.hbt.
 Require Export Hbt.Implementation.hbt.
 
-(* ***** Section 5.4: Lemmas concerning soundness ***** *)
-
-(* Given a triple that is sound, its binary trees should also be sound *)
-
-Lemma triple_sound_implies_hbts_sound:
-  forall (A : Type)
-         (h_hbt : nat)
-         (hbt1 : heightened_binary_tree A)
-         (e : A)
-         (hbt2 : heightened_binary_tree A),
-    is_sound_hbt A (HNode A h_hbt (Node A (Triple A hbt1 e hbt2))) = true ->
-    is_sound_hbt A hbt1 = true /\ is_sound_hbt A hbt2 = true.
-Proof.
-  intros A h_hbt hbt1 e hbt2 H_t.
-  split.
-  unfold is_sound_hbt in H_t.
-  rewrite ->
-          (unfold_traverse_to_check_soundness_hbt
-             A
-             h_hbt
-             (Node A (Triple A hbt1 e hbt2))) in H_t.
-  rewrite ->
-          (unfold_traverse_to_check_soundness_bt_node
-             A
-             (Triple A hbt1 e hbt2)) in H_t.
-  rewrite -> (unfold_traverse_to_check_soundness_t A hbt1 hbt2 e) in H_t.
-  case (traverse_to_check_soundness_hbt A hbt1) as [ret_h1 | ] eqn : C_sound_hbt1.
-  unfold is_sound_hbt.
-  rewrite -> C_sound_hbt1.
-  reflexivity.
-
-  discriminate.
-
-  unfold is_sound_hbt in H_t.
-  rewrite ->
-          (unfold_traverse_to_check_soundness_hbt
-             A
-             h_hbt
-             (Node A (Triple A hbt1 e hbt2))) in H_t.
-  rewrite ->
-          (unfold_traverse_to_check_soundness_bt_node
-             A
-             (Triple A hbt1 e hbt2)) in H_t.
-  rewrite -> (unfold_traverse_to_check_soundness_t A hbt1 hbt2 e) in H_t.
-  case (traverse_to_check_soundness_hbt A hbt1) as [ret_h1 | ] eqn : C_sound_hbt1.
-  case (traverse_to_check_soundness_hbt A hbt2) as [ret_h2 | ] eqn : C_sound_hbt2.
-  
-  unfold is_sound_hbt.
-  rewrite -> C_sound_hbt2.
-  reflexivity.
-
-  discriminate.
-
-  discriminate.
-Qed.
-
-(* If the helper function to check soundness for hbts returns some hbt, then 
- * the helper function to check soundness for bts should give the same hbt *)
-Lemma traverse_to_check_soundness_hbt_bt_same:
-  forall (A : Type)
-         (h h_hbt : nat)
-         (bt : binary_tree A),
-    traverse_to_check_soundness_hbt A (HNode A h bt) = Some h_hbt ->
-    traverse_to_check_soundness_bt A bt = Some h_hbt.
-Proof.
-  intros A h h_hbt bt H.
-  rewrite -> (unfold_traverse_to_check_soundness_hbt A h bt) in H.
-  case (traverse_to_check_soundness_bt A bt) as [h_ret | ]  eqn : C_soundness.
-  case (h_ret =n= h) as [ | ] eqn : C_equal_heights.
-  Check (beq_nat_true).
-  apply (beq_nat_true h_ret h) in C_equal_heights.
-  rewrite <- C_equal_heights in H.
-  exact H.
-
-  discriminate.
-
-  discriminate.
-Qed.
-
-(* If the helper function to check soundness for bts returns some hbt, then 
- * the helper function to check soundness for ts should give the same hbt *)
-Lemma traverse_to_check_soundness_bt_t_same:
-  forall (A : Type)
-         (h_hbt : nat)
-         (t : triple A),
-    traverse_to_check_soundness_bt A (Node A t) = Some h_hbt ->
-    traverse_to_check_soundness_t A t = Some h_hbt.
-Proof.
-  intros A h_hbt t H.
-  rewrite -> (unfold_traverse_to_check_soundness_bt_node A t) in H.
-  case (traverse_to_check_soundness_t A t) as [h_ret | ] eqn : C_h.
-  exact H.
-  discriminate.
-Qed.
-
-(* This is an important lemma: it provides the condition for which sound hbts 
- * imply soundness of a triple that they are part of *)
-Lemma hbts_sound_implies_triple_sound_weak:
-    forall (A : Type)
-           (h_hbt : nat)
-           (hbt1 : heightened_binary_tree A)
-           (e : A)
-           (hbt2 : heightened_binary_tree A),
-      is_sound_hbt A hbt1 = true ->
-      is_sound_hbt A hbt2 = true ->
-      h_hbt = 1 + max (project_height_hbt A hbt1) (project_height_hbt A hbt2) ->
-      is_sound_hbt A (HNode A h_hbt (Node A (Triple A hbt1 e hbt2))) = true.
-Proof.      
-  intros A h_hbt hbt1 e hbt2 H_hbt1 H_hbt2 H_h_hbt.
-  unfold is_sound_hbt.
-  rewrite ->
-          (unfold_traverse_to_check_soundness_hbt
-             A
-             h_hbt
-             (Node A (Triple A hbt1 e hbt2))).
-  rewrite ->
-          (unfold_traverse_to_check_soundness_bt_node
-             A
-             (Triple A hbt1 e hbt2)).
-  rewrite -> (unfold_traverse_to_check_soundness_t A hbt1 hbt2 e).
-  unfold is_sound_hbt in H_hbt1.
-
-  case (traverse_to_check_soundness_hbt A hbt1) as [h1_ret | ] eqn : C_check_hbt1.
-  case (traverse_to_check_soundness_hbt A hbt2) as [h2_ret | ] eqn : C_check_hbt2.
-  (* the proof shouldn't be too hard from here on; return to this later *)
-Admitted.
-
-(* ***** *)
-
-(* ***** Section 5.5: Balancedness lemmas ***** *)
-
-(* Given a balanced triple, its constituent hbts should also be balanced *)
-Lemma triple_balanced_implies_hbts_balanced:
-  forall (A : Type)
-         (h_hbt : nat)
-         (hbt1 : heightened_binary_tree A)
-         (e : A)
-         (hbt2 : heightened_binary_tree A),
-    is_balanced_hbt A (HNode A h_hbt (Node A (Triple A hbt1 e hbt2))) = true ->
-    is_balanced_hbt A hbt1 = true /\ is_balanced_hbt A hbt2 = true.
-Proof.
-  (* same structure as above, write later *)
-Admitted.
-
-(* If the helper function to check the balancedness of an hbt returns some hbt,
- * then the helper function to check the balancedness of the bt returns the same
- * hbt *)
-Lemma traverse_to_check_balanced_hbt_bt_same:
-  forall (A : Type)
-         (h h_hbt : nat)
-         (bt : binary_tree A),
-    traverse_to_check_balanced_hbt A (HNode A h bt) = Some h_hbt ->
-    traverse_to_check_balanced_bt A bt = Some h_hbt.
-Proof.
-  intros A h h_hbt bt H.
-  rewrite -> (unfold_traverse_to_check_balanced_hbt A h bt) in H.  
-  case (traverse_to_check_balanced_bt A bt) as [bt_ret | ] eqn : C_check_bal.
-  exact H.
-  discriminate.
-Qed.
-
-(* If the helper function to check the balancedness of an bt returns some hbt,
- * then the helper function to check the balancedness of the t returns the same
- * hbt *)
-Lemma traverse_to_check_balanced_bt_t_same:
-  forall (A : Type)
-         (h_hbt : nat)
-         (t : triple A),
-    traverse_to_check_balanced_bt A (Node A t) = Some h_hbt ->
-    traverse_to_check_balanced_t A t = Some h_hbt.
-Proof.
-  intros A h_hbt t H.
-  rewrite -> (unfold_traverse_to_check_balanced_bt_node A t) in H.
-  case (traverse_to_check_balanced_t A t) as [h_ret | ] eqn : C_h.
-  exact H.
-  discriminate.
-Qed.
-
-(* The relationship between the helper functions for soundness and balancedness. The
- * statement of the proof allows us to use the heightened_binary_tree_mutual_induction
- * principle *)
-Lemma relating_soundness_and_balancedness:
-  forall (A : Type),
-    (forall (hbt : heightened_binary_tree A)
-            (h_sound h_bal : nat),
-        traverse_to_check_soundness_hbt A hbt = Some h_sound ->
-        traverse_to_check_balanced_hbt A hbt = Some h_bal ->
-        h_sound = h_bal)
-    /\
-    (forall (bt : binary_tree A)
-            (h_sound h_bal : nat),
-        traverse_to_check_soundness_bt A bt = Some h_sound ->
-        traverse_to_check_balanced_bt A bt = Some h_bal ->
-        h_sound = h_bal)
-    /\
-    (forall (t : triple A)
-            (h_sound h_bal : nat),
-        traverse_to_check_soundness_t A t = Some h_sound ->
-        traverse_to_check_balanced_t A t = Some h_bal ->
-        h_sound = h_bal).
-Proof.           
-  intro A.
-  apply heightened_binary_tree_mutual_induction.
-
-  - intros h bt H_inductive_bt h_sound h_bal H_sound_hbt H_balanced_hbt.
-    Check (traverse_to_check_soundness_hbt_bt_same).
-    exact (H_inductive_bt h_sound h_bal
-                          (traverse_to_check_soundness_hbt_bt_same A h h_sound bt H_sound_hbt)
-                          (traverse_to_check_balanced_hbt_bt_same A h h_bal bt
-                                                            H_balanced_hbt)).
-
-  - intros h_sound h_bal H_sound_leaf H_balanced_leaf.
-    rewrite -> (unfold_traverse_to_check_soundness_bt_leaf A) in H_sound_leaf.
-    rewrite -> (unfold_traverse_to_check_balanced_bt_leaf A) in H_balanced_leaf.    
-    rewrite -> (some_x_equal_some_y nat 0 h_sound) in H_sound_leaf.
-    rewrite -> (some_x_equal_some_y nat 0 h_bal) in H_balanced_leaf.    
-    rewrite <- H_sound_leaf.
-    rewrite <- H_balanced_leaf.
-    reflexivity.
-
-  - intros t H_inductive_t h_sound h_bal H_sound_bt H_balanced_bt.
-    exact (H_inductive_t h_sound h_bal
-                         (traverse_to_check_soundness_bt_t_same A h_sound t H_sound_bt)
-                         (traverse_to_check_balanced_bt_t_same A h_bal t H_balanced_bt)).
-
-  - intros hbt1 H_inductive_hbt1 e hbt2 H_inductive_hbt2
-           h_sound h_bal H_sound_t H_balanced_t.
-    rewrite -> (unfold_traverse_to_check_soundness_t A hbt1 hbt2 e) in H_sound_t.
-    rewrite -> (unfold_traverse_to_check_balanced_t A hbt1 hbt2 e) in H_balanced_t. 
-    case (traverse_to_check_soundness_hbt A hbt1)
-      as [h_sound_sub_1 | ] eqn : C_sound_hbt1.
-    case (traverse_to_check_soundness_hbt A hbt2)
-      as [h_sound_sub_2 | ] eqn : C_sound_hbt2.
-    case (traverse_to_check_balanced_hbt A hbt1)
-      as [h_balanced_sub_1 | ] eqn : C_balanced_hbt1.
-    case (traverse_to_check_balanced_hbt A hbt2)
-      as [h_balanced_sub_2 | ] eqn : C_balanced_hbt2.
-    assert (H_sound_sub1_equal:
-              (Some h_sound_sub_1 = Some h_sound_sub_1)).
-    reflexivity.
-    assert (H_balanced_sub1_equal:
-              Some h_balanced_sub_1 = Some h_balanced_sub_1).
-    reflexivity.
-    assert (H_sub1_equals :
-              h_sound_sub_1 = h_balanced_sub_1).
-    exact (H_inductive_hbt1 h_sound_sub_1 h_balanced_sub_1
-                            H_sound_sub1_equal
-                            H_balanced_sub1_equal).
-    assert (H_sound_sub2_equal:
-              (Some h_sound_sub_2 = Some h_sound_sub_2)).
-    reflexivity.
-    assert (H_balanced_sub2_equal:
-              Some h_balanced_sub_2 = Some h_balanced_sub_2).
-    reflexivity.
-    assert (H_sub2_equals :
-              h_sound_sub_2 = h_balanced_sub_2).
-    exact (H_inductive_hbt2 h_sound_sub_2 h_balanced_sub_2
-                            H_sound_sub2_equal
-                            H_balanced_sub2_equal).
-    apply (some_x_equal_some_y
-             nat
-             (1 + max h_sound_sub_1 h_sound_sub_2)
-             h_sound) in H_sound_t.
-    case (differ_by_one h_balanced_sub_1 h_balanced_sub_2) as [ | ] eqn : C_diff_1.
-    apply (some_x_equal_some_y
-             nat
-             (1 + max h_balanced_sub_1 h_balanced_sub_2)
-             h_bal) in H_balanced_t.
-    rewrite <- H_sound_t.
-    rewrite <- H_balanced_t.
-    rewrite <- H_sub1_equals.
-    rewrite <- H_sub2_equals.
-    reflexivity.
-
-    discriminate.
-
-    discriminate.
-
-    discriminate.
-
-    discriminate.
-
-    discriminate.
-Qed.
-
-(* This lemma relates the projected height of an hbt to that returned by the helper
- * function for soundness *)
-Lemma relating_soundness_and_projection:
-  forall (A : Type)
-         (hbt : heightened_binary_tree A)
-         (h_ret : nat),
-    traverse_to_check_soundness_hbt A hbt = Some h_ret ->
-    project_height_hbt A hbt = h_ret.
-Proof.
-  intros A hbt h H_traverse_sound.
-  induction hbt as [h_given bt_given].
-  unfold project_height_hbt.
-  rewrite -> (unfold_traverse_to_check_soundness_hbt A h_given bt_given)
-    in H_traverse_sound.
-  case (traverse_to_check_soundness_bt A bt_given) as [h_ret | ] eqn : C_check_bt.
-  case (h_ret =n= h_given) as [ | ] eqn : C_equal_heights.
-  apply (beq_nat_true h_ret h_given) in C_equal_heights.  
-  apply (some_x_equal_some_y nat h_given h) in H_traverse_sound.
-  exact H_traverse_sound.
-
-  discriminate.
-
-  discriminate.
-Qed.
-
-(* Essential lemma to related height differences between 2 trees and the 
- * differ_by_one defintion *)  
-Lemma relating_compare_int_and_differ_by_one:
-  forall (ha hb : nat),
-    ((compare_int (ha - hb) 2 = Lt)
-    \/
-    (compare_int (hb - ha) 2 = Lt))
-    ->
-    differ_by_one ha hb = true.
-Proof.
-  intros ha hb [H_ab | H_ba].
-  
-  - unfold compare_int in H_ab.
-    case (ha - hb) as [ | hd] eqn : C_height_diff.
-    
-    + unfold differ_by_one.
-      apply (diff_equal_0_implies_equal ha hb) in C_height_diff.
-      rewrite -> C_height_diff.
-      Check (beq_nat_refl hb).
-      rewrite <- (beq_nat_refl hb).
-      Check (orb_true_r ((hb =n= hb + 1) || (hb =n= hb + 1))).
-      exact (orb_true_r ((hb =n= hb + 1) || (hb =n= hb + 1))).
-    
-    + case hd as [ | hd'] eqn : C_height_diff_succ.
-      unfold differ_by_one.
-      Check (diff_equal_1_implies_greater_by_1).
-      apply (diff_equal_1_implies_greater_by_1 ha hb) in C_height_diff.
-      rewrite -> C_height_diff.
-      rewrite <- (beq_nat_refl (hb + 1)).
-      Search (true || _ = _).
-      exact (orb_true_l ((hb =n= hb + 1 + 1) || (hb =n= hb + 1))).
-      
-      rewrite -> (unfold_ltb_Sn_Sm (S hd') 1) in H_ab.
-      rewrite -> (unfold_ltb_Sn_Sm hd' 0) in H_ab.
-      case hd' as [ | hd''].
-      rewrite -> (unfold_ltb_0_0) in H_ab.
-      unfold beq_nat in H_ab.
-      discriminate.
-
-      rewrite -> (unfold_ltb_Sn_0 hd'') in H_ab.
-      unfold beq_nat in H_ab.
-      discriminate.
-      
-  - unfold compare_int in H_ba.
-    case (hb - ha) as [ | hd] eqn : C_height_diff.
-    
-    + unfold differ_by_one.
-      apply (diff_equal_0_implies_equal hb ha) in C_height_diff.
-      rewrite -> C_height_diff.
-      rewrite <- (beq_nat_refl ha).
-      Check (orb_true_r ((hb =n= ha + 1) || (ha =n= ha + 1))).
-      exact (orb_true_r ((ha =n= ha + 1) || (ha =n= ha + 1))).
-    
-    + case hd as [ | hd'] eqn : C_height_diff_succ.
-      unfold differ_by_one.
-      Check (diff_equal_1_implies_greater_by_1).
-      apply (diff_equal_1_implies_greater_by_1 hb ha) in C_height_diff.
-      rewrite -> C_height_diff.
-      rewrite <- (beq_nat_refl (ha + 1)).
-      Search (true || _ = _).
-      rewrite -> (orb_true_r (ha =n= ha + 1 + 1)).
-      rewrite -> (orb_true_l (ha + 1 =n= ha)).
-      reflexivity.
-      
-      rewrite -> (unfold_ltb_Sn_Sm (S hd') 1) in H_ba.
-      rewrite -> (unfold_ltb_Sn_Sm hd' 0) in H_ba.
-      case hd' as [ | hd''].
-      rewrite -> (unfold_ltb_0_0) in H_ba.
-      unfold beq_nat in H_ba.
-      discriminate.
-
-      rewrite -> (unfold_ltb_Sn_0 hd'') in H_ba.
-      unfold beq_nat in H_ba.
-      discriminate.
-Qed.
-
-(* The most important lemma for balancedness: it provides the conditions for which
- * balanced hbts imply a balanced triple *)
-Lemma hbts_balanced_implies_triple_balanced_weak:
-    forall (A : Type)
-           (h_hbt : nat)
-           (hbt1 : heightened_binary_tree A)
-           (e : A)
-           (hbt2 : heightened_binary_tree A),
-      is_balanced_hbt A hbt1 = true ->
-      is_balanced_hbt A hbt2 = true ->
-      is_sound_hbt A hbt1 = true ->
-      is_sound_hbt A hbt2 = true -> 
-      ((compare_int ((project_height_hbt A hbt1) - (project_height_hbt A hbt2))
-                   2 = Lt)
-      \/
-      (compare_int ((project_height_hbt A hbt2) - (project_height_hbt A hbt1))
-                   2 = Lt)) ->
-      is_balanced_hbt A (HNode A h_hbt (Node A (Triple A hbt1 e hbt2))) = true.
-Proof.
-  intros A h_hbt hbt1 e hbt2 H_bal_hbt1 H_bal_hbt2
-         H_sound_hbt1 H_sound_hbt2 H_height_diff.
-  unfold is_balanced_hbt.
-  rewrite ->
-          (unfold_traverse_to_check_balanced_hbt
-             A h_hbt
-             (Node A (Triple A hbt1 e hbt2))).
-  rewrite ->
-          (unfold_traverse_to_check_balanced_bt_node
-             A
-             (Triple A hbt1 e hbt2)).
-  rewrite -> (unfold_traverse_to_check_balanced_t A hbt1 hbt2 e).
-  unfold is_balanced_hbt in H_bal_hbt1.
-  unfold is_balanced_hbt in H_bal_hbt2.
-  unfold is_sound_hbt in H_sound_hbt1.
-  unfold is_sound_hbt in H_sound_hbt2.
-  
-  case (traverse_to_check_balanced_hbt A hbt1) as [h1_ret_bal | ] eqn : C_bal_hbt1.
-  case (traverse_to_check_balanced_hbt A hbt2) as [h2_ret_bal | ] eqn : C_bal_hbt2.
-  case (traverse_to_check_soundness_hbt A hbt1)
-    as [h1_ret_sound | ] eqn : C_sound_hbt1.
-  case (traverse_to_check_soundness_hbt A hbt2)
-    as [h2_ret_sound | ] eqn : C_sound_hbt2.
-  
-  - destruct (relating_soundness_and_balancedness A) as [H_relate_sound_bal_hbt _].
-    Check (H_relate_sound_bal_hbt hbt1 h1_ret_sound h1_ret_bal
-                                  C_sound_hbt1 C_bal_hbt1).
-    assert (H_h1_ret_sound_equals_h1_ret_bal :
-              h1_ret_sound = h1_ret_bal).
-    exact (H_relate_sound_bal_hbt hbt1 h1_ret_sound h1_ret_bal
-                                  C_sound_hbt1 C_bal_hbt1).
-    assert (H_h2_ret_sound_equals_h2_ret_bal :
-              h2_ret_sound = h2_ret_bal).
-    exact (H_relate_sound_bal_hbt hbt2 h2_ret_sound h2_ret_bal
-                                  C_sound_hbt2 C_bal_hbt2).
-    assert (H_project_height_hbt1_equals_h1_ret_sound :
-              project_height_hbt A hbt1 = h1_ret_sound).
-    exact (relating_soundness_and_projection A hbt1 h1_ret_sound C_sound_hbt1).
-    assert (H_project_height_hbt2_equals_h2_ret_sound :
-              project_height_hbt A hbt2 = h2_ret_sound).
-    exact (relating_soundness_and_projection A hbt2 h2_ret_sound C_sound_hbt2).
-    rewrite -> H_h1_ret_sound_equals_h1_ret_bal
-      in H_project_height_hbt1_equals_h1_ret_sound.
-    rewrite -> H_h2_ret_sound_equals_h2_ret_bal
-      in H_project_height_hbt2_equals_h2_ret_sound.
-    rewrite -> H_project_height_hbt1_equals_h1_ret_sound in H_height_diff.
-    rewrite -> H_project_height_hbt2_equals_h2_ret_sound in H_height_diff.
-    Check (relating_compare_int_and_differ_by_one h1_ret_bal h2_ret_bal
-                                                  H_height_diff).
-    rewrite ->
-            (relating_compare_int_and_differ_by_one h1_ret_bal h2_ret_bal
-                                                    H_height_diff).
-    reflexivity.
-
-  - discriminate.
-
-  - discriminate.
-
-  - discriminate.
-
-  - discriminate.
-Qed.
-
-(* ***** *)
 
 (* ***** Section 5.6: Lemmas for orderedness ***** *)
+
+(* Lemma to show that an ordered triple must have ordered subtrees *)
 Lemma triple_ordered_implies_hbts_ordered:
   forall (A : Type)
          (compare : A -> A -> element_comparison)
@@ -537,7 +69,8 @@ Proof.
   discriminate. 
 Qed.
 
-
+(* Lemma that shows that an element inserted into a leaf will be both its min and its max 
+ * element *)
 Lemma insertion_in_leaf_min_max:
   forall (A : Type)
          (compare : A -> A -> element_comparison)
@@ -615,7 +148,7 @@ Proof.
   reflexivity.
 Qed.
 
-
+(* Lemma to show that a tree cannot be a leaf if an element is inserted into it *)
 Lemma insertion_impossible_case:
   forall (A : Type)
          (compare : A -> A -> element_comparison)
@@ -730,6 +263,8 @@ Proof.
     discriminate.
 Qed.
 
+(* Lemma to show that given the (false) hypothesis that a tree modified by the insertion 
+ * operation is a leaf, any proposition will be true *)
 Lemma insertion_impossible_case_implies_true:
   forall (A : Type)
          (hbt hbt' : heightened_binary_tree A)
@@ -757,6 +292,8 @@ Proof.
              H_false).
 Qed.
 
+(* Lemma to show that a node that is not a leaf and is ordered has a maximum and a 
+ * minimum element *)
 Lemma ordered_node_has_min_max:
   forall (A : Type)
          (compare : A -> A -> element_comparison)
@@ -845,7 +382,9 @@ Proof.
 
       discriminate.
 Qed.      
-      
+
+(* Lemma to show that if traversing a binary tree to check its orderedness yields a 
+ * maximum and a minimum value, then the tree must be ordered *)
 Lemma traverse_to_check_ordered_hbt_some_implies_is_ordered:
   forall (A : Type)
          (compare : A -> A -> element_comparison)
@@ -867,6 +406,8 @@ Proof.
   reflexivity.
 Qed.
 
+(* Lemma to show that traversing a node with a triple (as opposed to a leaf) to check 
+ * orderedness can never yield a TNone (which is returned only if a leaf is traversed) *)
 Lemma traverse_node_impossible_case:
   forall (A : Type)
          (compare : A -> A -> element_comparison)
@@ -907,6 +448,9 @@ Proof.
   discriminate.
 Qed.
 
+(* Lemma to show that if a binary tree is ordered, then it is either a leaf (in which 
+ * case traverse_to_check_ordered_hbt function returns a TNone value) or a node (in which case
+ * the traverse_to_check_ordered_hbt function returns a TSome value). *)
 Lemma is_ordered_true_implies_leaf_or_ordered_node:
   forall (A : Type)
          (compare : A -> A -> element_comparison)
@@ -944,7 +488,10 @@ Proof.
   exact C_traverse_bt.
 Qed.
 
-Lemma reconstruct_ordered_hbt_left:
+(* A very useful lemma: if traversing a binary tree to check its orderedness yields a 
+ * TSome pair, then reducing the left subtree to a leaf also yields an ordered tree 
+ * with a maximum and minimum value *)
+Lemma reduce_ordered_hbt_left:
   forall (A : Type)
          (compare : A -> A -> element_comparison)
          (h : nat)
@@ -1006,7 +553,9 @@ Proof.
   discriminate.
 Qed.
 
-Lemma reconstruct_ordered_hbt_right:
+(* Lemma to show the same thing as for reduce_ordered_hbt_left, but with the right subtree
+ * reduced *)
+Lemma reduce_ordered_hbt_right:
   forall (A : Type)
          (compare : A -> A -> element_comparison)
          (h : nat)
@@ -1068,6 +617,8 @@ Proof.
   discriminate.
 Qed.
 
+(* Lemma to show that if a right rotated tree is ordered, then the original subtree into which 
+ * an element was inserted is also ordered *)
 Lemma rotate_right_1_tree_ordered_implies_returned_tree_ordered:
   forall (A : Type)
          (compare : A -> A -> element_comparison)
@@ -1218,7 +769,7 @@ Proof.
                 A (HNode A h122' bt122') compare = TSome (A * A) (min122', max122') ->
               compare e12 min122' = Lt). 
   intros.
-  Check (reconstruct_ordered_hbt_left).
+  Check (reduce_ordered_hbt_left).
   assert (H_reduced_tree:
             traverse_to_check_ordered_hbt
               A
@@ -1228,7 +779,7 @@ Proof.
                                    (HNode A (1 + max h122' h2)
                                           (Node A (Triple A (HNode A h122' bt122') e (HNode A h2 bt2))))))) compare =
             TSome (A * A) (e12, t_max')).
-  exact (reconstruct_ordered_hbt_left
+  exact (reduce_ordered_hbt_left
            A compare
            (1 + max (1 + max h11' h121') (1 + max h122' h2))
            (HNode A (1 + max h11' h121')
@@ -1325,7 +876,7 @@ Proof.
                                           (Node A (Triple A (HNode A h11' bt11') e1 (HNode A h121' bt121')))) e12
                                    (HNode A 0 (Leaf A))))) compare = 
             TSome (A * A) (t_min', e12)).
-  exact (reconstruct_ordered_hbt_right
+  exact (reduce_ordered_hbt_right
            A compare
            (1 + max (1 + max h11' h121') (1 + max h122' h2))
            (HNode A (1 + max h11' h121')
@@ -1561,6 +1112,8 @@ Proof.
       }
 Qed.
 
+(* Lemma to show that if an insertion operation led to a rotation operation, then the 
+ * subtree on which the insertion operation was performed cannot be a leaf *)
 Lemma rotate_right_1_impossible_case:
   forall (A : Type)
          (compare : A -> A -> element_comparison)
@@ -1595,6 +1148,9 @@ Proof.
   discriminate.
 Qed.
 
+(* Lemma to show that the minimum element of a right rotated tree is either the element
+ * originally inserted, or the minimum value of the subtree on which the insertion 
+ * operation was performed *)
 Lemma rotate_right_min:
   forall (A : Type)
          (compare : A -> A -> element_comparison)
@@ -1641,7 +1197,10 @@ Proof.
   discriminate.
 Qed.  
 
-
+(* Lemma to show that the maximum element of a right rotated tree is the same as the 
+ * maximum element of the left reduced form of the original subtree into which the
+ * insertion was performed. Note that because the lemma can be used in the rotate_right_1
+ * and the rotate_right_2 cases, the variable names are generic *)
 Lemma rotate_right_max:
   forall (A : Type)
          (compare : A -> A -> element_comparison)
@@ -1798,7 +1357,8 @@ Proof.
 
       discriminate.
 Qed. 
-  
+
+(* Lemma to obtain the min and max values of a right rotated tree *)
 Lemma rotate_right_1_min_max: 
   forall (A : Type)
          (compare : A -> A -> element_comparison)
@@ -1838,10 +1398,10 @@ Proof.
 
   - apply or_intror.
 
-    (* t_max' is max2 in our case; to show this, we will left reconstruct the rotated tree
+    (* t_max' is max2 in our case; to show this, we will left reduce the rotated tree
      * twice *)
 
-    (* we first reconstruct our original triple to only consider hbt2 *)
+    (* we first reduce our original triple to only consider hbt2 *)
     assert (H_traverse_hbt_org:
               traverse_to_check_ordered_hbt
                 A
@@ -1851,13 +1411,13 @@ Proof.
     rewrite -> unfold_traverse_to_check_ordered_bt_node.  
     exact H0.
 
-    Check (reconstruct_ordered_hbt_left).
-    assert (H_hbt_org_reconstructed:
+    Check (reduce_ordered_hbt_left).
+    assert (H_hbt_org_reduceed:
               traverse_to_check_ordered_hbt
                 A
                 (HNode A h2 (Node A (Triple A (HNode A 0 (Leaf A)) e (HNode A h2 bt2)))) compare =
               TSome (A * A) (e, t_max)).
-    exact (reconstruct_ordered_hbt_left
+    exact (reduce_ordered_hbt_left
              A compare h2 hbt1 e (HNode A h2 bt2) t_min t_max H_traverse_hbt_org).
     
     (* next, we must get the returned triple in to hbt form *)
@@ -1875,8 +1435,8 @@ Proof.
     rewrite -> unfold_traverse_to_check_ordered_bt_node.  
     exact H.
 
-    (* next, use reconstruct_ordered_hbt_left *)
-    Check reconstruct_ordered_hbt_left.
+    (* next, use reduce_ordered_hbt_left *)
+    Check reduce_ordered_hbt_left.
 
     assert (H_reconstrcuted_1 :
               traverse_to_check_ordered_hbt
@@ -1887,7 +1447,7 @@ Proof.
                                      (HNode A (1 + max h122' h2)
                                             (Node A (Triple A (HNode A h122' bt122') e (HNode A h2 bt2))))))) compare =
               TSome (A * A) (e12, t_max')).
-    exact (reconstruct_ordered_hbt_left
+    exact (reduce_ordered_hbt_left
              A compare (1 + max (1 + max h11' h121') (1 + max h122' h2))
              (HNode A (1 + max h11' h121')
                     (Node A
@@ -1906,16 +1466,17 @@ Proof.
              (HNode A h122' bt122') e (HNode A h2 bt2)
              t_max' h2 t_max
              H_reconstrcuted_1
-             H_hbt_org_reconstructed).
+             H_hbt_org_reduceed).
     exact (rotate_right_max
              A compare (1 + max (1 + max h11' h121') (1 + max h122' h2))
              e12 (1 + max h122' h2)
              (HNode A h122' bt122') e (HNode A h2 bt2)
              t_max' h2 t_max
              H_reconstrcuted_1
-             H_hbt_org_reconstructed).
+             H_hbt_org_reduceed).
 Qed.    
-    
+
+(* Similar to the rotate_right_1, but for the second rotate right operation *) 
 Lemma rotate_right_2_tree_ordered_implies_returned_tree_ordered:
   forall (A : Type)
          (compare : A -> A -> element_comparison)
@@ -1986,14 +1547,14 @@ Proof.
   intros.
   
   (* reconstuct the rotated tree to isolate section of the tree we need *)
-  Check (reconstruct_ordered_hbt_right).
+  Check (reduce_ordered_hbt_right).
   assert (H_reduced_tree:
             traverse_to_check_ordered_hbt
               A
               (HNode A (1 + max h11' (1 + max h12' h2))
                      (Node A (Triple A (HNode A h11' bt11') e1 (HNode A 0 (Leaf A))))) compare =
             TSome (A * A) (t_min', e1)).
-  exact (reconstruct_ordered_hbt_right
+  exact (reduce_ordered_hbt_right
            A compare (1 + max h11' (1 + max h12' h2))
            (HNode A h11' bt11')
            e1
@@ -2019,8 +1580,8 @@ Proof.
               TSome (A * A) (min12', max12') ->
               compare e1 min12' = Lt).
   intros.
-  (* reconstruct tree *)
-  Check (reconstruct_ordered_hbt_left).
+  (* reduce tree *)
+  Check (reduce_ordered_hbt_left).
   assert (H_reduced_tree:
             traverse_to_check_ordered_hbt
               A
@@ -2030,7 +1591,7 @@ Proof.
                                    (HNode A (1 + max h12' h2)
                                           (Node A (Triple A (HNode A h12' bt12') e (HNode A h2 bt2))))))) compare =
             TSome (A * A) (e1, t_max')).
-  exact (reconstruct_ordered_hbt_left
+  exact (reduce_ordered_hbt_left
            A compare (1 + max h11' (1 + max h12' h2))
            (HNode A h11' bt11')
            e1
@@ -2065,14 +1626,14 @@ Proof.
   discriminate.  
 
   (* right reduce the rotated tree to obtain the minimum value for each case *)
-  Check (reconstruct_ordered_hbt_right).
+  Check (reduce_ordered_hbt_right).
   assert (H_reduced_tree:
             traverse_to_check_ordered_hbt
               A
               (HNode A (1 + max h11' (1 + max h12' h2))
                      (Node A (Triple A (HNode A h11' bt11') e1 (HNode A 0 (Leaf A))))) compare =
             TSome (A * A) (t_min', e1)).
-  exact (reconstruct_ordered_hbt_right
+  exact (reduce_ordered_hbt_right
            A compare (1 + max h11' (1 + max h12' h2))
            (HNode A h11' bt11')
            e1
@@ -2167,6 +1728,7 @@ Proof.
       reflexivity.      
 Qed.
 
+(* Similar to the rotate_right_1, but for the second rotate right operation *) 
 Lemma rotate_right_2_impossible_case:
   forall (A : Type)
          (compare : A -> A -> element_comparison)
@@ -2209,6 +1771,7 @@ Proof.
   discriminate.
 Qed.
 
+(* Similar to the rotate_right_1, but for the second rotate right operation *) 
 Lemma rotate_right_2_min_max: 
   forall (A : Type)
          (compare : A -> A -> element_comparison)
@@ -2261,19 +1824,19 @@ Proof.
   exact H0.
 
   (* then left reduce it *)
-  Check (reconstruct_ordered_hbt_left).
+  Check (reduce_ordered_hbt_left).
   assert (H_hbt_org_reduced:
             traverse_to_check_ordered_hbt
               A
               (HNode A (1 + max (project_height_hbt A hbt1) h2)
                      (Node A (Triple A (HNode A 0 (Leaf A)) e (HNode A h2 bt2)))) compare =
             TSome (A * A) (e, t_max)).
-  exact (reconstruct_ordered_hbt_left
+  exact (reduce_ordered_hbt_left
            A compare (1 + max (project_height_hbt A hbt1) h2)
            hbt1 e (HNode A h2 bt2) t_min t_max H_fold_traverse).
 
   (* next, left reduce the rotated tree *)
-  Check (reconstruct_ordered_hbt_left).
+  Check (reduce_ordered_hbt_left).
   assert (H_hbt_rot_reduced:
             traverse_to_check_ordered_hbt
               A
@@ -2283,7 +1846,7 @@ Proof.
                                    (HNode A (1 + max h12' h2)
                                           (Node A (Triple A (HNode A h12' bt12') e (HNode A h2 bt2))))))) compare =
             TSome (A * A) (e1, t_max')).
-  exact (reconstruct_ordered_hbt_left
+  exact (reduce_ordered_hbt_left
            A compare (1 + max h11' (1 + max h12' h2))
            (HNode A h11' bt11')
            e1
@@ -2309,8 +1872,7 @@ Proof.
            H_hbt_org_reduced).
 Qed.
 
-
-
+(* Similar to the rotate_right_1, but for the first rotate left operation *)
 Lemma rotate_left_1_tree_ordered_implies_returned_tree_ordered:
   forall (A : Type)
          (compare : A -> A -> element_comparison)
@@ -2395,7 +1957,7 @@ Proof.
 
   (* construct left reduced tree: to be used for inequality proofs and the main one *)
   (* left reduce rotated tree *)
-  Check (reconstruct_ordered_hbt_left).
+  Check (reduce_ordered_hbt_left).
   assert (H_rotate_left_reduced:
             traverse_to_check_ordered_hbt
               A
@@ -2405,7 +1967,7 @@ Proof.
                                    (HNode A (1 + max h212' h22')
                                           (Node A (Triple A (HNode A h212' bt212') e2 (HNode A h22' bt22')))))))
               compare = TSome (A * A) (e21, t_max')).
-  exact (reconstruct_ordered_hbt_left
+  exact (reduce_ordered_hbt_left
            A compare (1 + max (1 + max h1 h211') (1 + max h212' h22'))
            (HNode A (1 + max h1 h211')
                   (Node A (Triple A (HNode A h1 bt1) e (HNode A h211' bt211'))))
@@ -2426,7 +1988,7 @@ Proof.
   intros.
 
   (* reduce rotated tree first *)
-  Check (reconstruct_ordered_hbt_right).
+  Check (reduce_ordered_hbt_right).
   assert (H_rotate_right_reduced:
             traverse_to_check_ordered_hbt
               A
@@ -2437,7 +1999,7 @@ Proof.
                                           (Node A (Triple A (HNode A h1 bt1) e (HNode A h211' bt211')))) e21
                                    (HNode A 0 (Leaf A))))) compare = 
             TSome (A * A) (t_min', e21)).
-  exact (reconstruct_ordered_hbt_right
+  exact (reduce_ordered_hbt_right
            A compare (1 + max (1 + max h1 h211') (1 + max h212' h22'))
            (HNode A (1 + max h1 h211')
                   (Node A (Triple A (HNode A h1 bt1) e (HNode A h211' bt211'))))
@@ -2817,7 +2379,7 @@ Proof.
       }
 Qed.
 
-
+(* Similar to the rotate_right_1, but for the first rotate left operation *)
 Lemma rotate_left_1_impossible_case:
   forall (A : Type)
          (compare : A -> A -> element_comparison)
@@ -2854,6 +2416,7 @@ Proof.
   discriminate.
 Qed.
 
+(* Similar to the rotate_right_1, but for the first rotate left operation *)
 Lemma rotate_left_max:
   forall (A : Type)
          (compare : A -> A -> element_comparison)
@@ -2887,14 +2450,14 @@ Proof.
   rewrite -> unfold_traverse_to_check_ordered_bt_node.
   exact H.
   
-  Check (reconstruct_ordered_hbt_left).
+  Check (reduce_ordered_hbt_left).
   assert (H_t_left_reduced:
             traverse_to_check_ordered_hbt
               A
               (HNode A (1 + max h1 (project_height_hbt A hbt2))
                      (Node A (Triple A (HNode A 0 (Leaf A)) e hbt2))) compare = 
             TSome (A * A) (e, t_max)).
-  exact (reconstruct_ordered_hbt_left
+  exact (reduce_ordered_hbt_left
            A compare (1 + max h1 (project_height_hbt A hbt2))
            (HNode A h1 bt1) e hbt2 t_min t_max H').
 
@@ -2917,6 +2480,7 @@ Proof.
   discriminate.
 Qed.
 
+(* Similar to the rotate_right_1, but for the first rotate left operation *)
 Lemma rotate_left_min:
   forall (A : Type)
          (compare : A -> A -> element_comparison)
@@ -3070,7 +2634,8 @@ Proof.
     
     discriminate.
 Qed.    
-    
+
+(* Similar to the rotate_right_1, but for the first rotate left operation *)
 Lemma rotate_left_1_min_max:
   forall (A : Type)
          (compare : A -> A -> element_comparison)
@@ -3116,7 +2681,7 @@ Proof.
   (* min *)
 
   (* right reduce the rotated tree *)
-  Check (reconstruct_ordered_hbt_right).
+  Check (reduce_ordered_hbt_right).
   assert (H_rotated_tree_right_reduced:
             traverse_to_check_ordered_hbt
               A
@@ -3127,7 +2692,7 @@ Proof.
                                           (Node A (Triple A (HNode A h1 bt1) e (HNode A h211' bt211')))) e21
                                    (HNode A 0 (Leaf A))))) compare = 
             TSome (A * A) (t_min', e21)).
-  exact (reconstruct_ordered_hbt_right
+  exact (reduce_ordered_hbt_right
            A compare (1 + max (1 + max h1 h211') (1 + max h212' h22'))
            (HNode A (1 + max h1 h211')
                   (Node A (Triple A (HNode A h1 bt1) e (HNode A h211' bt211')))) e21
@@ -3136,14 +2701,14 @@ Proof.
            t_min' t_max' H).
 
   (* right reduce the original tree *)
-  Check (reconstruct_ordered_hbt_right).
+  Check (reduce_ordered_hbt_right).
   assert (H_org_tree_reduced:
             traverse_to_check_ordered_hbt
               A
               (HNode A (1 + max h1 (project_height_hbt A hbt2))
                      (Node A (Triple A (HNode A h1 bt1) e (HNode A 0 (Leaf A))))) compare =
             TSome (A * A) (t_min, e)).
-  exact (reconstruct_ordered_hbt_right
+  exact (reduce_ordered_hbt_right
            A compare (1 + max h1 (project_height_hbt A hbt2))
            (HNode A h1 bt1) e hbt2 t_min t_max H0).
 
@@ -3164,7 +2729,7 @@ Proof.
            H_rotated_tree_right_reduced H_org_tree_reduced).
 Qed.
 
-
+(* Similar to the rotate_right_1, but for the second rotate left operation *)
 Lemma rotate_left_2_tree_ordered_implies_returned_tree_ordered:
   forall (A : Type)
          (compare : A -> A ->element_comparison)
@@ -3239,14 +2804,14 @@ Proof.
               H_left_subtree_ord) as [H_ord_bt1 H_bt21'_ord].
 
   (* left reduce rotated tree for 2nd inequality proof and final proof *)
-  Check (reconstruct_ordered_hbt_left).
+  Check (reduce_ordered_hbt_left).
   assert (H_rotate_left_reduced:
             traverse_to_check_ordered_hbt
               A
               (HNode A (1 + max (1 + max h1 h21') h22')
                      (Node A (Triple A (HNode A 0 (Leaf A)) e2 (HNode A h22' bt22')))) compare =
             TSome (A * A) (e2, t_max')).
-  exact (reconstruct_ordered_hbt_left
+  exact (reduce_ordered_hbt_left
            A compare
            (1 + max (1 + max h1 h21') h22')
            (HNode A (1 + max h1 h21')
@@ -3273,7 +2838,7 @@ Proof.
   intros.
   
   (* right reduce the rotated subtree to obtain inequalities *)
-  Check (reconstruct_ordered_hbt_right).
+  Check (reduce_ordered_hbt_right).
   assert (H_rotate_right_reduced:
             traverse_to_check_ordered_hbt
               A
@@ -3284,7 +2849,7 @@ Proof.
                                           (Node A (Triple A (HNode A h1 bt1) e (HNode A h21' bt21')))) e2
                                    (HNode A 0 (Leaf A))))) compare = 
             TSome (A * A) (t_min', e2)).
-  exact (reconstruct_ordered_hbt_right
+  exact (reduce_ordered_hbt_right
            A compare (1 + max (1 + max h1 h21') h22')
            (HNode A (1 + max h1 h21')
                   (Node A (Triple A (HNode A h1 bt1) e (HNode A h21' bt21'))))
@@ -3507,7 +3072,7 @@ Proof.
     }
 Qed.
   
-
+(* Similar to the rotate_right_1, but for the second rotate left operation *)
 Lemma rotate_left_2_impossible_case:
   forall (A :Type)
          (compare : A -> A -> element_comparison)
@@ -3548,7 +3113,7 @@ Proof.
   discriminate.
 Qed.
 
-
+(* Similar to the rotate_right_1, but for the second rotate left operation *)
 Lemma rotate_left_2_min_max:
   forall (A : Type)
          (compare : A -> A -> element_comparison)
@@ -3589,7 +3154,7 @@ Proof.
   (* max *)
 
   (* first, right reduce rotated tree *)
-  Check (reconstruct_ordered_hbt_right).
+  Check (reduce_ordered_hbt_right).
   assert (H_rotate_right_reduced:
             traverse_to_check_ordered_hbt
               A
@@ -3600,7 +3165,7 @@ Proof.
                                           (Node A (Triple A (HNode A h1 bt1) e (HNode A h21' bt21')))) e2
                                    (HNode A 0 (Leaf A))))) compare = 
             TSome (A * A) (t_min', e2)).
-  exact (reconstruct_ordered_hbt_right
+  exact (reduce_ordered_hbt_right
            A compare
            (1 + max (1 + max h1 h21') h22')
            (HNode A (1 + max h1 h21')
@@ -3610,14 +3175,14 @@ Proof.
            t_min' t_max' H).
 
   (* next, right reduce original tree *)
-  Check (reconstruct_ordered_hbt_right).
+  Check (reduce_ordered_hbt_right).
   assert (H_org_tree_reduced:
             traverse_to_check_ordered_hbt
               A
               (HNode A (1 + max h1 (project_height_hbt A hbt2))
                      (Node A (Triple A (HNode A h1 bt1) e (HNode A 0 (Leaf A))))) compare =
             TSome (A * A) (t_min, e)).
-  exact (reconstruct_ordered_hbt_right
+  exact (reduce_ordered_hbt_right
            A compare (1 + max h1 (project_height_hbt A hbt2))
            (HNode A h1 bt1) e hbt2 t_min t_max H0).
 
@@ -3634,8 +3199,9 @@ Proof.
 Qed.            
 
 
-
-
+(* The main lemma required to prove the orderedness case of the insertion specification in 
+ * Hbt.Theorems.theorems: given an insertion into a subtree, show that the maximum and 
+ * minimum values of a subtree are as specified in the theorem *)
 Lemma insertion_in_node_min_max: 
   forall (A : Type)
          (compare : A -> A -> element_comparison),
@@ -4632,71 +4198,7 @@ Proof.
     + discriminate.
 Qed.
 
-
-(* ***** *)
-
-(* ***** Section 5.7 Lemmas concerning rotations ***** *)
-Lemma rotate_right_preserves_soundness:
-  forall (A : Type)
-         (h_ret : nat)
-         (bt_ret : binary_tree A)
-         (e : A) 
-         (hbt2 : heightened_binary_tree A) 
-         (hbt' : heightened_binary_tree A), 
-    is_sound_hbt A (HNode A h_ret bt_ret) = true ->
-    is_sound_hbt A hbt2 = true -> 
-    rotate_right_hbt A (HNode A h_ret bt_ret) e hbt2 = Some hbt' ->
-    is_sound_hbt A hbt' = true.
-Proof.
-Admitted.
-
-Lemma rotate_left_preserves_soundness:
-  forall (A : Type)
-         (hbt1 : heightened_binary_tree A)
-         (e : A)
-         (h_ret : nat)
-         (bt_ret : binary_tree A)
-         (hbt' : heightened_binary_tree A),
-    is_sound_hbt A hbt1 = true -> 
-    is_sound_hbt A (HNode A h_ret bt_ret) = true ->
-    rotate_left_hbt A hbt1 e (HNode A h_ret bt_ret) = Some hbt' -> 
-    is_sound_hbt A hbt' = true.
-Proof.
-Admitted.
-
-
-Lemma rotate_right_preserves_balance:
-  forall (A : Type)
-         (h_ret : nat)
-         (bt_ret : binary_tree A)
-         (e : A)
-         (hbt2 : heightened_binary_tree A)
-         (hbt' : heightened_binary_tree A),
-    is_balanced_hbt A (HNode A h_ret bt_ret) = true ->
-    is_balanced_hbt A hbt2 = true ->
-    is_sound_hbt A (HNode A h_ret bt_ret) = true ->
-    is_sound_hbt A hbt2 = true -> 
-    rotate_right_hbt A (HNode A h_ret bt_ret) e hbt2 = Some hbt' ->
-    is_balanced_hbt A hbt' = true.
-Proof.
-Admitted.
-
-Lemma rotate_left_preserves_balance:
-  forall (A : Type)
-         (hbt1 : heightened_binary_tree A)
-         (e : A)
-         (h_ret : nat)
-         (bt_ret : binary_tree A)
-         (hbt' : heightened_binary_tree A),
-    is_balanced_hbt A hbt1 = true -> 
-    is_balanced_hbt A (HNode A h_ret bt_ret) = true ->
-    is_sound_hbt A hbt1 = true -> 
-    is_sound_hbt A (HNode A h_ret bt_ret) = true ->
-    rotate_left_hbt A hbt1 e (HNode A h_ret bt_ret) = Some hbt' -> 
-    is_balanced_hbt A hbt' = true.
-Proof.
-Admitted.
-
+(* Rotation lemmas *) 
 Lemma rotate_right_preserves_order:
   forall (A : Type)
          (compare : A -> A -> element_comparison)
@@ -4713,7 +4215,7 @@ Lemma rotate_right_preserves_order:
     rotate_right_hbt A (HNode A h_ret bt_ret) e hbt2 = Some hbt' ->
     is_ordered_hbt A hbt' compare = true.
 Proof.
-Admitted.
+ Admitted.
 
 Lemma rotate_left_preserves_order:
   forall (A : Type)
@@ -4731,12 +4233,4 @@ Lemma rotate_left_preserves_order:
     rotate_left_hbt A hbt1 e (HNode A h_ret bt_ret) = Some hbt' -> 
     is_ordered_hbt A hbt' compare = true.
 Proof.
-Admitted.
-
-
-
-
-
-(* Admitted.  *)
-
-
+ Admitted.

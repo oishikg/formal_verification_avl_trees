@@ -1,10 +1,9 @@
 (* Imports: *)
-Require Import Hbt.Lemmas.lemmas.
+Require Import Hbt.Lemmas.sound_and_balanced.
+Require Import Hbt.Lemmas.ordered.
 
 
-(* ***** Section 5.3: The specifications  ***** *)
-Check (element_comparison).
-
+(* ***** Section 1: The specifications and theorems for insert  ***** *)
 Definition specification_of_insert_hbt_helper
            (A : Type)
            (compare : A -> A -> element_comparison)
@@ -72,16 +71,6 @@ Definition specification_of_insert_t_helper
     /\
     (is_ordered_hbt A hbt' compare = true).
 
-(* ***** *)
-
-
-
-
-  
-(* ***** 
-        SECTION 5.7: The main theorem: implementations meet their specifications
- * *****)
-
 
 Lemma the_helper_functions_meet_their_specifications:
   forall (A : Type)
@@ -91,7 +80,7 @@ Lemma the_helper_functions_meet_their_specifications:
     /\
     (specification_of_insert_bt_helper A compare x insert_bt_helper)
     /\
-    (specification_of_insert_t_helper A compare x insert_t_helper).
+    (specification_of_insert_t_helper A compare x insert_t_helper). 
 Proof.
   intros A compare x.
   unfold specification_of_insert_hbt_helper.
@@ -917,7 +906,7 @@ Proof.
 
       + discriminate.
   }
-
+Qed. 
 
 Definition specifiction_of_insert_hbt
            (A : Type)
@@ -937,37 +926,50 @@ Definition specifiction_of_insert_hbt
     (is_balanced_hbt A (insert_hbt A compare x hbt) = true)
     /\
     (is_ordered_hbt A (insert_hbt A compare x hbt) compare = true).
-
-
-(* Theorem insert_hbt_satisfies_its_specification:  *)
-(*   forall (A : Type) *)
-(*          (compare : A -> A -> element_comparison) *)
-(*          (x : A), *)
-(*     specifiction_of_insert_hbt A compare x insert_hbt. *)
-(* Proof.           *)
-(*   intros A compare.   *)
-(*   unfold specifiction_of_insert_hbt. *)
-(*   intros x hbt H_sound_init H_bal_init H_order_init. *)
-(*   unfold insert_hbt. *)
-(*   (* destruct (the_helper_functions_meet_their_specifications A compare x) as [H_hbt [_ _]]. *) *)
   
-(*   unfold specification_of_insert_hbt_helper in H_hbt. *)
-(*   case (insert_hbt_helper A compare x hbt) as [ hbt' | ] eqn : C. *)
-(*   apply (H_hbt hbt hbt'). *)
-(*   exact C. *)
+Theorem insert_hbt_satisfies_its_specification:
+  forall (A : Type)
+         (compare : A -> A -> element_comparison)
+         (x : A),
+    specifiction_of_insert_hbt A compare x insert_hbt.
+Proof.
+  intros A compare.
+  unfold specifiction_of_insert_hbt.
+  intros x hbt H_sound_init H_bal_init H_order_init.
+  unfold insert_hbt.
+  Check (the_helper_functions_meet_their_specifications).
+  destruct (the_helper_functions_meet_their_specifications A compare x) as [H_hbt [_ _]].
+  
+  unfold specification_of_insert_hbt_helper in H_hbt.
+  case (insert_hbt_helper A compare x hbt) as [ hbt' | ] eqn : C.
 
-(*   split. *)
-(*   exact H_sound_init. *)
-(*   split. *)
-(*   exact H_bal_init. *)
-(*   exact H_order_init. *)
-(* Qed. *)
+  (* case when the insertion operation goes through *)
+  - apply (H_hbt hbt hbt').
+    exact H_sound_init.
+    exact H_bal_init.
+    exact H_order_init.
+    exact C.
+
+  (* case when the insertion operation fails and a None value is returned *)
+  - split.
+    exact H_sound_init.
+    split.
+
+    exact H_bal_init.
+
+    exact H_order_init.
+Qed.
+
+
+(* ***** Section 2: Specifications and theorems for delete *)
 
 
 
-(* (* ***** Section 4.2: Formal specification and associated theorems for lookup ***** *) *)
 
 
+
+
+(* ***** Section 3: Specification and associated theorems for lookup ***** *)
 
 (* (* The specification *) *)
 (* Definition specification_of_occurs_hbt *)
