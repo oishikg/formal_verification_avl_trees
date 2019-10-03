@@ -2,10 +2,11 @@
 
 This project aims to formally verify the correctness of an OCaml based AVL tree implementation
 using the `Coq` proof assistant. It contains:
-- The corresponding `Gallina` implementation of AVL trees.
-- Specifications for the lookup, insert, and deleting operations.
-- Theorems to prove the specifications.
-- Lemmas to aid in the above theorems. 
+- Professor Olivier Danvy's implementation of AVL trees (in `AVL_Trees_Implementation`). 
+- The corresponding `Gallina` implementation of AVL trees (in `Coq_files/src`).
+- Specifications for the lookup, insert, and deleting operations (in `Coq_files/src`).
+- Theorems to prove the specifications (in `Coq_files/src`).
+- Lemmas to aid in the above theorems (in `Coq_files/src`).
 
 ## Getting started
 
