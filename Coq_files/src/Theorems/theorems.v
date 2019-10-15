@@ -220,6 +220,8 @@ Proof.
     destruct (triple_ordered_implies_hbts_ordered
                 A compare h_hbt hbt1 e hbt2 H_ord_t_init)
       as [H_hbt1_is_ordered H_hbt2_is_ordered].
+
+    
     rewrite -> (unfold_insert_t_helper A compare x h_hbt hbt1 e hbt2)
       in H_insert_t.
     (* Element to be inserted is Lt current element considered *)
