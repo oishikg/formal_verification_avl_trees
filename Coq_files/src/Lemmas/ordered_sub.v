@@ -2,6 +2,7 @@ Require Import Hbt.Implementation.hbt.
 Require Export Hbt.Implementation.hbt.
 
 Require Import Hbt.Lemmas.sound_balanced.
+Require Export Hbt.Lemmas.sound_balanced.
 
 (* ***** Section 5.6: Lemmas for orderedness ***** *)
 
