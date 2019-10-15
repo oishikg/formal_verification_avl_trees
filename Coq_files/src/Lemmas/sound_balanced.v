@@ -1,8 +1,7 @@
-(* ********** Imports ********** *)
 Require Import Hbt.Implementation.hbt.
 Require Export Hbt.Implementation.hbt.
 
-(* ***** Section 5.4: Lemmas concerning soundness ***** *)
+(* ********** Lemmas concerning soundness ********** *)
 
 (* Given a triple that is sound, its binary trees should also be sound *)
 Lemma triple_sound_implies_hbts_sound:
@@ -157,7 +156,7 @@ Proof.
 
 (* ***** *)
 
-(* ***** Section 5.5: Balancedness lemmas ***** *)
+(* ********** Lemmas concerning balancedness ********** *)
 
 (* Given a balanced triple, its constituent hbts should also be balanced *)
 Lemma triple_balanced_implies_hbts_balanced:
@@ -496,11 +495,6 @@ Proof.
   - discriminate.
 Qed.
 
-(* ***** *)
-
-
-(* ***** Section 5.7 Lemmas concerning rotations ***** *)
-
 Lemma equal_heights:
   forall (h1 h2 : nat),
     (1 + max h1 h2 =n= 1 + max h1 h2) = true.
@@ -608,6 +602,8 @@ Proof.
     (* finish the proof *)
 Admitted.
 
+(* ********** Lemmas concerning rotation ********** *)
+
 Lemma rotate_left_preserves_soundness:
   forall (A : Type)
          (hbt1 : heightened_binary_tree A)
@@ -657,8 +653,374 @@ Proof.
 
 
 
+Lemma insertion_preserves_soundness_and_balance: 
+  forall (A : Type)
+         (compare : A -> A -> element_comparison)
+         (x : A),
+    (forall (hbt : heightened_binary_tree A)
+            (hbt' : heightened_binary_tree A),
+        is_sound_hbt A hbt = true ->
+        is_balanced_hbt A hbt = true ->        
+        insert_hbt_helper A compare x hbt = Some hbt' ->
+        is_sound_hbt A hbt' = true /\ is_balanced_hbt A hbt' = true)
+    /\
+    (forall (bt : binary_tree A)
+            (h_hbt : nat)
+            (hbt' : heightened_binary_tree A),    
+        is_sound_hbt A (HNode A h_hbt bt) = true ->
+        is_balanced_hbt A (HNode A h_hbt bt) = true ->                
+        insert_bt_helper A compare x h_hbt bt = Some hbt' ->
+        is_sound_hbt A hbt' = true /\ is_balanced_hbt A hbt' = true)
+    /\
+    (forall (t : triple A)
+            (h_hbt : nat)
+            (hbt' : heightened_binary_tree A),    
+        is_sound_hbt A (HNode A h_hbt (Node A t)) = true ->
+        is_balanced_hbt A (HNode A h_hbt (Node A t)) = true ->                        
+        insert_t_helper A compare x h_hbt t = Some hbt' ->
+        is_sound_hbt A hbt' = true /\ is_balanced_hbt A hbt' = true).
+Proof.
+  intros.
+  apply heightened_binary_tree_mutual_induction.
+
+  (* Specification for hbt holds, given bt as inductive case *)  
+  - intros h bt H_bt_inductive_assumption hbt' H_sound_hbt_init H_bal_hbt_init H_insert_hbt.
+    Check (H_bt_inductive_assumption h hbt' H_sound_hbt_init H_bal_hbt_init H_insert_hbt).
+    exact (H_bt_inductive_assumption h hbt' H_sound_hbt_init H_bal_hbt_init H_insert_hbt).
+
+    (* Specification for bt leaf constructor holds *)
+  - intros h_hbt hbt' H_sound_bt_init H_bal_hbt_init H_insert_bt.
+    rewrite -> (unfold_insert_bt_helper_leaf A compare x)
+      in H_insert_bt.
+    rewrite -> some_x_equal_some_y in H_insert_bt.
+    rewrite <- H_insert_bt.
+
+    split.
+
+    (* prove soundness *)
+    + unfold is_sound_hbt.
+      rewrite -> unfold_traverse_to_check_soundness_hbt.
+      rewrite -> unfold_traverse_to_check_soundness_bt_node.
+      rewrite -> unfold_traverse_to_check_soundness_t.
+      rewrite -> unfold_traverse_to_check_soundness_hbt.
+      rewrite -> unfold_traverse_to_check_soundness_bt_leaf.
+      unfold beq_nat at 1.
+      unfold beq_nat at 1.
+      unfold max at 1.
+      Search (_ + 0 = _).
+      rewrite -> (plus_0_r 1) at 1.
+      unfold beq_nat at 1.
+      reflexivity.
+
+    (* prove balancedness *)
+    + unfold is_balanced_hbt.
+      rewrite -> unfold_traverse_to_check_balanced_hbt.
+      rewrite -> unfold_traverse_to_check_balanced_bt_node.
+      rewrite -> unfold_traverse_to_check_balanced_t.
+      rewrite -> unfold_traverse_to_check_balanced_hbt.
+      rewrite -> unfold_traverse_to_check_balanced_bt_leaf.
+      unfold differ_by_one.
+      rewrite -> (plus_0_l 1).
+      unfold beq_nat.
+      unfold max.
+      rewrite -> (plus_0_r 1).
+      (* why does the boolean statement not evaluate here? *)
+        reflexivity.
 
 
-(* Admitted.  *)
+    (* Specification for bt with node constructor holds, given t as inductive case *)
+  - intros t H_t_inductive_assumption h_hbt hbt' H_sound_bt_init H_bal_bt_init H_insert_bt.
+    exact (H_t_inductive_assumption h_hbt hbt' H_sound_bt_init H_bal_bt_init H_insert_bt).
+    
+  (* Specification for t holds, given hbt as inductive case *)    
+  - intros hbt1 H_hbt1_inductive_assumption
+           e
+           hbt2 H_hbt2_inductive_assumption
+           h_hbt hbt'
+           H_sound_t_init H_bal_t_init H_insert_t.
+    
+    (* Before working on the particular subgoals, assert some essential 
+     * hypotheses *)
+    destruct (triple_sound_implies_hbts_sound
+                A h_hbt hbt1 e hbt2 H_sound_t_init) as [H_hbt1_is_sound H_hbt2_is_sound].
+    destruct (triple_balanced_implies_hbts_balanced
+                A h_hbt hbt1 e hbt2 H_bal_t_init) as [H_hbt1_is_balanced H_hbt2_is_balanced].
+    
+        rewrite -> (unfold_insert_t_helper A compare x h_hbt hbt1 e hbt2)
+      in H_insert_t.
+    (* Element to be inserted is Lt current element considered *)
+    case (compare x e) as [ | | ] eqn : C_comp.
 
+    (* Case 1: x <e *)
+    + case (insert_hbt_helper A compare x hbt1) as [hbt_ret | ] eqn : C_insert_hbt1.
+      induction hbt_ret as [h_ret bt_ret].
 
+      (* Trivial hypothesis required to use other hypotheses *)
+      assert (P_some_eq : Some (HNode A h_ret bt_ret) =
+                          Some (HNode A h_ret bt_ret)).
+      reflexivity. 
+
+      case (compare_int (h_ret - project_height_hbt A hbt2) 2)
+        as [ | | ] eqn : C_height_diff.
+
+      (* The insertion does not unbalance the tree *) 
+      *  unfold beq_nat in H_insert_t.
+        apply (some_x_equal_some_y
+                 (heightened_binary_tree A)
+                 (HNode A (1 + max h_ret (project_height_hbt A hbt2))
+                        (Node A (Triple A (HNode A h_ret bt_ret) e hbt2)))
+                 hbt') in H_insert_t.
+        rewrite <- H_insert_t.
+
+        split.
+        
+        (* The resultant tree is sound *)
+        {
+          destruct (H_hbt1_inductive_assumption (HNode A h_ret bt_ret)
+                                                H_hbt1_is_sound
+                                                H_hbt1_is_balanced
+                                                P_some_eq) as
+              [H_hbt_ret_is_sound _].
+          assert (P_relating_heights :
+                    (1 + max h_ret (project_height_hbt A hbt2)) =
+                    (1 + max (project_height_hbt A (HNode A h_ret bt_ret))
+                             (project_height_hbt A hbt2))).
+          unfold project_height_hbt at 2.
+          reflexivity.
+          exact (hbts_sound_implies_triple_sound_weak
+                   A
+                   (1 + max h_ret (project_height_hbt A hbt2))
+                   (HNode A h_ret bt_ret)
+                   e
+                   hbt2
+                   H_hbt_ret_is_sound
+                   H_hbt2_is_sound
+                   P_relating_heights).
+        }
+
+        (* The resultant tree is balanced *)
+        {
+          destruct (H_hbt1_inductive_assumption (HNode A h_ret bt_ret)
+                                                H_hbt1_is_sound
+                                                H_hbt1_is_balanced
+                                                P_some_eq) as
+              [_ H_hbt_ret_is_balanced].
+          destruct (H_hbt1_inductive_assumption (HNode A h_ret bt_ret)
+                                                H_hbt1_is_sound
+                                                H_hbt1_is_balanced
+                                                P_some_eq) as
+              [H_hbt_ret_is_sound _].
+          assert (H_hbts_balanced_triple_balanced_with_da:
+                    compare_int (project_height_hbt A (HNode A h_ret bt_ret) -
+                                 project_height_hbt A hbt2) 2 = Lt
+                    \/
+                    compare_int (project_height_hbt A hbt2 -
+                                 project_height_hbt A (HNode A h_ret bt_ret)) 2 =
+                    Lt ->
+                    is_balanced_hbt
+                      A
+                      (HNode A (1 + max h_ret (project_height_hbt A hbt2))
+                             (Node A (Triple A (HNode A h_ret bt_ret) e hbt2))) =
+                    true).
+          exact (hbts_balanced_implies_triple_balanced_weak
+                   A
+                   (1 + max h_ret (project_height_hbt A hbt2))
+                   (HNode A h_ret bt_ret)
+                   e
+                   hbt2
+                   H_hbt_ret_is_balanced
+                   H_hbt2_is_balanced
+                   H_hbt_ret_is_sound
+                   H_hbt2_is_sound).
+          destruct (or_implication
+                      (compare_int
+                         (project_height_hbt A (HNode A h_ret bt_ret) -
+                          project_height_hbt A hbt2) 2 = Lt)
+                      (compare_int
+                         (project_height_hbt A hbt2 -
+                          project_height_hbt A (HNode A h_ret bt_ret)) 2 = Lt)
+                      (is_balanced_hbt
+                         A
+                         (HNode A (1 + max h_ret (project_height_hbt A hbt2))
+                                (Node A (Triple A (HNode A h_ret bt_ret) e hbt2)))
+                       = true)
+                      H_hbts_balanced_triple_balanced_with_da)
+            as [H_we_need_12  H_we_need_21].
+          exact (H_we_need_12 C_height_diff).
+        }
+
+      (* the insertion unbalances the tree: rotations required *) 
+      * Check (H_hbt1_inductive_assumption
+                 (HNode A h_ret bt_ret)
+                 H_hbt1_is_sound H_hbt1_is_balanced P_some_eq).
+        destruct (H_hbt1_inductive_assumption
+                    (HNode A h_ret bt_ret)
+                    H_hbt1_is_sound H_hbt1_is_balanced P_some_eq)
+          as [H_hbt_ret_sound H_hbt_ret_balanced].
+        split.
+
+        (* rotated tree is sound *)        
+        {
+          Check (rotate_right_preserves_soundness).
+          Check (rotate_right_preserves_soundness
+                   A h_ret bt_ret e hbt2 hbt'
+                   H_hbt_ret_sound H_hbt2_is_sound H_insert_t).
+          exact (rotate_right_preserves_soundness
+                   A h_ret bt_ret e hbt2 hbt'
+                   H_hbt_ret_sound H_hbt2_is_sound H_insert_t).
+        }
+
+        (* rotated tree is balanced *)
+        {
+          Check (rotate_right_preserves_balance).
+          Check (rotate_right_preserves_balance
+                   A h_ret bt_ret e hbt2 hbt'
+                   H_hbt_ret_balanced H_hbt2_is_balanced
+                   H_hbt_ret_sound H_hbt2_is_sound H_insert_t).
+          exact (rotate_right_preserves_balance
+                   A h_ret bt_ret e hbt2 hbt'
+                   H_hbt_ret_balanced H_hbt2_is_balanced
+                   H_hbt_ret_sound H_hbt2_is_sound H_insert_t).
+        }
+
+      * discriminate.
+
+      * discriminate.
+
+    + discriminate.
+
+    (* Case 3: x > e *)      
+    + case (insert_hbt_helper A compare x hbt2) as [hbt_ret | ] eqn : C_insert_hbt2.
+      induction hbt_ret as [h_ret bt_ret].
+
+      (* Trivial hypothesis required to use other hypotheses *)
+      assert (P_some_eq : Some (HNode A h_ret bt_ret) =
+                          Some (HNode A h_ret bt_ret)).
+      reflexivity. 
+
+      case (compare_int (h_ret - project_height_hbt A hbt1) 2)
+        as [ | | ] eqn : C_height_diff.
+
+      (* The insertion does not unbalance the tree *) 
+      * unfold beq_nat in H_insert_t.
+        rewrite -> some_x_equal_some_y in H_insert_t.
+        rewrite <- H_insert_t.
+
+        split.
+
+        (* The resultant tree is sound *)
+        {
+          destruct (H_hbt2_inductive_assumption (HNode A h_ret bt_ret)
+                                                H_hbt2_is_sound
+                                                H_hbt2_is_balanced
+                                                P_some_eq) as
+              [H_hbt_ret_is_sound _].
+          
+          assert (P_relating_heights :
+                    (1 + max (project_height_hbt A hbt1) h_ret) =
+                    (1 + max (project_height_hbt A hbt1)
+                             (project_height_hbt A (HNode A h_ret bt_ret)))).
+          unfold project_height_hbt at 3.
+          reflexivity.
+
+          Check (hbts_sound_implies_triple_sound_weak).
+          exact (hbts_sound_implies_triple_sound_weak
+                   A
+                   (1 + max (project_height_hbt A hbt1) h_ret)
+                   hbt1
+                   e
+                   (HNode A h_ret bt_ret)
+                   H_hbt1_is_sound
+                   H_hbt_ret_is_sound
+                   P_relating_heights).
+        }
+        
+        (* The resultant tree is balanced *)
+        {
+          destruct (H_hbt2_inductive_assumption (HNode A h_ret bt_ret)
+                                                H_hbt2_is_sound
+                                                H_hbt2_is_balanced
+                                                P_some_eq) as
+              [_ H_hbt_ret_is_balanced].
+          destruct (H_hbt2_inductive_assumption (HNode A h_ret bt_ret)
+                                                H_hbt2_is_sound
+                                                H_hbt2_is_balanced
+                                                P_some_eq) as
+              [H_hbt_ret_is_sound _].
+          assert (H_hbts_balanced_triple_balanced_with_da:
+                    compare_int (project_height_hbt A hbt1 -
+                                 project_height_hbt A (HNode A h_ret bt_ret)) 2 = Lt
+                    \/
+                    compare_int (project_height_hbt A (HNode A h_ret bt_ret) -
+                                 project_height_hbt A hbt1) 2 = Lt
+                    ->
+                    is_balanced_hbt
+                      A
+                      (HNode A (1 + max (project_height_hbt A hbt2) h_ret)
+                             (Node A (Triple A hbt1 e (HNode A h_ret bt_ret)))) =
+                    true). 
+          Check (hbts_balanced_implies_triple_balanced_weak).
+          exact (hbts_balanced_implies_triple_balanced_weak
+                   A
+                   (1 + max (project_height_hbt A hbt2) h_ret)
+                   hbt1
+                   e
+                   (HNode A h_ret bt_ret)
+                   H_hbt1_is_balanced
+                   H_hbt_ret_is_balanced
+                   H_hbt1_is_sound
+                   H_hbt_ret_is_sound).
+          destruct (or_implication
+                      (compare_int
+                         (project_height_hbt A hbt1 -
+                          project_height_hbt A (HNode A h_ret bt_ret)) 2 = Lt)
+                      (compare_int
+                         (project_height_hbt A (HNode A h_ret bt_ret) -
+                          project_height_hbt A hbt1) 2 = Lt)
+                      (is_balanced_hbt
+                         A
+                         (HNode A (1 + max (project_height_hbt A hbt1) h_ret)
+                                (Node A (Triple A hbt1 e (HNode A h_ret bt_ret)))) = true)
+                      H_hbts_balanced_triple_balanced_with_da) 
+            as [H_we_need_12  H_we_need_21].
+          exact (H_we_need_21 C_height_diff).
+        }
+
+      (* the insertion unbalances the tree: rotations required *) 
+      * Check (H_hbt2_inductive_assumption
+                 (HNode A h_ret bt_ret)
+                 H_hbt2_is_sound H_hbt2_is_balanced P_some_eq).
+        destruct (H_hbt2_inductive_assumption
+                    (HNode A h_ret bt_ret)
+                    H_hbt2_is_sound H_hbt2_is_balanced P_some_eq)
+          as [H_hbt_ret_sound H_hbt_ret_balanced].
+        split.
+
+        (* rotated tree is sound *)
+        {
+          Check (rotate_left_preserves_soundness).
+          Check (rotate_left_preserves_soundness
+                   A hbt1 e h_ret bt_ret hbt'
+                   H_hbt1_is_sound H_hbt_ret_sound H_insert_t).
+          exact (rotate_left_preserves_soundness
+                   A hbt1 e h_ret bt_ret hbt'
+                   H_hbt1_is_sound H_hbt_ret_sound H_insert_t).
+        }
+
+        (* rotated tree is balanced *)
+        {
+          Check (rotate_left_preserves_balance).
+          Check (rotate_left_preserves_balance
+                   A hbt1 e h_ret bt_ret hbt'
+                   H_hbt1_is_balanced H_hbt_ret_balanced
+                   H_hbt1_is_sound H_hbt_ret_sound H_insert_t).
+          exact (rotate_left_preserves_balance
+                   A hbt1 e h_ret bt_ret hbt'
+                   H_hbt1_is_balanced H_hbt_ret_balanced
+                   H_hbt1_is_sound H_hbt_ret_sound H_insert_t).
+        }
+
+      * discriminate.
+
+      * discriminate.
+Qed.
