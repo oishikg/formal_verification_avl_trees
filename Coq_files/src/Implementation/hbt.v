@@ -726,7 +726,7 @@ Definition rotate_right_bt
                                                            (HNode A h2 bt2)))))))
       end
     else
-      if h12 + 1 =n= h11
+      if (h12 + 1 =n= h11) || (h12 =n= h11)
       then Some (HNode A
                        (1 + max h11 (1 + max h12 h2))
                        (Node A (Triple A
@@ -741,7 +741,7 @@ Definition rotate_right_bt
                 (* impossible case *)
       else None
   end.
-           
+
 Definition rotate_right_hbt
          (A : Type)
          (hbt1 : heightened_binary_tree A)
@@ -789,7 +789,7 @@ Definition rotate_left_bt
                                                            (HNode A h22 bt22)))))))
       end
     else
-      if h21 + 1 =n= h22
+      if (h21 + 1 =n= h22) || (h21 =n= h22)
       then Some (HNode A (1 + max (1 + max h1 h21) h22)
                        (Node A (Triple A
                                        (HNode A
@@ -1588,24 +1588,20 @@ Definition t_del1_r :=
 
 Compute (is_sound_hbt nat t_del1_r&& is_balanced_hbt nat t_del1_r
                       && is_ordered_hbt nat t_del1_r compare_int).
-  
-Definition delete_is_succesful opt_hbt1 hbt1_del_res :=
-  match opt_hbt1 with
-  | None =>
-    false
-  | Some hbt1 =>
-    equal_hbt nat compare_int hbt1 hbt1_del_res
-  end.
 
-Definition test_delete_hbt_helper candidate :=
+Definition test_delete_hbt (candidate : (forall (A' : Type),
+                                            (A' -> A' -> element_comparison)
+                                            -> A'
+                                            -> heightened_binary_tree A'
+                                            -> heightened_binary_tree A')) :=
   let b0 :=
-      delete_is_succesful (candidate nat compare_int 10 t_del_leaf) t_del_leaf in
+      equal_hbt nat compare_int (candidate nat compare_int 10 t_del_leaf) t_del_leaf in
   let b1 :=
-      delete_is_succesful (candidate nat compare_int 3 t_del3) t_del3_r in
+      equal_hbt nat compare_int (candidate nat compare_int 3 t_del3) t_del3_r in
   let b2 :=
-      delete_is_succesful (candidate nat compare_int 3 t_del3') t_del3'_r in
+      equal_hbt nat compare_int (candidate nat compare_int 3 t_del3') t_del3'_r in
   let b3 :=
-      delete_is_succesful (candidate nat compare_int 3 t_del1) t_del1_r in
+      equal_hbt nat compare_int (candidate nat compare_int 1 t_del1) t_del1_r in
   (b0 && b1 && b2 && b3). 
 
 (* Implementation of delete *)
@@ -1857,4 +1853,17 @@ Lemma unfold_delete_t_helper:
 Proof.
   unfold_tactic delete_t_helper.
 Qed.
+
+Definition delete_hbt (A : Type)
+           (compare : A -> A -> element_comparison)
+           (x : A)
+           (hbt : heightened_binary_tree A) :=
+  match delete_hbt_helper A compare x hbt with
+  | None =>
+    hbt
+  | Some hbt' =>
+    hbt'
+  end.
+
+Compute (test_delete_hbt delete_hbt).
 

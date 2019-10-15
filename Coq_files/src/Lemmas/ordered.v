@@ -200,7 +200,7 @@ Proof.
     induction hbt0122 as [ h0122 bt0122 ].
     rewrite -> some_x_equal_some_y in H_ins.
     discriminate.
-    case (h012 + 1 =n= h011) as [ | ].
+    case ((h012 + 1 =n= h011) || (h012 =n= h011)) as [ | ].
     rewrite -> some_x_equal_some_y in H_ins.
     discriminate.
     discriminate.
@@ -229,7 +229,7 @@ Proof.
     induction hbt0212 as [h0212 bt0212].
     rewrite -> some_x_equal_some_y in H_ins.
     discriminate.
-    case (h021 + 1 =n= h022) as [ | ].
+    case ((h021 + 1 =n= h022) || (h021 =n= h022)) as [ | ].
     rewrite -> some_x_equal_some_y in H_ins.
     discriminate.
     discriminate.
@@ -1740,36 +1740,55 @@ Lemma rotate_right_2_impossible_case:
          (e1 : A),
     insert_hbt_helper A compare x (HNode A h1 bt1) =
     Some
-      (HNode A h1' (Node A (Triple A (HNode A h11' bt11') e1 (HNode A h12' bt12')))) -> 
-    (h12' + 1 =n= h11') = true ->
+      (HNode A h1' (Node A (Triple A (HNode A h11' bt11') e1 (HNode A h12' bt12')))) ->
+    (h12' + 1 =n= h11') = true -> 
     bt1 <> (Leaf A).
 Proof.
-  intros.
-  induction bt1 as [ | t1].
+  (* intros. *)
 
-  rewrite -> unfold_insert_hbt_helper in H.
-  rewrite -> unfold_insert_bt_helper_leaf in H.
-  rewrite -> some_x_equal_some_y in H.
-  Search (( _ =n= _) = _ -> _).
-  apply  beq_nat_true in H0.
-  rewrite <- H0 in H.
+  (* assert (H_height_diffs: (h12' + 1 =n= h11') = true \/ (h12' =n= h11') = true). *)
+  (* case (h12' + 1 =n= h11') as [ | ]. *)
+  (* case (h12' =n= h11') as [ | ]. *)
+  (* apply or_intror.  *)
+  (* reflexivity. *)
+  (* apply or_introl. *)
+  (* reflexivity.       *)
+  (* Search (false || _ = _ ). *)
+  (* rewrite -> orb_false_l in H0. *)
+  (* apply or_intror. *)
+  (* exact H0. *)
 
-  assert (H_unequal: False).
-  case h12' as [ | h12''].
-  Search (0 + _ = _).
-  rewrite -> plus_O_n in H0.
-  rewrite -> plus_O_n in H.
-  discriminate.
-  discriminate.
+  (* Admitted. *)
+
+  (* destruct H_height_diffs as [Hd1 | Hd2]. *)
+  (* induction bt1 as [ | t1]. *)
+
+  (* rewrite -> unfold_insert_hbt_helper in H. *)
+  (* rewrite -> unfold_insert_bt_helper_leaf in H. *)
+  (* rewrite -> some_x_equal_some_y in H. *)
+  (* Search (( _ =n= _) = _ -> _). *)
+
+  (* apply  beq_nat_true in Hd1. *)
+  (* rewrite <- Hd1 in H. *)
+
+  (* assert (H_unequal: False). *)
+  (* case h12' as [ | h12'']. *)
+  (* Search (0 + _ = _). *)
+  (* rewrite -> plus_O_n in H0. *)
+  (* rewrite -> plus_O_n in H. *)
+  (* discriminate. *)
+  (* discriminate. *)
   
-  unfold not.
-  intro H'.
-  exact H_unequal.
+  (* unfold not. *)
+  (* intro H'. *)
+  (* exact H_unequal. *)
 
-  unfold not.
-  intro H'.
-  discriminate.
-Qed.
+  (* unfold not. *)
+  (* intro H'. *)
+  (* discriminate. *)
+
+Admitted.
+
 
 (* Similar to the rotate_right_1, but for the second rotate right operation *) 
 Lemma rotate_right_2_min_max: 
@@ -3642,7 +3661,7 @@ Proof.
                C_traverse_ord_hbt1
                H_t_min').
 
-    + case (h12' + 1 =n= h11') as [ | ] eqn : C_h12'_h11'.
+    + case ((h12' + 1 =n= h11') || (h12' =n= h11')) as [ | ] eqn : C_h12'_h11'.
       rewrite -> some_x_equal_some_y in H_insert_hbt.
       rewrite <- H_insert_hbt in H_ord_hbt'.
 
@@ -3656,7 +3675,7 @@ Proof.
                   H_ord_hbt') as [t_max'' H_traverse_ord_hbt_ret_org].
 
       (* work through base cases for traverse_to_check_ordered_hbt hbt1 until we get to the 
-       * point where it is a node *)
+       * point where it is a node *) 
       unfold is_ordered_hbt in H_hbt1_is_ord.
       case (traverse_to_check_ordered_hbt A hbt1 compare)
         as [ | | (min1, max1)] eqn : C_traverse_ord_hbt1.
@@ -3664,6 +3683,21 @@ Proof.
       
       induction hbt1 as [h1 bt1].
       
+      assert (H_height_diffs: (h12' + 1 =n= h11') = true \/ (h12' =n= h11') = true).
+      case (h12' + 1 =n= h11') as [ | ].
+      case (h12' =n= h11') as [ | ].
+      apply or_intror.
+      reflexivity.
+      apply or_introl.
+      reflexivity.      
+      Search (false || _ = _ ).
+      rewrite -> orb_false_l in C_h12'_h11'.
+      apply or_intror.
+      exact C_h12'_h11'.
+      
+      destruct H_height_diffs as [H_h12'_gt_h11' | H_ht12'_eq_h11'].
+
+      (* case 1: H_h12'_gt_h11' *) 
       assert (H_impossible_hbt1 : bt1 <> Leaf A).
       Check (rotate_right_2_impossible_case).
       exact (rotate_right_2_impossible_case
@@ -3671,7 +3705,7 @@ Proof.
                h1' h11' h12'
                bt11' bt12' e1
                C_insert_hbt1
-               C_h12'_h11').
+               H_h12'_gt_h11').
 
       rewrite -> unfold_traverse_to_check_ordered_hbt in C_traverse_ord_hbt1.
       induction bt1 as [ | t1].
@@ -3688,6 +3722,16 @@ Proof.
       apply False_ind.
       exact C_traverse_ord_hbt1.
 
+      (* case 2: H_h12'_eq_h11' *)
+      Check (insertion_in_leaf_min_max).
+      Check (insertion_in_leaf_min_max
+               A compare
+               (HNode A h1 bt1)
+               (HNode A h1'
+                      (Node A (Triple A (HNode A h11' bt11') e1 (HNode A h12' bt12'))))
+               
+
+      
       (* finally, we have what is required to apply the inductive hypothesis *)
       assert (H_trivial_equality:
                 TSome (A * A) (min1, max1) = TSome (A * A) (min1, max1)).
