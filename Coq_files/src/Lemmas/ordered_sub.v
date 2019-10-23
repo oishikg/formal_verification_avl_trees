@@ -178,8 +178,9 @@ Proof.
     case (compare x e0) as [ | | ] eqn : C_comp_x_e0.
     case (insert_hbt_helper A compare x hbt01) as [ hbt01_ret | ]  eqn : C_ins_hbt01.
     induction hbt01_ret as [h01_ret bt_01_ret].
-    case (compare_int (h01_ret - project_height_hbt A hbt02) 2)
-         as [ | | ] eqn : C_h_diff.
+    case ((h01_ret =n= project_height_hbt A hbt01)
+          || (h01_ret =n= 1 + project_height_hbt A hbt01)) as [ | ].
+    case (compare_int h01_ret (2 + project_height_hbt A hbt02)) as [ | | ].
     rewrite -> (some_x_equal_some_y
                   (heightened_binary_tree A)
                   (HNode A (1 + max h01_ret (project_height_hbt A hbt02))
@@ -209,10 +210,13 @@ Proof.
     discriminate.
     discriminate.
     discriminate.
+    discriminate.
     
     case (insert_hbt_helper A compare x hbt02) as [hbt02_ret | ].
     induction hbt02_ret as [h02_ret bt02_ret].
-    case (compare_int (h02_ret - project_height_hbt A hbt01) 2) as [ | | ].
+    case ((h02_ret =n= project_height_hbt A hbt02)
+          || (h02_ret =n= 1 + project_height_hbt A hbt02)) as [ | ].
+    case (compare_int h02_ret (2 + project_height_hbt A hbt01)) as [ | | ].
     rewrite -> some_x_equal_some_y in H_ins.
     discriminate.
     unfold rotate_left_hbt in H_ins.
@@ -233,6 +237,7 @@ Proof.
     discriminate.
     case ((h021 + 1 =n= h022) || (h021 =n= h022)) as [ | ].
     rewrite -> some_x_equal_some_y in H_ins.
+    discriminate.
     discriminate.
     discriminate.
     discriminate.
@@ -1817,29 +1822,31 @@ Lemma non_zero_height:
          (bt' : binary_tree A),
     h2 = h1 ->
     1 + max h1 h2 = h ->
-    compare_int (h - project_height_hbt A (HNode A h' bt')) 2 = Eq ->
+    compare_int h (2 + project_height_hbt A (HNode A h' bt')) = Eq -> 
     exists x,
       h2 = S x.
 Proof.
   intros.
+  rewrite <- H in H0.
+  rewrite -> Max.max_idempotent in H0.
+  rewrite <- H0 in H1.
+  unfold project_height_hbt in H1.
+
   unfold compare_int in H1.
-  case (h - project_height_hbt A (HNode A h' bt') <n 2) as [ | ].
+  case (1 + h2 <n 2 + h') as [ | ].
   discriminate.
-  case (h - project_height_hbt A (HNode A h' bt') =n= 2) as [ | ] eqn : C_h_2.
-  Focus 2.
+  case (1 + h2 =n= 2 + h') as [ | ] eqn : C_S_h2_SS_h'.
+
+  apply beq_nat_true in C_S_h2_SS_h'.
+  Check (succ_eq).
+  apply succ_eq in C_S_h2_SS_h'.
+
+  exists h'.
+  exact C_S_h2_SS_h'.
+
   discriminate.
-  apply beq_nat_true in C_h_2.
-  unfold project_height_hbt in C_h_2.
-  rewrite <- H0 in C_h_2.
-  rewrite -> H in C_h_2.
-  case h1 as [ | h1'].
-  unfold max in C_h_2.
-  case h' as [ | h''].
-  discriminate.
-  discriminate.
-  exists h1'.
-  exact H.
 Qed.
+
 
 Lemma rotate_right_2_impossible_case_2:
   forall (A : Type)
@@ -1858,7 +1865,7 @@ Lemma rotate_right_2_impossible_case_2:
     Some
       (HNode A h1' (Node A (Triple A (HNode A h11' bt11') e1 (HNode A h12' bt12')))) ->
     (h12' =n= h11') = true ->
-    compare_int (h1' - project_height_hbt A (HNode A h2 bt2)) 2 = Eq ->
+    compare_int h1' (2 + project_height_hbt A (HNode A h2 bt2)) = Eq -> 
     bt1 <> (Leaf A).
 Proof.
   intros.
@@ -3257,7 +3264,7 @@ Lemma rotate_left_2_impossible_case_2:
       (HNode A h2'
              (Node A (Triple A (HNode A h21' bt21') e2 (HNode A h22' bt22')))) ->
     (h21' =n= h22') = true ->
-    compare_int (h2' - project_height_hbt A (HNode A h1 bt1)) 2 = Eq ->
+    compare_int h2' (2 + project_height_hbt A (HNode A h1 bt1)) = Eq -> 
     bt2 <> Leaf A.
 Proof.
   intros.
@@ -3494,8 +3501,12 @@ Proof.
   case (compare x e) as [ | | ] eqn : C_comp_x_e.
   case (insert_hbt_helper A compare x hbt1) as [ hbt1'| ] eqn : C_insert_hbt1.
   induction hbt1' as [h1' bt1'].
-  case (compare_int (h1' - project_height_hbt A hbt2) 2) as [ | | ] eqn : C_comp_heights.
-  
+
+  case ((h1' =n= project_height_hbt A hbt1)
+        || (h1' =n= 1 + project_height_hbt A hbt1))
+    as [ | ] eqn : C_h1'_possible_values.
+  case (compare_int h1' (2 + project_height_hbt A hbt2))
+    as [ | | ] eqn : C_comp_heights.       
 
   (* height diff is less than 2: no rotations required *)
   - rewrite -> (some_x_equal_some_y
@@ -3988,11 +3999,16 @@ Proof.
   - discriminate.
 
   - discriminate.
-    
-  - case (insert_hbt_helper A compare x hbt2) as [ hbt2'| ] eqn : C_insert_hbt2.
-  induction hbt2' as [h2' bt2'].
-  case (compare_int (h2' - project_height_hbt A hbt1) 2) as [ | | ] eqn : C_comp_heights.
 
+  - discriminate.
+
+  - case (insert_hbt_helper A compare x hbt2) as [ hbt2'| ] eqn : C_insert_hbt2.
+    induction hbt2' as [h2' bt2'].
+    case ((h2' =n= project_height_hbt A hbt2)
+                     || (h2' =n= 1 + project_height_hbt A hbt2)) as [ | ].
+    case (compare_int h2' (2 + project_height_hbt A hbt1))
+      as [ | | ] eqn : C_comp_heights.
+    
     (* height diff is less than 2: no rotations required *) 
     + rewrite -> some_x_equal_some_y in H_insert_hbt.
       rewrite <- H_insert_hbt in H_ord_hbt'.
@@ -4499,6 +4515,8 @@ Proof.
     + discriminate.
 
     + discriminate.
+
+    + discriminate.
 Qed.
 
 (* Rotation lemmas *) 
@@ -4629,8 +4647,10 @@ Proof.
                           Some (HNode A h_ret bt_ret)).
       reflexivity. 
 
-      case (compare_int (h_ret - project_height_hbt A hbt2) 2)
-        as [ | | ] eqn : C_height_diff.
+      case ((h_ret =n= project_height_hbt A hbt1)
+            || (h_ret =n= 1 + project_height_hbt A hbt1)) as [ | ].
+      case (compare_int h_ret (2 + project_height_hbt A hbt2))
+        as [ | | ] eqn : C_height_diff.           
 
     (* The insertion does not unbalance the tree *) 
       * unfold beq_nat in H_insert_t.
@@ -4825,6 +4845,8 @@ Proof.
 
       * discriminate.
 
+      * discriminate.
+
     (* Case 2: x = e, in which case a None value is returned *)        
     + discriminate.
       
@@ -4837,7 +4859,9 @@ Proof.
                           Some (HNode A h_ret bt_ret)).
       reflexivity. 
 
-      case (compare_int (h_ret - project_height_hbt A hbt1) 2)
+      case ((h_ret =n= project_height_hbt A hbt2)
+            || (h_ret =n= 1 + project_height_hbt A hbt2)) as [ | ].
+      case (compare_int h_ret (2 + project_height_hbt A hbt1)) 
         as [ | | ] eqn : C_height_diff.
 
       (* The insertion does not unbalance the tree *) 
@@ -5086,6 +5110,8 @@ Proof.
           exact (rotate_left_preserves_order
                    A compare h_hbt hbt1 e hbt2 h_ret bt_ret hbt'
                    H_ord_t_init H_hbt1_is_ordered H_hbt_ret_ordered H_insert_t).
+
+      * discriminate.
 
       * discriminate.
 
