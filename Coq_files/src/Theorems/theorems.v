@@ -1,4 +1,4 @@
-(* Imports: *)
+(* Imports: *) 
 Require Import Hbt.Lemmas.sound_balanced.
 Require Import Hbt.Lemmas.ordered_main.
 
@@ -68,11 +68,62 @@ Qed.
 
 
 (* ***** Section 2: Specifications and theorems for delete *)
+Definition specifiction_of_delete_hbt
+           (A : Type)
+           (compare : A -> A -> element_comparison)
+           (x : A)
+           (delete_hbt : forall (A' : Type),
+               (A' -> A' -> element_comparison)
+               -> A'
+               -> heightened_binary_tree A'
+               -> heightened_binary_tree A') :=
+  forall (hbt : heightened_binary_tree A),
+    (is_sound_hbt A hbt = true) ->
+    (is_balanced_hbt A hbt = true) ->
+    (is_ordered_hbt A hbt compare = true) -> 
+    (is_sound_hbt A (delete_hbt A compare x hbt) = true)
+    /\
+    (is_balanced_hbt A (delete_hbt A compare x hbt) = true)
+    /\
+    (is_ordered_hbt A (delete_hbt A compare x hbt) compare = true).
 
 
 
 
+Theorem delete_hbt_satisfies_its_specification:
+  forall (A : Type)
+         (compare : A -> A -> element_comparison)
+         (x : A),
+    specifiction_of_delete_hbt A compare x delete_hbt.
+Proof.
+  intros.
+  unfold specifiction_of_delete_hbt.
+  intros.
+  unfold delete_hbt.
+  case (delete_hbt_helper A compare x hbt) as [hbt' | ] eqn: C_del.
 
+  Focus 2.
+  split.
+  exact H.
+  split.
+
+  exact H0.
+  exact H1.
+
+  destruct (deletion_preserves_soundness_and_balance A compare x) as [H_s_b _].
+  destruct (H_s_b hbt hbt' H H0 C_del) as [H_sound H_bal].
+  
+  destruct (deletion_preserves_order A compare x) as [H_o _].         
+  assert (H_ord : is_ordered_hbt A hbt' compare = true).
+  exact (H_o hbt hbt' H H0 H1 C_del).
+  split.
+
+  exact H_sound.
+  split.
+
+  exact H_bal.
+  exact H_ord.
+Qed.
 
 
 (* ***** Section 3: Specification and associated theorems for lookup ***** *)

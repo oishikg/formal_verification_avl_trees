@@ -890,16 +890,21 @@ with insert_t_helper
            | None =>
              None 
            | Some (HNode h1' bt1') =>
-             match compare_int (h1' - (project_height_hbt A hbt2)) 2 with
-             | Lt =>
-               Some (HNode A
-                           (1 + max h1' (project_height_hbt A hbt2))
-                           (Node A (Triple A (HNode A h1' bt1') e hbt2)))
-             | Eq =>
-               rotate_right_hbt A (HNode A h1' bt1') e hbt2
-             | Gt =>
-               None 
-             end
+             if (h1' =n= project_height_hbt A hbt1)
+                || (h1' =n= 1 + (project_height_hbt A hbt1))
+             then
+               match compare_int h1' (2 + (project_height_hbt A hbt2)) with
+               | Lt =>
+                 Some (HNode A
+                             (1 + max h1' (project_height_hbt A hbt2))
+                             (Node A (Triple A (HNode A h1' bt1') e hbt2)))
+               | Eq =>
+                 rotate_right_hbt A (HNode A h1' bt1') e hbt2
+               | Gt =>
+                 None 
+               end
+             else
+               None
            end
          | Eq =>
            None
@@ -908,16 +913,21 @@ with insert_t_helper
            | None =>
              None 
            | Some (HNode h2' bt2') =>
-             match compare_int (h2' - (project_height_hbt A hbt1)) 2 with
-             | Lt =>
-               Some (HNode A
-                           (1 + max (project_height_hbt A hbt1) h2')
-                           (Node A (Triple A hbt1 e (HNode A h2' bt2'))))
-             | Eq =>
-               rotate_left_hbt A hbt1 e (HNode A h2' bt2')
-             | Gt =>
+             if (h2' =n= project_height_hbt A hbt2)
+                || (h2' =n= 1 + (project_height_hbt A hbt2))
+             then
+               match compare_int h2' (2 + (project_height_hbt A hbt1)) with
+               | Lt =>
+                 Some (HNode A
+                             (1 + max (project_height_hbt A hbt1) h2')
+                             (Node A (Triple A hbt1 e (HNode A h2' bt2'))))
+               | Eq =>
+                 rotate_left_hbt A hbt1 e (HNode A h2' bt2')
+               | Gt =>
+                 None
+               end
+             else
                None
-             end
            end
          end
        end.
@@ -978,16 +988,21 @@ Lemma unfold_insert_t_helper:
       | None =>
         None 
       | Some (HNode h1' bt1') =>
-        match compare_int (h1' - (project_height_hbt A hbt2)) 2 with
-        | Lt =>
-          Some (HNode A
-                      (1 + max h1' (project_height_hbt A hbt2))
-                      (Node A (Triple A (HNode A h1' bt1') e hbt2)))
-        | Eq =>
-          rotate_right_hbt A (HNode A h1' bt1') e hbt2
-        | Gt =>
-          None 
-        end
+        if (h1' =n= project_height_hbt A hbt1)
+           || (h1' =n= 1 + (project_height_hbt A hbt1))
+        then
+          match compare_int h1' (2 + (project_height_hbt A hbt2)) with
+          | Lt =>
+            Some (HNode A
+                        (1 + max h1' (project_height_hbt A hbt2))
+                        (Node A (Triple A (HNode A h1' bt1') e hbt2)))
+          | Eq =>
+            rotate_right_hbt A (HNode A h1' bt1') e hbt2
+          | Gt =>
+            None 
+          end
+        else
+          None
       end
     | Eq =>
       None
@@ -996,16 +1011,21 @@ Lemma unfold_insert_t_helper:
       | None =>
         None 
       | Some (HNode h2' bt2') =>
-        match compare_int (h2' - (project_height_hbt A hbt1)) 2 with
-        | Lt =>
-          Some (HNode A
-                      (1 + max (project_height_hbt A hbt1) h2')
-                      (Node A (Triple A hbt1 e (HNode A h2' bt2'))))
-        | Eq =>
-          rotate_left_hbt A hbt1 e (HNode A h2' bt2')
-        | Gt =>
+        if (h2' =n= project_height_hbt A hbt2)
+           || (h2' =n= 1 + (project_height_hbt A hbt2))
+        then
+          match compare_int h2' (2 + (project_height_hbt A hbt1)) with
+          | Lt =>
+            Some (HNode A
+                        (1 + max (project_height_hbt A hbt1) h2')
+                        (Node A (Triple A hbt1 e (HNode A h2' bt2'))))
+          | Eq =>
+            rotate_left_hbt A hbt1 e (HNode A h2' bt2')
+          | Gt =>
+            None
+          end
+        else
           None
-        end
       end
     end.
 Proof.
@@ -1148,7 +1168,7 @@ with factor_rightmost_bt (A : Type)
        | Node t2 => 
          match factor_rightmost_t A t2 with
          | Some (HNode h2' bt2', e') =>
-           match compare_int (project_height_hbt A hbt1) (h2' + 2) with
+           match compare_int (project_height_hbt A hbt1) (2 + h2') with
            | Lt =>
              Some ((HNode A
                           (1 + max (project_height_hbt A hbt1) h2')
@@ -1216,7 +1236,7 @@ Lemma unfold_factor_rightmost_bt_node:
     factor_rightmost_bt A hbt1 e (Node A t2) =
     match factor_rightmost_t A t2 with
     | Some (HNode h2' bt2', e') =>
-      match compare_int (project_height_hbt A hbt1) (h2' + 2) with
+      match compare_int (project_height_hbt A hbt1) (2 + h2') with
       | Lt =>
         Some ((HNode A
                      (1 + max (project_height_hbt A hbt1) h2')
@@ -1344,7 +1364,7 @@ with factor_leftmost_bt (A : Type)
        | Node t1 =>
          match factor_leftmost_t A t1 with
          | Some ((HNode h1' bt1'), e') =>
-           match compare_int (project_height_hbt A hbt2) (h1' + 2) with
+           match compare_int (project_height_hbt A hbt2) (2 + h1') with
            | Lt =>
              Some ((HNode A
                           (1 + max h1' (project_height_hbt A hbt2))
@@ -1413,7 +1433,7 @@ Lemma unfold_factor_leftmost_bt_node:
     factor_leftmost_bt A (Node A t1) e hbt2 =
     match factor_leftmost_t A t1 with
     | Some ((HNode h1' bt1'), e') =>
-      match compare_int (project_height_hbt A hbt2) (h1' + 2) with
+      match compare_int (project_height_hbt A hbt2) (2 + h1') with
       | Lt =>
         Some ((HNode A
                      (1 + max h1' (project_height_hbt A hbt2))
@@ -1638,7 +1658,7 @@ with delete_t_helper (A : Type)
            | None =>
              None
            | Some (HNode h1' bt1') =>
-             match compare_int ((project_height_hbt A hbt2) - h1') 2 with
+             match compare_int (project_height_hbt A hbt2) (2 + h1') with
              | Lt =>
                Some (HNode A (1 + max h1' (project_height_hbt A hbt2))
                            (Node A (Triple A (HNode A h1' bt1') e hbt2)))
@@ -1651,7 +1671,7 @@ with delete_t_helper (A : Type)
            (* in this case, we have found the node to be deleted *)
          | Eq =>
            (* case 1: height (hbt1) > height (hbt2), factor rightmost *)
-           if ((project_height_hbt A hbt1) - (project_height_hbt A hbt2) =n= 1)
+           if ((project_height_hbt A hbt1) =n= 1 + (project_height_hbt A hbt2))
            then
              match (project_bt_hbt A hbt1) with
              | Leaf =>
@@ -1684,7 +1704,7 @@ with delete_t_helper (A : Type)
                end
              else
                (* case 3: height (hbt2) > height (hbt1) *) 
-               if ((project_height_hbt A hbt2) - (project_height_hbt A hbt1) =n= 1)
+               if ((project_height_hbt A hbt2) =n= 1 + (project_height_hbt A hbt1))
                then
                  match (project_bt_hbt A hbt2) with
                  | Leaf =>
@@ -1706,7 +1726,7 @@ with delete_t_helper (A : Type)
            | None =>
              None
            | Some (HNode h2' bt2') =>
-             match compare_int (h2' - (project_height_hbt A hbt1)) 2 with
+             match compare_int (project_height_hbt A hbt1) (2 + h2') with
              | Lt =>
                Some (HNode A (1 + max (project_height_hbt A hbt1) h2')
                            (Node A (Triple A hbt1 e (HNode A h2' bt2'))))
@@ -1771,7 +1791,7 @@ Lemma unfold_delete_t_helper:
            | None =>
              None
            | Some (HNode h1' bt1') =>
-             match compare_int ((project_height_hbt A hbt2) - h1') 2 with
+             match compare_int (project_height_hbt A hbt2)  (2 + h1') with
              | Lt =>
                Some (HNode A (1 + max h1' (project_height_hbt A hbt2))
                            (Node A (Triple A (HNode A h1' bt1') e hbt2)))
@@ -1784,7 +1804,7 @@ Lemma unfold_delete_t_helper:
            (* in this case, we have found the node to be deleted *)
          | Eq =>
            (* case 1: height (hbt1) > height (hbt2), factor rightmost *)
-           if ((project_height_hbt A hbt1) - (project_height_hbt A hbt2) =n= 1)
+           if ((project_height_hbt A hbt1) =n= 1 + (project_height_hbt A hbt2))
            then
              match (project_bt_hbt A hbt1) with
              | Leaf =>
@@ -1817,7 +1837,7 @@ Lemma unfold_delete_t_helper:
                end
              else
                (* case 3: height (hbt2) > height (hbt1) *) 
-               if ((project_height_hbt A hbt2) - (project_height_hbt A hbt1) =n= 1)
+               if ((project_height_hbt A hbt2) =n= 1 + (project_height_hbt A hbt1))
                then
                  match (project_bt_hbt A hbt2) with
                  | Leaf =>
@@ -1839,7 +1859,7 @@ Lemma unfold_delete_t_helper:
            | None =>
              None
            | Some (HNode h2' bt2') =>
-             match compare_int (h2' - (project_height_hbt A hbt1)) 2 with
+             match compare_int (project_height_hbt A hbt1) (2 + h2') with
              | Lt =>
                Some (HNode A (1 + max (project_height_hbt A hbt1) h2')
                            (Node A (Triple A hbt1 e (HNode A h2' bt2'))))

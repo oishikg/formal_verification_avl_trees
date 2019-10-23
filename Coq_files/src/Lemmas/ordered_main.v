@@ -1680,3 +1680,318 @@ Proof.
 
       * discriminate.
 Qed.
+
+
+Lemma deletion_preserves_order_lt:
+  forall (A : Type)
+         (compare : A -> A -> element_comparison)
+         (x : A)
+         (hbt1 : heightened_binary_tree A)
+         (e : A)
+         (hbt2 : heightened_binary_tree A)
+         (h : nat)
+         (hbt' : heightened_binary_tree A),
+    (forall (hbt' : heightened_binary_tree A),
+        is_sound_hbt A hbt1 = true ->
+        is_balanced_hbt A hbt1 = true ->
+        is_ordered_hbt A hbt1 compare = true ->
+        delete_hbt_helper A compare x hbt1 = Some hbt' ->
+        is_ordered_hbt A hbt' compare = true) ->
+    is_sound_hbt A (HNode A h (Node A (Triple A hbt1 e hbt2))) = true -> 
+    is_balanced_hbt A (HNode A h (Node A (Triple A hbt1 e hbt2))) = true ->
+    is_ordered_hbt A (HNode A h (Node A (Triple A hbt1 e hbt2))) compare = true -> 
+    compare x e = Lt -> 
+    (match delete_hbt_helper A compare x hbt1 with
+     | Some (HNode h1' bt1') =>
+       match compare_int (project_height_hbt A hbt2 - h1') 2 with
+       | Lt =>
+         Some
+           (HNode A (1 + max h1' (project_height_hbt A hbt2))
+                  (Node A (Triple A (HNode A h1' bt1') e hbt2)))
+       | Eq => rotate_left_hbt A (HNode A h1' bt1') e hbt2
+       | Gt => None
+       end
+     | None => None
+     end) = Some hbt' ->
+    is_ordered_hbt A hbt' compare = true.
+Proof.
+  intros.
+
+  (* obtain some crucial hypotheses *)
+  destruct (triple_sound_implies_hbts_sound
+              A h hbt1 e hbt2 H0) as [H_hbt1_is_sound H_hbt2_is_sound].
+  destruct (triple_balanced_implies_hbts_balanced
+              A h hbt1 e hbt2 H1) as [H_hbt1_is_balanced H_hbt2_is_balanced].
+  destruct (triple_ordered_implies_hbts_ordered
+              A compare h hbt1 e hbt2 H2)
+    as [H_hbt1_is_ordered H_hbt2_is_ordered].
+
+  induction hbt2 as [h2 bt2].
+
+  case (delete_hbt_helper A compare x hbt1) as [[h1' bt1'] | ] eqn : C_del_hbt_helper.
+  case (compare_int (project_height_hbt A (HNode A h2 bt2) - h1') 2) as [ | | ] eqn : C_height_diff.
+
+  (* Case 1: tree is not unbalanced *)
+  - rewrite -> some_x_equal_some_y in H4.
+    rewrite <- H4.
+
+    assert (H_trivial:
+              Some (HNode A h1' bt1') = Some (HNode A h1' bt1')).
+    reflexivity.
+    
+    assert (H_hbt'_orderd:
+              is_ordered_hbt A (HNode A h1' bt1') compare = true).
+    exact (H (HNode A h1' bt1') H_hbt1_is_sound H_hbt1_is_balanced H_hbt1_is_ordered
+             H_trivial).
+
+    unfold project_height_hbt.
+Admitted.    
+
+
+
+
+
+
+
+
+
+Lemma deletion_preserves_order_eq_1:
+  forall (A : Type)
+         (compare : A -> A -> element_comparison)
+         (x : A)
+         (hbt1 : heightened_binary_tree A)
+         (e : A)
+         (hbt2 : heightened_binary_tree A)
+         (h : nat)
+         (hbt' : heightened_binary_tree A),
+    (forall (hbt' : heightened_binary_tree A),
+        is_sound_hbt A hbt1 = true ->
+        is_balanced_hbt A hbt1 = true ->
+        is_ordered_hbt A hbt1 compare = true ->
+        delete_hbt_helper A compare x hbt1 = Some hbt' ->
+        is_ordered_hbt A hbt' compare = true) ->
+    is_sound_hbt A (HNode A h (Node A (Triple A hbt1 e hbt2))) = true -> 
+    is_balanced_hbt A (HNode A h (Node A (Triple A hbt1 e hbt2))) = true ->
+    is_ordered_hbt A (HNode A h (Node A (Triple A hbt1 e hbt2))) compare = true -> 
+    compare x e = Eq ->
+    (project_height_hbt A hbt1 - project_height_hbt A hbt2 =n= 1) = true ->
+    (match project_bt_hbt A hbt1 with
+            | Leaf => None
+            | Node t1 =>
+                match factor_rightmost_t A t1 with
+                | Some (HNode h1' bt1', e') =>
+                    Some
+                      (HNode A (1 + max h1' (project_height_hbt A hbt2))
+                         (Node A (Triple A (HNode A h1' bt1') e' hbt2)))
+                | None => None
+                end
+     end) = Some hbt' ->
+    is_ordered_hbt A hbt' compare = true.
+Proof.
+Admitted.
+
+Lemma deletion_preserves_order_eq_2:
+  forall (A : Type)
+         (compare : A -> A -> element_comparison)
+         (x : A)
+         (hbt1 : heightened_binary_tree A)
+         (e : A)
+         (hbt2 : heightened_binary_tree A)
+         (h : nat)
+         (hbt' : heightened_binary_tree A),
+    (forall (hbt' : heightened_binary_tree A),
+        is_sound_hbt A hbt1 = true ->
+        is_balanced_hbt A hbt1 = true ->
+        is_ordered_hbt A hbt1 compare = true ->
+        delete_hbt_helper A compare x hbt1 = Some hbt' ->
+        is_ordered_hbt A hbt' compare = true) ->
+    is_sound_hbt A (HNode A h (Node A (Triple A hbt1 e hbt2))) = true -> 
+    is_balanced_hbt A (HNode A h (Node A (Triple A hbt1 e hbt2))) = true ->
+    is_ordered_hbt A (HNode A h (Node A (Triple A hbt1 e hbt2))) compare = true -> 
+    compare x e = Eq ->
+    (project_height_hbt A hbt1 =n= project_height_hbt A hbt2) = true ->
+    (match project_bt_hbt A hbt1 with
+     | Leaf => Some (HNode A 0 (Leaf A))
+     | Node t1 =>
+       match factor_rightmost_t A t1 with
+       | Some (HNode h1' bt1', e') =>
+         Some
+           (HNode A (1 + max h1' (project_height_hbt A hbt2))
+                  (Node A (Triple A (HNode A h1' bt1') e' hbt2)))
+       | None => None
+       end
+     end) = Some hbt' -> 
+    is_ordered_hbt A hbt' compare = true.
+Proof.
+Admitted.
+
+Lemma deletion_preserves_order_eq_3:
+  forall (A : Type)
+         (compare : A -> A -> element_comparison)
+         (x : A)
+         (hbt1 : heightened_binary_tree A)
+         (e : A)
+         (hbt2 : heightened_binary_tree A)
+         (h : nat)
+         (hbt' : heightened_binary_tree A),
+    (forall (hbt' : heightened_binary_tree A),
+        is_sound_hbt A hbt2 = true ->
+        is_balanced_hbt A hbt2 = true ->
+        is_ordered_hbt A hbt2 compare = true ->
+        delete_hbt_helper A compare x hbt2 = Some hbt' ->
+        is_ordered_hbt A hbt' compare = true) -> 
+    is_sound_hbt A (HNode A h (Node A (Triple A hbt1 e hbt2))) = true -> 
+    is_balanced_hbt A (HNode A h (Node A (Triple A hbt1 e hbt2))) = true ->
+    is_ordered_hbt A (HNode A h (Node A (Triple A hbt1 e hbt2))) compare = true -> 
+    compare x e = Eq ->
+    (project_height_hbt A hbt2 - project_height_hbt A hbt1 =n= 1) = true -> 
+    (match project_bt_hbt A hbt2 with
+     | Leaf => None
+     | Node t2 =>
+       match factor_leftmost_t A t2 with
+       | Some (HNode h2' bt2', e') =>
+         Some
+           (HNode A (1 + max (project_height_hbt A hbt1) h2')
+                  (Node A (Triple A hbt1 e' (HNode A h2' bt2'))))
+       | None => None
+       end
+     end) = Some hbt' ->
+    is_ordered_hbt A hbt' compare = true.
+Proof.
+Admitted.
+
+Lemma deletion_preserves_order_gt:
+  forall (A : Type)
+         (compare : A -> A -> element_comparison)
+         (x : A)
+         (hbt1 : heightened_binary_tree A)
+         (e : A)
+         (hbt2 : heightened_binary_tree A)
+         (h : nat)
+         (hbt' : heightened_binary_tree A),
+    (forall (hbt' : heightened_binary_tree A),
+               is_sound_hbt A hbt2 = true ->
+               is_balanced_hbt A hbt2 = true ->
+               is_ordered_hbt A hbt2 compare = true ->
+               delete_hbt_helper A compare x hbt2 = Some hbt' ->
+               is_ordered_hbt A hbt' compare = true) ->
+    is_sound_hbt A (HNode A h (Node A (Triple A hbt1 e hbt2))) = true -> 
+    is_balanced_hbt A (HNode A h (Node A (Triple A hbt1 e hbt2))) = true ->
+    is_ordered_hbt A (HNode A h (Node A (Triple A hbt1 e hbt2))) compare = true -> 
+    compare x e = Gt ->
+    (match delete_hbt_helper A compare x hbt2 with
+            | Some (HNode h2' bt2') =>
+                match compare_int (h2' - project_height_hbt A hbt1) 2 with
+                | Lt =>
+                    Some
+                      (HNode A (1 + max (project_height_hbt A hbt1) h2')
+                         (Node A (Triple A hbt1 e (HNode A h2' bt2'))))
+                | Eq => rotate_right_hbt A hbt1 e (HNode A h2' bt2')
+                | Gt => None
+                end
+            | None => None
+     end) = Some hbt' ->
+    is_ordered_hbt A hbt' compare = true.
+Proof.
+Admitted.
+
+
+(* Main theorem for deletion concerning ordering *)
+Lemma deletion_preserves_order: 
+  forall (A : Type)
+         (compare : A -> A -> element_comparison)
+         (x : A),
+    (forall (hbt : heightened_binary_tree A)
+            (hbt' : heightened_binary_tree A),
+        is_sound_hbt A hbt = true ->
+        is_balanced_hbt A hbt = true ->
+        is_ordered_hbt A hbt compare = true -> 
+        delete_hbt_helper A compare x hbt = Some hbt' ->
+        is_ordered_hbt A hbt' compare = true)
+    /\
+    (forall (bt : binary_tree A)
+            (h_hbt : nat)
+            (hbt' : heightened_binary_tree A),    
+        is_sound_hbt A (HNode A h_hbt bt) = true ->
+        is_balanced_hbt A (HNode A h_hbt bt) = true ->
+        is_ordered_hbt A (HNode A h_hbt bt) compare = true ->
+        delete_bt_helper A compare x h_hbt bt = Some hbt' ->
+        is_ordered_hbt A hbt' compare = true)
+    /\
+    (forall (t : triple A)
+            (h_hbt : nat)
+            (hbt' : heightened_binary_tree A),    
+        is_sound_hbt A (HNode A h_hbt (Node A t)) = true ->
+        is_balanced_hbt A (HNode A h_hbt (Node A t)) = true ->
+        is_ordered_hbt A (HNode A h_hbt (Node A t)) compare = true ->        
+        delete_t_helper A compare x h_hbt t = Some hbt' ->
+        is_ordered_hbt A hbt' compare = true).
+Proof.
+  intros.
+  apply heightened_binary_tree_mutual_induction.
+
+  (* proof for hbt with bt as inductive case *)
+  - intros h bt H_ind_bt hbt' H_sound_hbt H_bal_hbt H_ord_hbt H_del_hbt.
+    Check (H_ind_bt h hbt' H_sound_hbt H_bal_hbt H_ord_hbt H_del_hbt).
+    exact (H_ind_bt h hbt' H_sound_hbt H_bal_hbt H_ord_hbt H_del_hbt).
+
+  (* proof for leaf: vacuous case *)
+  - intros.
+    rewrite -> unfold_delete_bt_helper_leaf in H2.
+    discriminate.
+
+    (* proof for node with t as inductive hypothesis *)
+  - intros.
+    exact (H h_hbt hbt' H0 H1 H2 H3).
+
+    (* finally, the main proof: for t, with inductive hypotheses on hbt *)
+  - intros hbt1 H_ind_hbt1 e hbt2 H_ind_hbt2 h hbt' H_sound_t H_bal_t H_ord_t H_del_t.
+
+    (* unfold the delete_t_helper function *)
+    rewrite -> unfold_delete_t_helper in H_del_t.
+
+    (* case analysis on compare x e *)
+    case (compare x e) as [ | | ] eqn : C_comp_x_e.
+
+    (* Case 1: x < e, so traverse left sub-tree *)
+    + Check (deletion_preserves_order_lt).
+      exact (deletion_preserves_order_lt
+               A compare x hbt1 e hbt2 h hbt' 
+               H_ind_hbt1 H_sound_t H_bal_t H_ord_t C_comp_x_e H_del_t).
+
+    (* Case 2: x = e, and we have found the node to delete *)
+    + (* the left sub-tree > right sub-tree (factor rightmost on left sub-tree *)
+      case (project_height_hbt A hbt1 - project_height_hbt A hbt2 =n= 1)
+        as [ | ] eqn : C_h1_h2_diff_1.
+      Check (deletion_preserves_order_eq_1).
+      exact (deletion_preserves_order_eq_1
+               A compare x hbt1 e hbt2 h hbt'
+               H_ind_hbt1 H_sound_t H_bal_t H_ord_t C_comp_x_e C_h1_h2_diff_1 H_del_t).
+
+      (* the left sub-tree =  right sub-tree (factor any tree, we choose left tree *)
+      case (project_height_hbt A hbt1 =n= project_height_hbt A hbt2)
+           as [ | ] eqn : C_h1_h2_same.
+      Check (deletion_preserves_order_eq_2).
+      exact (deletion_preserves_order_eq_2
+               A compare x hbt1 e hbt2 h hbt'
+               H_ind_hbt1 H_sound_t H_bal_t H_ord_t C_comp_x_e C_h1_h2_same H_del_t).
+
+      (* the right sub-tree > left sub-tree (factor leftmost on right sub-tree *)
+      case (project_height_hbt A hbt2 - project_height_hbt A hbt1 =n= 1)
+        as [ | ] eqn : C_h2_h1_diff_1.
+      Check (deletion_preserves_order_eq_3).
+      exact (deletion_preserves_order_eq_3
+               A compare x hbt1 e hbt2 h hbt'
+               H_ind_hbt2 H_sound_t H_bal_t H_ord_t C_comp_x_e C_h2_h1_diff_1 H_del_t).
+
+      (* If the given tree is not balanced, then the other cases arise, so we return none *)
+      discriminate.
+
+      (* Case 3: x > e, so traverse the right sub-tree *)
+    + Check (deletion_preserves_order_gt).
+      exact (deletion_preserves_order_gt
+               A compare x hbt1 e hbt2 h hbt' 
+               H_ind_hbt2 H_sound_t H_bal_t H_ord_t C_comp_x_e H_del_t).
+Qed.      
+
+
