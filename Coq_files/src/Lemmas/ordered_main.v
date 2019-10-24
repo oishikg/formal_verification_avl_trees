@@ -1100,8 +1100,79 @@ Proof.
     + discriminate.
 Qed.
 
-(* Rotation lemmas *) 
+Lemma rotate_left_preserves_order:
+  forall (A : Type)
+         (compare : A -> A -> element_comparison)
+         (h1 : nat)
+         (bt1 : binary_tree A)
+         (e : A)
+         (h21 : nat)
+         (bt21 : binary_tree A)
+         (e2 : A)
+         (h22 : nat)
+         (bt22 : binary_tree A),
+    is_ordered_hbt A (HNode A (1 + max h1 (1 + max h21 h22))
+                            (Node A (Triple A
+                                            (HNode A h1 bt1)
+                                            e
+                                            (HNode A (1 + max h21 h22)
+                                                   (Node A (Triple A
+                                                                   (HNode A h21 bt21)
+                                                                   e2
+                                                                   (HNode A h22 bt22)))))))
+                   compare = true ->
+    is_ordered_hbt A (HNode A (1 + max (1 + max h1 h21) h22)
+                            (Node A (Triple A
+                                            (HNode A (1 + max h1 h21)
+                                                   (Node A (Triple A
+                                                                   (HNode A h1 bt1)
+                                                                   e
+                                                                   (HNode A h21 bt21))))
+                                            e2
+                                            (HNode A h22 bt22)))) compare = true.
+Proof.
+  Admitted.
+
 Lemma rotate_right_preserves_order:
+  forall (A : Type)
+         (compare : A -> A -> element_comparison)
+         (h11 : nat)
+         (bt11 : binary_tree A)
+         (e1 : A)
+         (h12 : nat)
+         (bt12 : binary_tree A)
+         (e : A)
+         (h2 : nat)
+         (bt2 : binary_tree A),
+    is_ordered_hbt A (HNode A (1 + max (1 + max h11 h12) h2)
+                            (Node A (Triple A
+                                            (HNode A (1 + max h11 h12)
+                                                   (Node A (Triple A
+                                                                   (HNode A h11 bt11)
+                                                                   e1
+                                                                   (HNode A h12 bt12))))
+                                            e
+                                            (HNode A h2 bt2)))) compare = true ->
+    is_ordered_hbt A (HNode A (1 + max h11 (1 + max h12 h2))
+                            (Node A (Triple A
+                                            (HNode A h11 bt11)
+                                            e1
+                                            (HNode A (1 + max h12 h2)
+                                                   (Node A (Triple A
+                                                                   (HNode A h12 bt12)
+                                                                   e
+                                                                   (HNode A h2 bt2)))))))
+                   compare = true.
+Proof.
+  Admitted.
+
+
+
+
+
+
+(* Rotation lemmas *) 
+Lemma insertion_rotate_right_preserves_order:
   forall (A : Type)
          (compare : A -> A -> element_comparison)
          (h_hbt : nat)
@@ -1119,7 +1190,7 @@ Lemma rotate_right_preserves_order:
 Proof.
  Admitted.
 
-Lemma rotate_left_preserves_order:
+Lemma insertion_rotate_left_preserves_order:
   forall (A : Type)
          (compare : A -> A -> element_comparison)
          (h_hbt : nat)
