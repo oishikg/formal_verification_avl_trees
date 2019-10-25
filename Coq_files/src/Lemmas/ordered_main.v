@@ -1100,82 +1100,14 @@ Proof.
     + discriminate.
 Qed.
 
-Lemma rotate_right_preserves_order:
+Lemma trivial_equality:
   forall (A : Type)
-         (compare : A -> A -> element_comparison)
-         (h11 : nat)
-         (bt11 : binary_tree A)
-         (e1 : A)
-         (h12 : nat)
-         (bt12 : binary_tree A)
-         (e : A)
-         (h2 : nat)
-         (bt2 : binary_tree A)
-         (t_min t_max : A), 
-    traverse_to_check_ordered_hbt
-      A (HNode A (1 + max (1 + max h11 h12) h2)
-               (Node A (Triple A
-                               (HNode A (1 + max h11 h12)
-                                      (Node A (Triple A
-                                                      (HNode A h11 bt11)
-                                                      e1
-                                                      (HNode A h12 bt12))))
-                               e
-                               (HNode A h2 bt2)))) compare =
-    TSome (A * A) (t_min, t_max) -> 
-    traverse_to_check_ordered_hbt
-      A (HNode A (1 + max h11 (1 + max h12 h2))
-               (Node A (Triple Asssssssss
-                               (HNode A h11 bt11)
-                               e1
-                               (HNode A (1 + max h12 h2)
-                                      (Node A (Triple A
-                                                      (HNode A h12 bt12)
-                                                      e
-                                                      (HNode A h2 bt2)))))))
-      compare = TSome (A * A) (t_min, t_max).
+         (v : A),
+    v = v.
 Proof.
   intros.
-  
-
-
-
-Lemma rotate_left_preserves_order:
-  forall (A : Type)
-         (compare : A -> A -> element_comparison)
-         (h1 : nat)
-         (bt1 : binary_tree A)
-         (e : A)
-         (h21 : nat)
-         (bt21 : binary_tree A)
-         (e2 : A)
-         (h22 : nat)
-         (bt22 : binary_tree A)
-         (t_min t_max : A),
-    traverse_to_check_ordered_hbt
-      A (HNode A (1 + max h1 (1 + max h21 h22))
-               (Node A (Triple A
-                               (HNode A h1 bt1)
-                               e
-                               (HNode A (1 + max h21 h22)
-                                      (Node A (Triple A
-                                                      (HNode A h21 bt21)
-                                                      e2
-                                                      (HNode A h22 bt22)))))))
-      compare = TSome (A * A) (t_min, t_max) ->
-    traverse_to_check_ordered_hbt
-      A (HNode A (1 + max (1 + max h1 h21) h22)
-               (Node A (Triple A
-                               (HNode A (1 + max h1 h21)
-                                      (Node A (Triple A
-                                                      (HNode A h1 bt1)
-                                                      e
-                                                      (HNode A h21 bt21))))
-                               e2
-                               (HNode A h22 bt22)))) compare =
-    TSome (A * A) (t_min, t_max).
-Proof.
-  Admitted.
+  reflexivity.
+Qed.
 
 
 Lemma rotate_right_intermediate_tree_ordered:
@@ -1242,6 +1174,203 @@ Proof.
     reflexivity.
 Qed.
 
+
+Lemma rotate_right_preserves_order:
+  forall (A : Type)
+         (compare : A -> A -> element_comparison)
+         (h11 : nat)
+         (bt11 : binary_tree A)
+         (e1 : A)
+         (h12 : nat)
+         (bt12 : binary_tree A)
+         (e : A)
+         (h2 : nat)
+         (bt2 : binary_tree A)
+         (t_min t_max : A), 
+    traverse_to_check_ordered_hbt
+      A (HNode A (1 + max (1 + max h11 h12) h2)
+               (Node A (Triple A
+                               (HNode A (1 + max h11 h12)
+                                      (Node A (Triple A
+                                                      (HNode A h11 bt11)
+                                                      e1
+                                                      (HNode A h12 bt12))))
+                               e
+                               (HNode A h2 bt2)))) compare =
+    TSome (A * A) (t_min, t_max) -> 
+    traverse_to_check_ordered_hbt
+      A (HNode A (1 + max h11 (1 + max h12 h2))
+               (Node A (Triple A
+                               (HNode A h11 bt11)
+                               e1
+                               (HNode A (1 + max h12 h2)
+                                      (Node A (Triple A
+                                                      (HNode A h12 bt12)
+                                                      e
+                                                      (HNode A h2 bt2)))))))
+      compare = TSome (A * A) (t_min, t_max).
+Proof.
+  intros.
+
+  (* we must first assert that the subtrees are ordered *)
+
+  (* fold H *)
+  assert (H_fold_traverse:
+            is_ordered_hbt
+              A
+              (HNode A (1 + max (1 + max h11 h12) h2)
+                     (Node A
+                           (Triple A
+                                   (HNode A (1 + max h11 h12)
+                                          (Node A (Triple A
+                                                          (HNode A h11 bt11)
+                                                          e1
+                                                          (HNode A h12 bt12))))
+                                   e
+                                   (HNode A h2 bt2)))) compare = true). 
+  unfold is_ordered_hbt.
+  rewrite -> H.
+  reflexivity.
+  
+  (* assert orderedness of the left subtree and hbt2 *)
+  Check (triple_ordered_implies_hbts_ordered).
+  destruct (triple_ordered_implies_hbts_ordered
+              A compare (1 + max (1 + max h11 h12) h2)
+              (HNode A (1 + max h11 h12)
+                     (Node A (Triple A (HNode A h11 bt11) e1 (HNode A h12 bt12))))
+              e
+              (HNode A h2 bt2) H_fold_traverse) as [H_left_subtree_ord H_bt2_ord].
+  destruct (triple_ordered_implies_hbts_ordered
+              A compare (1 + max h11 h12)
+              (HNode A h11 bt11) e1 (HNode A h12 bt12) H_left_subtree_ord)
+    as [H_bt11_ord H_bt12_ord].
+
+  (* assert required inequalities *)
+  
+  (* max11 < e1 *)
+  assert (H_comp_max11_e1:
+            forall (min11 max11 : A),
+              traverse_to_check_ordered_hbt A (HNode A h11 bt11) compare =
+              TSome (A * A) (min11, max11) ->
+              compare max11 e1 = Lt).
+  intros.
+  unfold is_ordered_hbt in H_left_subtree_ord.
+  rewrite -> unfold_traverse_to_check_ordered_hbt in H_left_subtree_ord.
+  rewrite -> unfold_traverse_to_check_ordered_bt_node in H_left_subtree_ord.
+  rewrite -> unfold_traverse_to_check_ordered_t in H_left_subtree_ord.
+  rewrite -> H0 in H_left_subtree_ord.
+  case (compare max11 e1) as [ | | ].
+  reflexivity.
+  discriminate.
+  discriminate.
+
+  (* e1 < min12  *)
+  assert (H_comp_e1_min12:
+            forall (min12 max12 : A),
+              traverse_to_check_ordered_hbt A (HNode A h12 bt12) compare =
+              TSome (A * A) (min12, max12) ->
+              compare e1 min12 = Lt).
+  intros.
+  unfold is_ordered_hbt in H_left_subtree_ord.
+  rewrite -> unfold_traverse_to_check_ordered_hbt in H_left_subtree_ord.
+  rewrite -> unfold_traverse_to_check_ordered_bt_node in H_left_subtree_ord.
+  rewrite -> unfold_traverse_to_check_ordered_t in H_left_subtree_ord.
+  case (traverse_to_check_ordered_hbt A (HNode A h11 bt11) compare)
+       as [ | | (min11, max11)].
+  discriminate.
+  rewrite -> H0 in H_left_subtree_ord.
+  case (compare e1 min12) as [ | | ].
+  reflexivity.
+  discriminate.
+  discriminate.
+  assert (H_trivial_equality :
+            TSome (A * A) (min11, max11) = TSome (A * A) (min11, max11)).
+  reflexivity.
+  rewrite -> (H_comp_max11_e1 min11 max11 H_trivial_equality) in H_left_subtree_ord.
+  rewrite -> H0 in H_left_subtree_ord.
+  case (compare e1 min12) as [ | | ].
+  reflexivity.
+  discriminate.
+  discriminate.
+  
+  (* max12 < e1 *)
+  assert (H_comp_max12_e:
+            forall (min12 max12 : A),
+              traverse_to_check_ordered_hbt A (HNode A h12 bt12) compare =
+              TSome (A * A) (min12, max12) ->
+              compare max12 e = Lt).
+  intros.
+  rewrite -> unfold_traverse_to_check_ordered_hbt in H.
+  rewrite -> unfold_traverse_to_check_ordered_bt_node in H.
+  rewrite -> unfold_traverse_to_check_ordered_t in H.
+  rewrite -> unfold_traverse_to_check_ordered_hbt in H.
+  rewrite -> unfold_traverse_to_check_ordered_bt_node in H.
+  rewrite -> unfold_traverse_to_check_ordered_t in H.
+  case (traverse_to_check_ordered_hbt A (HNode A h11 bt11) compare)
+    as [ | | (min11, max11)].
+  discriminate.
+  rewrite -> H0 in H.
+  rewrite -> (H_comp_e1_min12 min12 max12 H0) in H.
+  case (compare max12 e) as [ | | ].
+  reflexivity.
+  discriminate.
+  discriminate.
+  rewrite -> (H_comp_max11_e1
+                min11 max11
+                (trivial_equality (triple_option (A * A))
+                                  (TSome (A * A) (min11, max11)))) in H.
+  rewrite -> H0 in H.
+  rewrite -> (H_comp_e1_min12 min12 max12 H0) in H.
+  case (compare max12 e) as [ | | ].
+  reflexivity.
+  discriminate.
+  discriminate.
+
+  (* e < min bt2 *)
+
+
+
+
+
+Lemma rotate_left_preserves_order:
+  forall (A : Type)
+         (compare : A -> A -> element_comparison)
+         (h1 : nat)
+         (bt1 : binary_tree A)
+         (e : A)
+         (h21 : nat)
+         (bt21 : binary_tree A)
+         (e2 : A)
+         (h22 : nat)
+         (bt22 : binary_tree A)
+         (t_min t_max : A),
+    traverse_to_check_ordered_hbt
+      A (HNode A (1 + max h1 (1 + max h21 h22))
+               (Node A (Triple A
+                               (HNode A h1 bt1)
+                               e
+                               (HNode A (1 + max h21 h22)
+                                      (Node A (Triple A
+                                                      (HNode A h21 bt21)
+                                                      e2
+                                                      (HNode A h22 bt22)))))))
+      compare = TSome (A * A) (t_min, t_max) ->
+    traverse_to_check_ordered_hbt
+      A (HNode A (1 + max (1 + max h1 h21) h22)
+               (Node A (Triple A
+                               (HNode A (1 + max h1 h21)
+                                      (Node A (Triple A
+                                                      (HNode A h1 bt1)
+                                                      e
+                                                      (HNode A h21 bt21))))
+                               e2
+                               (HNode A h22 bt22)))) compare =
+    TSome (A * A) (t_min, t_max).
+Proof.
+  Admitted.
+
+
+wwwwwwwww
 
 (* Rotation lemmas *)
 Lemma insertion_rotate_right_preserves_order:
