@@ -2465,7 +2465,7 @@ Proof.
                               (HNode A h11 bt11)
                               e1
                               (HNode A h12 bt12)))
-                e
+                  e
                 h2 bt2
                 min_ret max_ret
                 H H2 H0 H3) as [max2 H_intermediate_tree_is_ordered].
@@ -2511,24 +2511,234 @@ Qed.
 
 
 
-
 Lemma insertion_rotate_left_preserves_order:
   forall (A : Type)
          (compare : A -> A -> element_comparison)
-         (h_hbt : nat)
          (hbt1 : heightened_binary_tree A)
+         (hbt_ret : heightened_binary_tree A)
+         (min_ret max_ret : A)
          (e : A)
-         (hbt2 : heightened_binary_tree A)
-         (h_ret : nat)
-         (bt_ret : binary_tree A)
          (hbt' : heightened_binary_tree A),
-    is_ordered_hbt A (HNode A h_hbt (Node A (Triple A hbt1 e hbt2))) compare = true ->     
-    is_ordered_hbt A hbt1 compare = true -> 
-    is_ordered_hbt A (HNode A h_ret bt_ret) compare = true ->
-    rotate_left_hbt A hbt1 e (HNode A h_ret bt_ret) = Some hbt' -> 
+    is_ordered_hbt A hbt1 compare = true ->
+    traverse_to_check_ordered_hbt A hbt_ret compare =
+    TSome (A * A) (min_ret, max_ret) ->
+    is_sound_hbt A hbt_ret = true ->
+    (forall (min1 max1 : A),
+        traverse_to_check_ordered_hbt A hbt1 compare =
+        TSome (A * A) (min1, max1) ->
+        compare max1 e = Lt) ->
+    compare e min_ret = Lt -> 
+    rotate_left_hbt A hbt1 e hbt_ret = Some hbt' ->
     is_ordered_hbt A hbt' compare = true.
 Proof.
-Admitted.
+ intros.
+
+ (* unfold *)
+ unfold rotate_left_hbt in H4.
+ induction hbt1 as [h1 bt1]. 
+ induction hbt_ret as [h_ret bt_ret].
+ unfold rotate_left_bt in H4.
+ case bt_ret as [ | t_ret].
+
+ discriminate.
+
+ induction t_ret as [[h21 bt21] e2 [h22 bt22]].
+ case (h22 + 1 =n= h21) as [ | ] eqn : C_S_h22_eq_h21.
+
+ (* rotate left case 1 *)
+ - case bt21 as [ | [[h211 bt211] e21 [h212 bt212]]].
+   discriminate.
+   rewrite -> some_x_equal_some_y in H4.
+   rewrite <- H4.
+   
+   (* We note that rotate left case 1 is a double rotation: we first rotate the 
+    * returned sub-tree using a left rotation, then the entire tree is 
+    * left rotated *)
+   
+   (* first, we must use the soundness of hbt_ret to rewrite the correct heights *)
+   Check (triple_sound_implies_hbts_sound).
+   destruct (triple_sound_implies_hbts_sound
+               A h_ret
+               (HNode A h21
+                      (Node A (Triple A
+                                      (HNode A h211 bt211)
+                                      e21
+                                      (HNode A h212 bt212))))
+               e2
+               (HNode A h22 bt22)
+               H1) as [H_left_subtree_sound _].
+   
+   Check (relate_heights).
+   assert (H_21_h211_h212: h21 = 1 + max h211 h212).
+   exact (relate_heights A h21 h211 bt211 e21 h212 bt212 H_left_subtree_sound).
+   
+   rewrite -> H_21_h211_h212 in H1.
+
+   Check (relate_heights).
+   assert (H_h_ret_h211_h212_h22: h_ret = 1 + max (1 + max h211 h212) h22).
+   exact (relate_heights
+            A h_ret
+            (1 + max h211 h212)
+            (Node A (Triple A (HNode A h211 bt211) e21 (HNode A h212 bt212)))
+            e2
+            h22 bt22
+            H1).
+
+   rewrite -> H_h_ret_h211_h212_h22 in H0.
+
+   (* we can now perform the first right rotation on the originally returned tree *)
+    Check (rotate_right_preserves_order).   
+    assert (H_first_right_rotation:
+              traverse_to_check_ordered_hbt
+                A
+                (HNode A (1 + max h211 (1 + max h212 h22))
+                       (Node A
+                             (Triple A
+                                     (HNode A h211 bt211)
+                                     e21
+                                     (HNode A (1 + max h212 h22)
+                                            (Node A (Triple A
+                                                            (HNode A h212 bt212)
+                                                            e2
+                                                            (HNode A h22 bt22)))))))
+                compare = TSome (A * A) (min_ret, max_ret)).
+     exact (rotate_right_preserves_order
+             A compare h211 bt211 e21 h212 bt212 e2 h22 bt22 min_ret max_ret H0).
+     
+     (* next, we attach the right rotated tree to e and hbt1, and show that the
+      * intermediate tree is ordered *)
+     Check (rotate_left_intermediate_tree_ordered).
+     destruct (rotate_left_intermediate_tree_ordered
+                 A compare
+                 h1 bt1
+                 e
+                 (1 + max h211 (1 + max h212 h22))
+                 (Node A
+                       (Triple A (HNode A h211 bt211) e21
+                               (HNode A (1 + max h212 h22)
+                                      (Node A
+                                            (Triple A 
+                                                    (HNode A h212 bt212) e2 
+                                                    (HNode A h22 bt22))))))
+                 min_ret max_ret
+                 H H2
+                 H_first_right_rotation
+                 H3) as [min1 H_intermediate_tree_is_ordered].
+
+     (* next, left rotate the intermediate tree *)
+     Check (rotate_left_preserves_order).
+     assert (H_double_rotation_preserves_order:
+               traverse_to_check_ordered_hbt
+                 A
+                 (HNode A (1 + max (1 + max h1 h211) (1 + max h212 h22))
+                        (Node A
+                              (Triple A
+                                      (HNode A (1 + max h1 h211)
+                                             (Node A (Triple A
+                                                             (HNode A h1 bt1)
+                                                             e
+                                                             (HNode A h211 bt211))))
+                                      e21
+                                      (HNode A (1 + max h212 h22)
+                                             (Node A (Triple A
+                                                             (HNode A h212 bt212)
+                                                             e2
+                                                             (HNode A h22 bt22)))))))
+                 compare = TSome (A * A) (min1, max_ret)).
+     exact (rotate_left_preserves_order
+              A compare h1 bt1 e h211 bt211 e21
+              (1 + max h212 h22)
+              (Node A
+                    (Triple A 
+                            (HNode A h212 bt212) e2 
+                            (HNode A h22 bt22)))
+              min1 max_ret
+              H_intermediate_tree_is_ordered).
+
+      (* the final step involves using 
+       * traverse_to_check_ordered_hbt_some_implies_is_ordered *)
+      Check (traverse_to_check_ordered_hbt_some_implies_is_ordered).     
+      exact (traverse_to_check_ordered_hbt_some_implies_is_ordered
+               A compare 
+               (HNode A (1 + max (1 + max h1 h211) (1 + max h212 h22))
+                        (Node A
+                              (Triple A
+                                      (HNode A (1 + max h1 h211)
+                                             (Node A (Triple A
+                                                             (HNode A h1 bt1)
+                                                             e
+                                                             (HNode A h211 bt211))))
+                                      e21
+                                      (HNode A (1 + max h212 h22)
+                                             (Node A (Triple A
+                                                             (HNode A h212 bt212)
+                                                             e2
+                                                             (HNode A h22 bt22)))))))
+               min1 max_ret H_double_rotation_preserves_order).
+
+ - case ((h21 + 1 =n= h22) || (h21 =n= h22)) as [ | ].
+   rewrite -> some_x_equal_some_y in H4.
+   rewrite <- H4.
+   
+   (* Note that rotate right case 2 requires only a single right rotation *)
+
+   (* first, rewrite h_ret correctly *)
+   Check (relate_heights).
+   assert (H_h_ret_h21_h22: h_ret = 1 + max h21 h22).
+   exact (relate_heights A h_ret h21 bt21 e2 h22 bt22 H1).
+   
+   rewrite -> H_h_ret_h21_h22 in H0.
+   
+   (* next, assert that the intermediate tree is ordered *)
+    Check (rotate_left_intermediate_tree_ordered).
+    destruct (rotate_left_intermediate_tree_ordered
+                A compare h1 bt1 e
+                (1 + max h21 h22)
+                (Node A (Triple A (HNode A h21 bt21) e2 (HNode A h22 bt22)))
+                min_ret max_ret
+                H H2 H0 H3) as [min1 H_intermediate_tree_is_ordered].
+
+    (* now rotate the intermediate tree left and show that order is preserved *)
+    Check (rotate_left_preserves_order).
+    assert (H_singly_rotated_tree_ordered:
+              traverse_to_check_ordered_hbt
+                A
+                (HNode A (1 + max (1 + max h1 h21) h22)
+                       (Node A
+                             (Triple A
+                                     (HNode A (1 + max h1 h21)
+                                            (Node A (Triple A
+                                                            (HNode A h1 bt1)
+                                                            e
+                                                            (HNode A h21 bt21))))
+                                     e2
+                                     (HNode A h22 bt22))))
+                compare = TSome (A * A) (min1, max_ret)).
+    exact (rotate_left_preserves_order
+             A compare h1 bt1 e h21 bt21 e2 h22 bt22 min1 max_ret
+             H_intermediate_tree_is_ordered).
+    
+    (* the final step involves using 
+     * traverse_to_check_ordered_hbt_some_implies_is_ordered *)
+    Check (traverse_to_check_ordered_hbt_some_implies_is_ordered).
+    exact (traverse_to_check_ordered_hbt_some_implies_is_ordered
+             A compare
+             (HNode A (1 + max (1 + max h1 h21) h22)
+                       (Node A
+                             (Triple A
+                                     (HNode A (1 + max h1 h21)
+                                            (Node A (Triple A
+                                                            (HNode A h1 bt1)
+                                                            e
+                                                            (HNode A h21 bt21))))
+                                     e2
+                                     (HNode A h22 bt22))))
+             min1 max_ret
+             H_singly_rotated_tree_ordered).
+
+    discriminate.
+Qed.
+
 
 Lemma non_zero_height_implies_node:
   forall (A : Type)
@@ -3022,7 +3232,8 @@ Proof.
       reflexivity. 
 
       case ((h_ret =n= project_height_hbt A hbt2)
-            || (h_ret =n= 1 + project_height_hbt A hbt2)) as [ | ].
+            || (h_ret =n= 1 + project_height_hbt A hbt2))
+        as [ | ] eqn : C_hbt2_possible_heights.
       case (compare_int h_ret (2 + project_height_hbt A hbt1))
         as [ | | ] eqn : C_height_diff.
 
@@ -3265,14 +3476,189 @@ Proof.
         exact (H_hbt2_inductive_assumption
                  (HNode A h_ret bt_ret)
                  H_hbt2_is_sound H_hbt2_is_balanced H_hbt2_is_ordered P_some_eq).
-        Check (rotate_left_preserves_order).
-        Check (rotate_left_preserves_order
-                 A compare h_hbt hbt1 e hbt2 h_ret bt_ret hbt'
-                 H_ord_t_init H_hbt1_is_ordered H_hbt_ret_ordered H_insert_t).
-          exact (rotate_left_preserves_order
-                   A compare h_hbt hbt1 e hbt2 h_ret bt_ret hbt'
-                   H_ord_t_init H_hbt1_is_ordered H_hbt_ret_ordered H_insert_t).
 
+        (* obtain relation between e and min (hbt_ret); to do so we want to 
+         * use insertion_in_node_min_max;
+         * the key here is to assert that both hbt_ret and hbt are nodes, and then
+         * unfold is_ordered_hbt to get the min and max values in both cases *)
+        induction hbt1 as [h1 bt1].                
+        induction hbt2 as [h2 bt2].
+        case bt_ret as [ | t_ret].
+        
+        (* impossible case: bt_ret is leaf *)
+        unfold rotate_left_hbt in H_insert_t.
+        unfold rotate_left_bt in H_insert_t.
+        discriminate.
+
+        (* bt_ret is a triple: use lemma traverse_node_impossible_case *)
+        Check (traverse_node_impossible_case).
+
+        assert (H_bt_ret_impossible_case:
+                  traverse_to_check_ordered_bt A (Node A t_ret) compare =
+                  TNone (A * A) -> False).
+        exact (traverse_node_impossible_case A compare t_ret).
+        
+
+        (* now unfold is_ordered_hbt for hbt_ret *)
+        unfold is_ordered_hbt in H_hbt_ret_ordered.
+        case (traverse_to_check_ordered_hbt A (HNode A h_ret (Node A t_ret)) compare)
+             as [ | | (min_ret, max_ret)] eqn : C_check_ord_hbt_ret.
+        discriminate.
+        apply H_bt_ret_impossible_case in C_check_ord_hbt_ret.
+        apply False_ind.
+        exact C_check_ord_hbt_ret.
+
+        (* we have shown that hbt_ret has a min and a max; now we want to do so for
+         * hbt2 *)
+
+        (* first, unfold and set the hypotheses up as required *)
+        unfold project_height_hbt in C_hbt2_possible_heights.
+        unfold project_height_hbt in C_height_diff.
+        unfold compare_int in C_height_diff.
+        case (h_ret <n 2 + h1) as [ | ].
+        discriminate.
+        case (h_ret =n= 2 + h1) as [ | ] eqn : C_h_ret_eq_SS_h1.
+
+        (* next, assert that hbt1 is a node *)
+        Check (non_zero_height_implies_node).
+        destruct (non_zero_height_implies_node
+                    A h_ret h2 h1 bt2 C_hbt2_possible_heights
+                    C_h_ret_eq_SS_h1 H_hbt2_is_sound) as [t2 H_bt2_as_node].
+        rewrite -> H_bt2_as_node in H_hbt2_is_ordered.
+        unfold is_ordered_hbt in H_hbt2_is_ordered.
+        case (traverse_to_check_ordered_hbt A (HNode A h2 (Node A t2)) compare)
+             as [ | | (min2, max2)] eqn : C_check_ord_hbt2.
+        discriminate.
+
+        (* assert that traversing hbt2 to check ordered can never give a TNone 
+         * constructor *)
+        Check (traverse_node_impossible_case).
+
+        assert (H_bt2_impossible_case:
+                  traverse_to_check_ordered_bt A (Node A t2) compare =
+                  TNone (A * A) -> False).
+        exact (traverse_node_impossible_case A compare t2).
+
+        apply H_bt2_impossible_case in C_check_ord_hbt2.
+        apply False_ind.
+        exact C_check_ord_hbt2.
+
+        (* finally, we may use insertion_in_node_min_max *)
+        destruct (insertion_in_node_min_max A compare) as [H_hbt_min_max _].
+        rewrite -> H_bt2_as_node in H_hbt2_is_sound.
+        rewrite -> H_bt2_as_node in H_hbt2_is_balanced.
+        rewrite -> H_bt2_as_node in C_insert_hbt2.
+        destruct (H_hbt_min_max (HNode A h2 (Node A t2))
+                                (HNode A h_ret (Node A t_ret))
+                                x min2 min_ret max2 max_ret
+                                H_hbt2_is_sound H_hbt2_is_balanced
+                                C_insert_hbt2
+                                C_check_ord_hbt_ret
+                                C_check_ord_hbt2) as [_ H_hbt_ret_min].
+        
+        (* assert relation between e and min_ret *)
+        assert (H_e_lt_min_ret: compare e min_ret = Lt).
+        destruct H_hbt_ret_min as [H_min_ret_eq_x | H_min_ret_eq_min2].
+
+        (* case 1 : min_ret = x *)
+        rewrite -> H_min_ret_eq_x.
+        Check (relating_lt_gt).
+        Check (relating_lt_gt A e x compare).
+        apply (relating_lt_gt A e x compare).
+        exact C_comp.
+
+        (* case 2 : min_ret min2 *)
+        rewrite -> H_min_ret_eq_min2.
+
+        (* to solve this problem, we right reduce H_ord_t_init *)
+        Check (ordered_node_has_min_max).
+        rewrite -> H_bt2_as_node in H_ord_t_init.
+        destruct (ordered_node_has_min_max
+                    A compare h_hbt (HNode A h1 bt1) e (HNode A h2 (Node A t2))
+                    H_ord_t_init) as [min1 [max2_alias H_hbt_init_traverse_bt]].
+
+        (* fold traverse_to_check_ordered_bt *)
+        assert (H_hbt_init_traverse_hbt:
+                  traverse_to_check_ordered_hbt
+                    A
+                    (HNode A h_hbt (Node A (Triple A
+                                                   (HNode A h1 bt1)
+                                                   e
+                                                   (HNode A h2 (Node A t2)))))
+                    compare = TSome (A * A) (min1, max2_alias)).
+        rewrite -> unfold_traverse_to_check_ordered_hbt.
+        exact H_hbt_init_traverse_bt.
+        
+        (* now left reduce H_hbt_init_traverse *)
+        Check (reduce_ordered_hbt_left).
+        assert (H_hbt_init_left_reduced:
+                  traverse_to_check_ordered_hbt
+                    A
+                    (HNode A h_hbt (Node A (Triple A
+                                                   (HNode A 0 (Leaf A))
+                                                   e (HNode A h2 (Node A t2)))))
+                    compare = TSome (A * A) (e, max2_alias)).
+        exact (reduce_ordered_hbt_left
+                 A compare h_hbt
+                 (HNode A h1 bt1) e (HNode A h2 (Node A t2))
+                 min1 max2_alias H_hbt_init_traverse_hbt).
+        
+        (* now unfold in H_hbt_init_traverse_hbt *)
+        rewrite -> unfold_traverse_to_check_ordered_hbt in H_hbt_init_left_reduced.
+        rewrite -> unfold_traverse_to_check_ordered_bt_node
+          in H_hbt_init_left_reduced.
+        rewrite -> unfold_traverse_to_check_ordered_t in H_hbt_init_left_reduced.
+        rewrite -> (unfold_traverse_to_check_ordered_hbt A 0 (Leaf A))
+          in H_hbt_init_left_reduced.
+        rewrite -> unfold_traverse_to_check_ordered_bt_leaf
+          in H_hbt_init_left_reduced.
+        rewrite -> C_check_ord_hbt2 in H_hbt_init_left_reduced.
+        case (compare e min2) as [ | | ].
+        reflexivity.
+        discriminate.
+        discriminate.
+
+        (* obtain hypothesis for soundness of hbt_ret *)
+        Check (insertion_preserves_soundness_and_balance).
+        destruct (insertion_preserves_soundness_and_balance
+                    A compare x) as [H_soundness _].
+        destruct (H_soundness 
+                    (HNode A h2 (Node A t2)) (HNode A h_ret (Node A t_ret))
+                    H_hbt2_is_sound H_hbt2_is_balanced C_insert_hbt2)
+          as [H_hbt_ret_sound _].
+
+        (* obtain hypothesis relating hbt1 and e *)
+        assert (H_hbt1_e:
+                  forall (min1 max1 : A),
+                    traverse_to_check_ordered_hbt A (HNode A h1 bt1) compare =
+                    TSome (A * A) (min1, max1) ->
+                    compare max1 e = Lt).
+        intros.
+        unfold is_ordered_hbt in H_ord_t_init.
+        rewrite -> unfold_traverse_to_check_ordered_hbt in H_ord_t_init.
+        rewrite -> unfold_traverse_to_check_ordered_bt_node in H_ord_t_init.
+        rewrite -> unfold_traverse_to_check_ordered_t in H_ord_t_init.
+        rewrite -> H in H_ord_t_init.
+        case (compare max1 e) as [ | | ].
+        reflexivity.
+        discriminate.
+        discriminate.
+
+        (* we are finally in a position to apply 
+         * insertion_rotate_right_preserves_order ! *)
+        Check (insertion_rotate_left_preserves_order).
+        exact (insertion_rotate_left_preserves_order
+                 A compare (HNode A h1 bt1) (HNode A h_ret (Node A t_ret))
+                 min_ret max_ret e hbt'
+                 H_hbt1_is_ordered
+                 C_check_ord_hbt_ret
+                 H_hbt_ret_sound
+                 H_hbt1_e
+                 H_e_lt_min_ret
+                 H_insert_t).
+
+        discriminate.
+        
       * discriminate.
 
       * discriminate.
