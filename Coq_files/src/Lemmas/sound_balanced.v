@@ -2635,7 +2635,6 @@ Proof.
                                                     H_hbt2_is_sound
                                                     H_hbt2_is_balanced) in H_bal_t_init.
           case (differ_by_one h1 h2) as [ | ] eqn : C_diff_by_one_h1_h2.
-
               
           Check (right_insert_differ_by_one).
           rewrite -> (right_insert_differ_by_one
