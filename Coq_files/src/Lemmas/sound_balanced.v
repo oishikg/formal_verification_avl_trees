@@ -2420,7 +2420,7 @@ Proof.
 
         (* The resultant tree is balanced *) 
         {
-          destruct (H_hbt1_inductive_assumption (HNode A h_ret bt_ret)
+          destruct (H_hbt1_inductive_assumption (HNode A h_ret bt_ret) 
                                                 H_hbt1_is_sound
                                                 H_hbt1_is_balanced
                                                 P_some_eq) as

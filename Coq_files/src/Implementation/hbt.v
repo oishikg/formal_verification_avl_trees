@@ -714,7 +714,7 @@ Definition rotate_right_bt
                                     (HNode A
                                            (1 + max h11 h121)
                                            (Node A (Triple A
-                  git s                                         (HNode A h11 bt11)
+                                                           (HNode A h11 bt11)
                                                            e1
                                                            (HNode A h121 bt121))))
                                     e12
