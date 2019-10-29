@@ -7,7 +7,6 @@ Require Export Hbt.Lemmas.sound_balanced.
 Require Import Hbt.Lemmas.ordered_sub.
 Require Export Hbt.Lemmas.ordered_sub.
 
-
 (* The main lemma required to prove the orderedness case of the insertion specification in 
  * Hbt.Theorems.theorems: given an insertion into a subtree, show that the maximum and 
  * minimum values of a subtree are as specified in the theorem *)
@@ -83,11 +82,9 @@ Proof.
   case (compare x e) as [ | | ] eqn : C_comp_x_e.
   case (insert_hbt_helper A compare x hbt1) as [ hbt1'| ] eqn : C_insert_hbt1.
   induction hbt1' as [h1' bt1'].
-  case ((h1' =n= project_height_hbt A hbt1)
-        || (h1' =n= 1 + project_height_hbt A hbt1)) as [ | ].
+
   case (compare_int h1' (2 + project_height_hbt A hbt2))
-    as [ | | ] eqn : C_comp_heights.
-  
+    as [ | | ] eqn : C_comp_heights.       
 
   (* height diff is less than 2: no rotations required *)
   - rewrite -> (some_x_equal_some_y
@@ -581,15 +578,11 @@ Proof.
 
   - discriminate.
 
-  - discriminate.
-    
   - case (insert_hbt_helper A compare x hbt2) as [ hbt2'| ] eqn : C_insert_hbt2.
     induction hbt2' as [h2' bt2'].
-    case ((h2' =n= project_height_hbt A hbt2)
-          || (h2' =n= 1 + project_height_hbt A hbt2)) as [ | ].
     case (compare_int h2' (2 + project_height_hbt A hbt1))
       as [ | | ] eqn : C_comp_heights.
-
+    
     (* height diff is less than 2: no rotations required *) 
     + rewrite -> some_x_equal_some_y in H_insert_hbt.
       rewrite <- H_insert_hbt in H_ord_hbt'.
@@ -1096,9 +1089,8 @@ Proof.
     + discriminate.
 
     + discriminate.
-
-    + discriminate.
 Qed.
+
 
 Lemma trivial_equality:
   forall (A : Type)
@@ -2744,7 +2736,7 @@ Lemma non_zero_height_implies_node:
   forall (A : Type)
          (h_ret h1 h2 : nat)
          (bt1 : binary_tree A),
-    (h_ret =n= h1) || (h_ret =n= 1 + h1) = true ->
+    (h_ret = h1) \/ (h_ret = 1 + h1) -> 
     (h_ret =n= 2 + h2) = true ->
     is_sound_hbt A (HNode A h1 bt1) = true ->
     exists (t1 : triple A),
@@ -2752,10 +2744,9 @@ Lemma non_zero_height_implies_node:
 Proof.
   intros.
   apply beq_nat_true in H0.
-  case (h_ret =n= h1) as [ | ] eqn : C_h_ret_eq_h1.
+  destruct H as [H_ret_eq_h1 | H_ret_eq_S_h1].
 
-  - apply beq_nat_true in C_h_ret_eq_h1.
-    rewrite -> C_h_ret_eq_h1 in H0.
+  - rewrite -> H_ret_eq_h1 in H0.
     rewrite H0 in H1.
     case bt1 as [ | t1].
     unfold is_sound_hbt in H1.
@@ -2771,9 +2762,7 @@ Proof.
     exists t1.
     reflexivity.
 
-  - rewrite -> orb_false_l in H.
-    apply beq_nat_true in H.
-    rewrite H in H0.
+  - rewrite H_ret_eq_S_h1 in H0.
     Check (succ_eq).
     apply succ_eq in H0.
     rewrite H0 in H1.
@@ -2868,7 +2857,12 @@ Proof.
                 A compare h_hbt hbt1 e hbt2 H_ord_t_init)
       as [H_hbt1_is_ordered H_hbt2_is_ordered].
 
-    
+    destruct (insertion_preserves_soundness A compare x) as [H_hbt_insertion_sound _].
+
+    destruct (relating_insertion_and_original_height A compare x)
+      as [H_hbt_relating_heights _].
+
+
     rewrite -> (unfold_insert_t_helper A compare x h_hbt hbt1 e hbt2)
       in H_insert_t. 
     (* Element to be inserted is Lt current element considered *)
@@ -2878,14 +2872,25 @@ Proof.
     + case (insert_hbt_helper A compare x hbt1) as [hbt_ret | ] eqn : C_insert_hbt1.
       induction hbt_ret as [h_ret bt_ret].
 
-    (* Trivial hypothesis required to use other hypotheses *)
+      (* Trivial hypothesis required to use other hypotheses *)
       assert (P_some_eq : Some (HNode A h_ret bt_ret) =
                           Some (HNode A h_ret bt_ret)).
       reflexivity.
 
-      case ((h_ret =n= project_height_hbt A hbt1)
-            || (h_ret =n= 1 + project_height_hbt A hbt1))
-        as [ | ] eqn : C_hbt1_possible_heights.
+      (* essential hypothesis for possible hbt1 heights *)
+      assert (H_hbt_ret_is_sound: is_sound_hbt A (HNode A h_ret bt_ret) = true).
+      exact (H_hbt_insertion_sound
+               hbt1 (HNode A h_ret bt_ret)  H_hbt1_is_sound C_insert_hbt1).
+
+      assert (C_hbt1_possible_heights:
+                project_height_hbt A (HNode A h_ret bt_ret) =
+                project_height_hbt A hbt1 \/
+                project_height_hbt A (HNode A h_ret bt_ret) =
+                1 + project_height_hbt A hbt1).
+      exact (H_hbt_relating_heights
+               hbt1 (HNode A h_ret bt_ret) C_insert_hbt1 H_hbt1_is_sound
+               H_hbt1_is_balanced H_hbt_ret_is_sound).
+      
       case (compare_int h_ret (2 + project_height_hbt A hbt2))
         as [ | | ] eqn : C_height_diff.
 
@@ -3167,15 +3172,6 @@ Proof.
         discriminate.
         discriminate.
 
-        (* obtain hypothesis for soundness of hbt_ret *)
-        Check (insertion_preserves_soundness_and_balance).
-        destruct (insertion_preserves_soundness_and_balance
-                    A compare x) as [H_soundness _].
-        destruct (H_soundness 
-                    (HNode A h1 (Node A t1)) (HNode A h_ret (Node A t_ret))
-                    H_hbt1_is_sound H_hbt1_is_balanced C_insert_hbt1)
-          as [H_hbt_ret_sound _].
-
         (* obtain hypothesis relating hbt2 and e *)
         assert (H_e_hbt2:
                   forall (min2 max2 : A),
@@ -3204,16 +3200,14 @@ Proof.
                  A compare (HNode A h_ret (Node A t_ret)) (HNode A h2 bt2)
                  min_ret max_ret e hbt'
                  C_check_ord_hbt_ret H_hbt2_is_ordered
-                 H_hbt_ret_sound H_max_ret_lt_e H_e_hbt2 H_insert_t).
+                 H_hbt_ret_is_sound H_max_ret_lt_e H_e_hbt2 H_insert_t).
         exact (insertion_rotate_right_preserves_order
                  A compare (HNode A h_ret (Node A t_ret)) (HNode A h2 bt2)
                  min_ret max_ret e hbt'
                  C_check_ord_hbt_ret H_hbt2_is_ordered
-                 H_hbt_ret_sound H_max_ret_lt_e H_e_hbt2 H_insert_t).
+                 H_hbt_ret_is_sound H_max_ret_lt_e H_e_hbt2 H_insert_t).
 
         discriminate.
-
-      * discriminate.
 
       * discriminate.
 
@@ -3229,11 +3223,22 @@ Proof.
       (* Trivial hypothesis required to use other hypotheses *)
       assert (P_some_eq : Some (HNode A h_ret bt_ret) =
                           Some (HNode A h_ret bt_ret)).
-      reflexivity. 
+      reflexivity.
 
-      case ((h_ret =n= project_height_hbt A hbt2)
-            || (h_ret =n= 1 + project_height_hbt A hbt2))
-        as [ | ] eqn : C_hbt2_possible_heights.
+      (* essential hypothesis for possible hbt1 heights *)
+      assert (H_hbt_ret_is_sound: is_sound_hbt A (HNode A h_ret bt_ret) = true).
+      exact (H_hbt_insertion_sound
+               hbt2 (HNode A h_ret bt_ret) H_hbt2_is_sound C_insert_hbt2).
+
+      assert (C_hbt2_possible_heights:
+                project_height_hbt A (HNode A h_ret bt_ret) =
+                project_height_hbt A hbt2 \/
+                project_height_hbt A (HNode A h_ret bt_ret) =
+                1 + project_height_hbt A hbt2).
+      exact (H_hbt_relating_heights
+               hbt2 (HNode A h_ret bt_ret) C_insert_hbt2 H_hbt2_is_sound
+               H_hbt2_is_balanced H_hbt_ret_is_sound).
+      
       case (compare_int h_ret (2 + project_height_hbt A hbt1))
         as [ | | ] eqn : C_height_diff.
 
@@ -3618,15 +3623,6 @@ Proof.
         discriminate.
         discriminate.
 
-        (* obtain hypothesis for soundness of hbt_ret *)
-        Check (insertion_preserves_soundness_and_balance).
-        destruct (insertion_preserves_soundness_and_balance
-                    A compare x) as [H_soundness _].
-        destruct (H_soundness 
-                    (HNode A h2 (Node A t2)) (HNode A h_ret (Node A t_ret))
-                    H_hbt2_is_sound H_hbt2_is_balanced C_insert_hbt2)
-          as [H_hbt_ret_sound _].
-
         (* obtain hypothesis relating hbt1 and e *)
         assert (H_hbt1_e:
                   forall (min1 max1 : A),
@@ -3652,15 +3648,13 @@ Proof.
                  min_ret max_ret e hbt'
                  H_hbt1_is_ordered
                  C_check_ord_hbt_ret
-                 H_hbt_ret_sound
+                 H_hbt_ret_is_sound
                  H_hbt1_e
                  H_e_lt_min_ret
                  H_insert_t).
 
         discriminate.
         
-      * discriminate.
-
       * discriminate.
 
       * discriminate.
