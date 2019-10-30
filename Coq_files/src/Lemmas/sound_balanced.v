@@ -1,7 +1,6 @@
 Require Import Hbt.Implementation.hbt.
 Require Export Hbt.Implementation.hbt.
 
-
 (* ********** Lemmas concerning soundness ********** *)
 
 Lemma unfold_beq_nat_Sn_Sm:
@@ -92,8 +91,21 @@ Lemma max_cases:
   forall (a b : nat),
     max a b = a \/ max a b = b.
 Proof.
-  Admitted.
+  intros.
+  intros.
+  case (le_ge_dec a b) as [ | ].
+  - Search (max _ _ = _).
+    right.
+    exact (max_r a b l).
+    
+  - Search (max _ _ = _).
+    
+    assert (H: b <= a).
+    auto.
 
+    left.
+    exact (max_l a b H).
+Qed.    
 
 
 Lemma prop_to_bool_helper:
