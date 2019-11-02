@@ -28,7 +28,7 @@ Theorem insert_hbt_satisfies_its_specification:
   forall (A : Type)
          (compare : A -> A -> element_comparison)
          (x : A),
-    specifiction_of_insert_hbt A compare x insert_hbt.
+    specifiction_of_insert_hbt A compare x insert_hbt. 
 Proof.
   intros A compare.
   unfold specifiction_of_insert_hbt.
@@ -36,26 +36,22 @@ Proof.
   unfold insert_hbt.
   case (insert_hbt_helper A compare x hbt) as [ hbt' | ] eqn : C.
 
-  - assert (H_sound_bal:
-            is_sound_hbt A hbt' = true
-            /\
-            is_balanced_hbt A hbt' = true).
-    Check (insertion_preserves_soundness_and_balance).
-    destruct (insertion_preserves_soundness_and_balance
-                A compare x) as [H_for_soundness _].
-    exact (H_for_soundness hbt hbt' H_sound_init H_bal_init C).
-
-    destruct H_sound_bal as [H_sound H_bal].
+  - Check (insertion_preserves_soundness).
+    destruct (insertion_preserves_soundness A compare x) as
+        [H_hbt_sound _].
     split.
 
-    exact H_sound.
-    split.
+    + exact (H_hbt_sound hbt hbt' H_sound_init C).
 
-    exact H_bal.
-    
-    Check (insertion_preserves_order).
-    destruct (insertion_preserves_order A compare x) as [H_ord _].
-    exact (H_ord hbt hbt' H_sound_init H_bal_init H_order_init C).
+    + destruct (insertion_preserves_balance A compare x) as
+          [H_hbt_balance _].
+      split.
+      exact (H_hbt_balance hbt hbt' H_sound_init H_bal_init C).
+
+      
+      Check (insertion_preserves_order).
+      destruct (insertion_preserves_order A compare x) as [H_ord _].
+      exact (H_ord hbt hbt' H_sound_init H_bal_init H_order_init C).
 
   - split.
     exact H_sound_init.
@@ -94,7 +90,7 @@ Theorem delete_hbt_satisfies_its_specification:
   forall (A : Type)
          (compare : A -> A -> element_comparison)
          (x : A),
-    specifiction_of_delete_hbt A compare x delete_hbt.
+    specifiction_of_delete_hbt A compare x delete_hbt. 
 Proof.
   intros.
   unfold specifiction_of_delete_hbt.

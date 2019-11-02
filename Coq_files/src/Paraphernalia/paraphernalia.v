@@ -107,6 +107,8 @@ Compute (test_gtb gtb).
 (* Notation for "greater than" *) 
 Notation "A n> B" := (gtb A B) (at level 70, right associativity).
 
+
+
 (* Paraphernalia for comparison: *)
 Inductive element_comparison :=
 | Lt : element_comparison
@@ -122,6 +124,7 @@ Axiom transitivity_of_comparisons:
     compare x y = r ->
     compare y z = r ->
     compare x z = r.
+
 
 Axiom relating_lt_gt:
   forall (A : Type)
@@ -154,18 +157,146 @@ Axiom some_x_equal_some_y:
          (x y : A),
     Some x = Some y <-> x = y.
 
-Lemma diff_equal_0_implies_equal:
-  forall (x y : nat),
-    x - y = 0 -> x = y.
+Lemma unfold_beq_nat_Sn_Sm:
+  forall (n m : nat),
+    beq_nat (S n) (S m) = beq_nat n m.
 Proof.
-Admitted.
-(* figure this out *)
+  unfold_tactic beq_nat.
+Qed.
+    
+Lemma unfold_max_Sn_Sm:
+  forall (n m : nat),
+    max (S n) (S m) = S (max n m).
+Proof.
+  unfold_tactic max.
+Qed.
 
-Lemma diff_equal_1_implies_greater_by_1:
-  forall (x y : nat),
-    x - y = 1 -> x = y + 1.
+(* put this in paraphernalia *)
+Lemma pred_succ:
+  forall (n : nat),
+    pred (S n) = n.
 Proof.
-Admitted.
+  intros.
+  unfold pred.
+  reflexivity.
+Qed.
+
+Lemma succ_eq:
+  forall (a b : nat),
+    S a = S b -> a = b.
+Proof.
+  intros.
+  
+  assert (H_pred:
+            pred (S a) = pred (S b)).
+  rewrite H.
+  reflexivity.
+  
+  Check (pred_succ).
+  rewrite -> pred_succ in H_pred.
+  rewrite -> pred_succ in H_pred.
+  exact H_pred.
+Qed.
+
+Lemma add_to_both_sides:
+  forall (x y z : nat),
+    x = y -> x + z = y + z.
+  intros.
+  induction z as [ | z' IH_z'].
+  rewrite -> plus_0_r.
+  rewrite -> plus_0_r.
+  exact H.
+
+  rewrite <- plus_n_Sm.
+  rewrite <- plus_n_Sm.
+  rewrite -> IH_z'.
+  reflexivity.
+Qed.
+
+Lemma minus_Sn_0:
+  forall (n : nat),
+    S n - 0 = S n.
+Proof.
+  unfold_tactic minus.
+Qed.
+
+Lemma minus_Sn_Sm:
+  forall (n m : nat),
+    S n - S m = n - m.
+Proof.
+  unfold_tactic minus.
+Qed.
+
+Lemma minus_n_0:
+  forall (n : nat),
+    n - 0 = n.
+Proof.
+  intros.
+  case n as [ | n'].
+
+  unfold minus.
+  reflexivity.
+
+  rewrite -> minus_Sn_0.
+  reflexivity.
+Qed.
+
+Lemma max_cases:
+  forall (a b : nat),
+    max a b = a \/ max a b = b.
+Proof.
+  intros.
+  intros.
+  case (le_ge_dec a b) as [ | ].
+  - Search (max _ _ = _).
+    right.
+    exact (max_r a b l).
+    
+  - Search (max _ _ = _).
+    
+    assert (H: b <= a).
+    auto.
+
+    left.
+    exact (max_l a b H).
+Qed.    
+
+
+Lemma prop_to_bool_helper:
+  forall (a : nat),
+    a = a -> ((a =n= a) = true).
+Proof.
+  intros.
+  induction a as [ | a' IH_a].
+  unfold beq_nat.
+  reflexivity.
+  
+  rewrite -> unfold_beq_nat_Sn_Sm. 
+  apply IH_a.
+  exact (succ_eq a' a' H).
+Qed.  
+
+Lemma prop_to_bool:
+  forall (a b : nat),
+    a = b -> ((a =n= b) = true).
+Proof.
+  intros.
+  induction a as [ | a' IH_a].
+  case b as [ | b'].
+  unfold beq_nat.
+  reflexivity.
+  discriminate.
+
+  case b as [ | b'].
+  discriminate.
+  rewrite -> H.
+  rewrite -> unfold_beq_nat_Sn_Sm.
+  
+  assert (H_trivial: b' = b').
+  reflexivity.
+  exact (prop_to_bool_helper b' H_trivial).
+Qed.  
+
 
 Lemma or_implication:
   forall (A B C : Prop),
