@@ -3,148 +3,6 @@ Require Export Hbt.Implementation.hbt.
 
 (* ********** Lemmas concerning soundness ********** *)
 
-Lemma unfold_beq_nat_Sn_Sm:
-  forall (n m : nat),
-    beq_nat (S n) (S m) = beq_nat n m.
-Proof.
-  unfold_tactic beq_nat.
-Qed.
-    
-Lemma unfold_max_Sn_Sm:
-  forall (n m : nat),
-    max (S n) (S m) = S (max n m).
-Proof.
-  unfold_tactic max.
-Qed.
-
-(* put this in paraphernalia *)
-Lemma pred_succ:
-  forall (n : nat),
-    pred (S n) = n.
-Proof.
-  intros.
-  unfold pred.
-  reflexivity.
-Qed.
-
-Lemma succ_eq:
-  forall (a b : nat),
-    S a = S b -> a = b.
-Proof.
-  intros.
-  
-  assert (H_pred:
-            pred (S a) = pred (S b)).
-  rewrite H.
-  reflexivity.
-  
-  Check (pred_succ).
-  rewrite -> pred_succ in H_pred.
-  rewrite -> pred_succ in H_pred.
-  exact H_pred.
-Qed.
-
-Lemma add_to_both_sides:
-  forall (x y z : nat),
-    x = y -> x + z = y + z.
-  intros.
-  induction z as [ | z' IH_z'].
-  rewrite -> plus_0_r.
-  rewrite -> plus_0_r.
-  exact H.
-
-  rewrite <- plus_n_Sm.
-  rewrite <- plus_n_Sm.
-  rewrite -> IH_z'.
-  reflexivity.
-Qed.
-
-Lemma minus_Sn_0:
-  forall (n : nat),
-    S n - 0 = S n.
-Proof.
-  unfold_tactic minus.
-Qed.
-
-Lemma minus_Sn_Sm:
-  forall (n m : nat),
-    S n - S m = n - m.
-Proof.
-  unfold_tactic minus.
-Qed.
-
-Lemma minus_n_0:
-  forall (n : nat),
-    n - 0 = n.
-Proof.
-  intros.
-  case n as [ | n'].
-
-  unfold minus.
-  reflexivity.
-
-  rewrite -> minus_Sn_0.
-  reflexivity.
-Qed.
-
-Lemma max_cases:
-  forall (a b : nat),
-    max a b = a \/ max a b = b.
-Proof.
-  intros.
-  intros.
-  case (le_ge_dec a b) as [ | ].
-  - Search (max _ _ = _).
-    right.
-    exact (max_r a b l).
-    
-  - Search (max _ _ = _).
-    
-    assert (H: b <= a).
-    auto.
-
-    left.
-    exact (max_l a b H).
-Qed.    
-
-
-Lemma prop_to_bool_helper:
-  forall (a : nat),
-    a = a -> ((a =n= a) = true).
-Proof.
-  intros.
-  induction a as [ | a' IH_a].
-  unfold beq_nat.
-  reflexivity.
-  
-  rewrite -> unfold_beq_nat_Sn_Sm. 
-  apply IH_a.
-  exact (succ_eq a' a' H).
-Qed.  
-
-Lemma prop_to_bool:
-  forall (a b : nat),
-    a = b -> ((a =n= b) = true).
-Proof.
-  intros.
-  induction a as [ | a' IH_a].
-  case b as [ | b'].
-  unfold beq_nat.
-  reflexivity.
-  discriminate.
-
-  case b as [ | b'].
-  discriminate.
-  rewrite -> H.
-  rewrite -> unfold_beq_nat_Sn_Sm.
-  
-  assert (H_trivial: b' = b').
-  reflexivity.
-  exact (prop_to_bool_helper b' H_trivial).
-Qed.  
-
-
-
 Lemma equal_nats_implies_true_prop:
   forall (h1 h2 : nat),
     (1 + max h1 h2 =n= 1 + max h1 h2) = true.
@@ -2794,8 +2652,6 @@ Proof.
 
     (* Case 2: insertion in left subtree, insertion unbalances tree *)
 
-
-
     (* unfold *)
     unfold rotate_right_hbt in H_insert_t.
     unfold rotate_right_bt in H_insert_t.
@@ -2895,7 +2751,6 @@ Proof.
     rewrite <- BinInt.ZL0 in C_h1'_eq_SS_h2.
     apply succ_eq in C_h1'_eq_SS_h2.
     apply succ_eq in C_h1'_eq_SS_h2.  
-
 
     (* next, show a trivial equality that is a hypothesis *)
     assert (H_trivial_equality:

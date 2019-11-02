@@ -3440,4 +3440,3 @@ Proof.
   Check (traverse_node_impossible_case).
   exact (traverse_node_impossible_case A compare t H).
 Qed.
-

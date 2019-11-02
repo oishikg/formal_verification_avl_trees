@@ -28,7 +28,7 @@ Theorem insert_hbt_satisfies_its_specification:
   forall (A : Type)
          (compare : A -> A -> element_comparison)
          (x : A),
-    specifiction_of_insert_hbt A compare x insert_hbt.
+    specifiction_of_insert_hbt A compare x insert_hbt. 
 Proof.
   intros A compare.
   unfold specifiction_of_insert_hbt.
@@ -90,7 +90,7 @@ Theorem delete_hbt_satisfies_its_specification:
   forall (A : Type)
          (compare : A -> A -> element_comparison)
          (x : A),
-    specifiction_of_delete_hbt A compare x delete_hbt.
+    specifiction_of_delete_hbt A compare x delete_hbt. 
 Proof.
   intros.
   unfold specifiction_of_delete_hbt.
