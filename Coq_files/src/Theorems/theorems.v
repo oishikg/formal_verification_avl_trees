@@ -1,5 +1,4 @@
 (* Imports: *) 
-Require Import Hbt.Lemmas.sound_balanced.
 Require Import Hbt.Lemmas.ordered_main.
 
 
@@ -17,7 +16,8 @@ Definition specifiction_of_insert_hbt
   forall (hbt : heightened_binary_tree A),
     (is_sound_hbt A hbt = true) ->
     (is_balanced_hbt A hbt = true) ->
-    (is_ordered_hbt A hbt compare = true) -> 
+    (is_ordered_hbt A hbt compare = true) ->
+    (specification_of_compare_defining_total_order A compare) -> 
     (is_sound_hbt A (insert_hbt A compare x hbt) = true)
     /\
     (is_balanced_hbt A (insert_hbt A compare x hbt) = true)
@@ -32,7 +32,7 @@ Theorem insert_hbt_satisfies_its_specification:
 Proof.
   intros A compare.
   unfold specifiction_of_insert_hbt.
-  intros x hbt H_sound_init H_bal_init H_order_init.
+  intros x hbt H_sound_init H_bal_init H_order_init H_compare.
   unfold insert_hbt.
   case (insert_hbt_helper A compare x hbt) as [ hbt' | ] eqn : C.
 
@@ -50,7 +50,7 @@ Proof.
 
       
       Check (insertion_preserves_order).
-      destruct (insertion_preserves_order A compare x) as [H_ord _].
+      destruct (insertion_preserves_order A compare x H_compare) as [H_ord _].
       exact (H_ord hbt hbt' H_sound_init H_bal_init H_order_init C).
 
   - split.

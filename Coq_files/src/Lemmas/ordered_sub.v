@@ -1,7 +1,7 @@
 Require Import Hbt.Lemmas.balanced.
 Require Export Hbt.Lemmas.balanced.
 
-(* ***** Section 5.6: Lemmas for orderedness ***** *)
+(* ********** General lemmas ********** *)
 
 (* Lemma to show that an ordered triple must have ordered subtrees *)
 Lemma triple_ordered_implies_hbts_ordered:
@@ -67,6 +67,30 @@ Proof.
   discriminate.
   discriminate. 
 Qed.
+
+(* Lemma to show that if traversing a binary tree to check its orderedness yields a 
+ * maximum and a minimum value, then the tree must be ordered *)
+Lemma traverse_to_check_ordered_hbt_some_implies_is_ordered:
+  forall (A : Type)
+         (compare : A -> A -> element_comparison)
+         (hbt : heightened_binary_tree A)
+         (min max : A),
+    traverse_to_check_ordered_hbt A hbt compare = TSome (A * A) (min, max) ->
+    is_ordered_hbt A hbt compare = true. 
+Proof. 
+  intros.
+  induction hbt as [h bt].
+  rewrite -> unfold_traverse_to_check_ordered_hbt in H.
+  induction bt as [ | t].
+  rewrite -> unfold_traverse_to_check_ordered_bt_leaf in H.
+  discriminate.
+  induction t as [hbt1 e hbt2].
+  unfold is_ordered_hbt.
+  rewrite -> unfold_traverse_to_check_ordered_hbt.
+  rewrite -> H.
+  reflexivity.
+Qed.
+
 
 (* Lemma that shows that an element inserted into a leaf will be both its min and its max 
  * element *)
@@ -381,28 +405,6 @@ Proof.
       discriminate.
 Qed.      
 
-(* Lemma to show that if traversing a binary tree to check its orderedness yields a 
- * maximum and a minimum value, then the tree must be ordered *)
-Lemma traverse_to_check_ordered_hbt_some_implies_is_ordered:
-  forall (A : Type)
-         (compare : A -> A -> element_comparison)
-         (hbt : heightened_binary_tree A)
-         (min max : A),
-    traverse_to_check_ordered_hbt A hbt compare = TSome (A * A) (min, max) ->
-    is_ordered_hbt A hbt compare = true. 
-Proof. 
-  intros.
-  induction hbt as [h bt].
-  rewrite -> unfold_traverse_to_check_ordered_hbt in H.
-  induction bt as [ | t].
-  rewrite -> unfold_traverse_to_check_ordered_bt_leaf in H.
-  discriminate.
-  induction t as [hbt1 e hbt2].
-  unfold is_ordered_hbt.
-  rewrite -> unfold_traverse_to_check_ordered_hbt.
-  rewrite -> H.
-  reflexivity.
-Qed.
 
 (* Lemma to show that traversing a node with a triple (as opposed to a leaf) to check 
  * orderedness can never yield a TNone (which is returned only if a leaf is traversed) *)
@@ -1772,41 +1774,6 @@ Proof.
 Qed.
 
 
-Lemma relating_height_with_subtree_heights:
-  forall (A : Type)
-         (h : nat)
-         (h1 : nat)
-         (bt1 : binary_tree A)
-         (e : A)
-         (h2 : nat)
-         (bt2 : binary_tree A),
-    is_sound_hbt A
-                 (HNode A h (Node A (Triple A (HNode A h1 bt1) e (HNode A h2 bt2)))) = true ->
-    1 + max h1 h2 = h.
-Proof.
-  intros.
-  unfold is_sound_hbt in H.
-  rewrite -> unfold_traverse_to_check_soundness_hbt in H.
-  rewrite -> unfold_traverse_to_check_soundness_bt_node in H.  
-  rewrite -> unfold_traverse_to_check_soundness_t in H.
-  rewrite -> unfold_traverse_to_check_soundness_hbt in H.
-  rewrite -> unfold_traverse_to_check_soundness_hbt in H.    
-  case (traverse_to_check_soundness_bt A bt1) as [h1' | ].
-  case (traverse_to_check_soundness_bt A bt2) as [h2' | ].
-  case (h1' =n= h1) as [ | ].
-  case (h2' =n= h2) as [ | ].
-  case (1 + max h1 h2 =n= h) as [ | ] eqn : C_req.
-  apply beq_nat_true in C_req.
-  exact C_req.
-  discriminate.
-  discriminate.
-  discriminate.
-  case (h1' =n= h1) as [ | ].
-  discriminate.
-  discriminate.
-  discriminate.
-Qed.
-
 Lemma non_zero_height:
   forall (A : Type)
          (h1 h2 h h' : nat)
@@ -1882,8 +1849,9 @@ Proof.
   
   assert (H_h1'_h11'_h12' :
             1 + max h11' h12' = h1').
-  Check (relating_height_with_subtree_heights).
-  exact (relating_height_with_subtree_heights A h1' h11' bt11' e1 h12' bt12' H_hbt_ret_sound).
+  Check (relate_heights A h1' h11' bt11' e1 h12' bt12' H_hbt_ret_sound).
+  symmetry.
+  exact (relate_heights A h1' h11' bt11' e1 h12' bt12' H_hbt_ret_sound).
 
   (* next, show that h11' cannot be 0 *)
   apply beq_nat_true in H2.
@@ -3292,8 +3260,9 @@ Proof.
 
   assert (H_h2'_h21'_h22' :
             1 + max h21' h22' = h2').
-  Check (relating_height_with_subtree_heights).
-  exact (relating_height_with_subtree_heights A h2' h21' bt21' e2 h22' bt22' H_hbt_ret_sound).
+  Check (relate_heights).
+  symmetry.
+  exact (relate_heights A h2' h21' bt21' e2 h22' bt22' H_hbt_ret_sound).
   
   (* next, show that h11' cannot be 0 *)
   apply beq_nat_true in H2.
@@ -3401,22 +3370,6 @@ Proof.
            H_org_tree_reduced).
 Qed.            
 
-Lemma disjunction_to_prop:
-  forall (b1 b2 : bool),
-    (b1 || b2 = true) -> (b1 = true) \/ (b2 = true).
-Proof.
-  intros.
-  case b1 as [ | ].
-  case b2 as [ | ].
-  apply or_intror.
-  reflexivity.
-  apply or_introl.
-  reflexivity.
-  apply or_intror.
-  Search (false || _ = _).
-  rewrite -> (orb_false_l b2) in H.
-  exact H.
-Qed.
 
 Lemma tnone_implies_leaf:
   forall (A : Type)

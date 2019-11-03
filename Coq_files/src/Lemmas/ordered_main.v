@@ -1086,15 +1086,6 @@ Proof.
 Qed.
 
 
-Lemma trivial_equality:
-  forall (A : Type)
-         (v : A),
-    v = v.
-Proof.
-  intros.
-  reflexivity.
-Qed.
-
 
 Lemma rotate_right_intermediate_tree_ordered:
   forall (A : Type)
@@ -2774,12 +2765,11 @@ Proof.
 Qed.    
     
 
-
-
 Lemma insertion_preserves_order: 
   forall (A : Type)
          (compare : A -> A -> element_comparison)
          (x : A),
+    specification_of_compare_defining_total_order A compare -> 
     (forall (hbt : heightened_binary_tree A)
             (hbt' : heightened_binary_tree A),
         is_sound_hbt A hbt = true ->
@@ -2806,7 +2796,7 @@ Lemma insertion_preserves_order:
         insert_t_helper A compare x h_hbt t = Some hbt' ->
         is_ordered_hbt A hbt' compare = true).
 Proof.
-  intros A compare x.
+  intros A compare x H_compare.
   apply heightened_binary_tree_mutual_induction.
 
   (* Specification for hbt holds, given bt as inductive case *)
@@ -3306,8 +3296,10 @@ Proof.
                       A compare (HNode A h2 (Leaf A)) (HNode A h_ret bt_ret) x min_ret max_ret
                       C_insert_hbt2 C_traverse_ord_hbt_ret H_traverse_leaf)
             as [H_min_ret H_max_ret].
-          rewrite -> H_min_ret. 
-          rewrite <- (relating_lt_gt A e x compare) in C_comp.
+          rewrite -> H_min_ret.
+          destruct (relating_Lt_Gt_total_order A e x compare H_compare)
+            as [_ H_we_need].
+          apply H_we_need in C_comp.
           rewrite -> C_comp.
           reflexivity. 
 
@@ -3352,7 +3344,9 @@ Proof.
           
           (* prove case for H_min_ret_x *)
           rewrite -> H_min_ret_x.
-          rewrite <- relating_lt_gt in C_comp.
+          destruct (relating_Lt_Gt_total_order A e x compare H_compare)
+            as [_ H_we_need].
+          apply H_we_need in C_comp.
           rewrite -> C_comp.
           reflexivity.
 
@@ -3406,7 +3400,9 @@ Proof.
                       C_insert_hbt2 C_traverse_ord_hbt_ret H_traverse_leaf)
             as [H_min_ret H_max_ret].
           rewrite -> H_min_ret.
-          rewrite <- (relating_lt_gt A e x compare) in C_comp.
+          destruct (relating_Lt_Gt_total_order A e x compare H_compare)
+            as [_ H_we_need].
+          apply H_we_need in C_comp.
           rewrite -> C_comp.
           reflexivity. 
 
@@ -3450,7 +3446,9 @@ Proof.
           
           (* prove case for H_min_ret_x *)
           rewrite -> H_min_ret_x.
-          rewrite <- relating_lt_gt in C_comp.
+          destruct (relating_Lt_Gt_total_order A e x compare H_compare)
+            as [_ H_we_need].
+          apply H_we_need in C_comp.
           rewrite -> C_comp.
           reflexivity.
 
@@ -3561,11 +3559,11 @@ Proof.
 
         (* case 1 : min_ret = x *)
         rewrite -> H_min_ret_eq_x.
-        Check (relating_lt_gt).
-        Check (relating_lt_gt A e x compare).
-        apply (relating_lt_gt A e x compare).
+        destruct (relating_Lt_Gt_total_order A e x compare H_compare)
+          as [_ H_we_need].
+        apply H_we_need in C_comp.
         exact C_comp.
-
+        
         (* case 2 : min_ret min2 *)
         rewrite -> H_min_ret_eq_min2.
 

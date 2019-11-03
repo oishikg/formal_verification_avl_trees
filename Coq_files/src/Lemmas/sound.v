@@ -17,6 +17,58 @@ Proof.
   exact (prop_to_bool_helper (1 + max h1 h2) H_trivial).
 Qed.
 
+Lemma relate_heights:
+  forall (A : Type)
+         (h_res : nat)
+         (h1 : nat)
+         (bt1 : binary_tree A)
+         (e : A)
+         (h2 : nat)
+         (bt2 : binary_tree A),
+    is_sound_hbt
+      A
+      (HNode A h_res (Node A (Triple A (HNode A h1 bt1) e (HNode A h2 bt2)))) = true ->
+    h_res = 1 + max h1 h2.
+Proof.
+  intros.
+  unfold is_sound_hbt in H.
+  rewrite -> unfold_traverse_to_check_soundness_hbt in H.
+  rewrite -> unfold_traverse_to_check_soundness_bt_node in H.
+  rewrite -> unfold_traverse_to_check_soundness_t in H.
+  case (traverse_to_check_soundness_hbt A (HNode A h1 bt1))
+       as [h1' | ] eqn : C_h1.
+  case (traverse_to_check_soundness_hbt A (HNode A h2 bt2))
+       as [h2' | ] eqn : C_h2.
+  case (1 + max h1' h2' =n= h_res) as [ | ] eqn : C_sum.
+  apply beq_nat_true in C_sum.
+  
+  assert (H_h1'_h1: h1 = h1').
+  rewrite -> unfold_traverse_to_check_soundness_hbt in C_h1.
+  case (traverse_to_check_soundness_bt A bt1) as [h' | ] eqn : C.
+  case (h' =n= h1) as [ | ] eqn :C'.
+  rewrite -> some_x_equal_some_y in C_h1.
+  exact C_h1.
+  discriminate.
+  discriminate.
+
+  assert (H_h2'_h2: h2 = h2').
+  rewrite -> unfold_traverse_to_check_soundness_hbt in C_h2.
+  case (traverse_to_check_soundness_bt A bt2) as [h' | ] eqn : C.
+  case (h' =n= h2) as [ | ] eqn :C'.
+  rewrite -> some_x_equal_some_y in C_h2.
+  exact C_h2.
+  discriminate.
+  discriminate.  
+
+  rewrite <- H_h1'_h1 in C_sum. 
+  rewrite <- H_h2'_h2 in C_sum.
+  symmetry.
+  exact C_sum.
+  discriminate.
+  discriminate.
+  discriminate.
+Qed.
+
 
 (* Given a triple that is sound, its binary trees should also be sound *)
 Lemma triple_sound_implies_hbts_sound:
@@ -648,7 +700,7 @@ Proof.
       * assert (H_hbt_ret_sound: is_sound_hbt A (HNode A h_ret bt_ret) = true).
         exact (H_hbt2_inductive_assumption
                  (HNode A h_ret bt_ret)
-                 H_hbt2_is_sound P_some_eq).
+                H_hbt2_is_sound P_some_eq).
         
         Check (rotate_left_preserves_soundness).
         Check (rotate_left_preserves_soundness

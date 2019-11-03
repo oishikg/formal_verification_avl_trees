@@ -1,7 +1,7 @@
 Require Import Hbt.Lemmas.sound.
 Require Export Hbt.Lemmas.sound.
 
-(* ********** Lemmas concerning balancedness ********** *)
+(* ********** General lemmas related to balancedness ********** *)
 
 (* Given a balanced triple, its constituent hbts should also be balanced *)
 Lemma triple_balanced_implies_hbts_balanced:
@@ -237,7 +237,9 @@ Proof.
   discriminate.
 Qed.
 
+(* ********** *)
 
+(* ********** General lemmas concerning the differ_by_one function ********** *)
 
 Lemma same_nat_differs_by_one:
   forall (n : nat),
@@ -284,40 +286,6 @@ Proof.
   reflexivity.
 Qed.
 
-Lemma beq_nat_symm:
-  forall (x y : nat),
-    (x =n= y) = (y =n= x).
-Proof.
-  intros.
-  
-  case (x =n= y) as [ | ] eqn : C_xy.
-
-  - apply beq_nat_true in C_xy.
-    case (y =n= x) as [ | ] eqn : C_yx.
-    reflexivity.
-
-    apply beq_nat_false in C_yx.
-    rewrite -> C_xy in C_yx.
-    unfold not in C_yx.
-
-    assert (H_trivial: y = y).
-    reflexivity.
-
-    apply C_yx in H_trivial.
-    apply False_ind.
-
-    exact H_trivial.
-
-  - apply beq_nat_false in C_xy.
-    unfold not in C_xy.
-    case (y =n= x) as [ | ] eqn : C_yx.
-    apply beq_nat_true in C_yx.
-    symmetry in C_yx.
-    apply C_xy in C_yx.
-    apply False_ind.
-    exact C_yx.
-    reflexivity.
-Qed.
 
 Lemma differ_by_one_symm:
   forall (x y : nat),
@@ -329,6 +297,115 @@ Proof.
   rewrite -> (beq_nat_symm y x) at 1.
   reflexivity.
 Qed.
+
+Lemma sound_and_balanced_imply_differ_by_one:
+  forall (A : Type)
+         (h_hbt : nat)
+         (h1 : nat)
+         (bt1 : binary_tree A)
+         (e : A)
+         (h2 : nat)
+         (bt2 : binary_tree A),
+    is_sound_hbt A (HNode A h_hbt (Node A (Triple A
+                                                  (HNode A h1 bt1)
+                                                  e
+                                                  (HNode A h2 bt2)))) = true ->
+    is_balanced_hbt A (HNode A h_hbt (Node A (Triple A
+                                                     (HNode A h1 bt1)
+                                                     e
+                                                     (HNode A h2 bt2)))) = true ->
+    differ_by_one h1 h2 = true.
+Proof.
+  intros.
+  unfold is_sound_hbt in H.
+  unfold is_balanced_hbt in H0.
+  rewrite -> unfold_traverse_to_check_soundness_hbt in H.
+  rewrite -> unfold_traverse_to_check_soundness_bt_node in H.
+  rewrite -> unfold_traverse_to_check_soundness_t in H.
+  case (traverse_to_check_soundness_hbt A (HNode A h1 bt1))
+    as [h1_sound | ] eqn : C_check_sound_bt1.
+  case (traverse_to_check_soundness_hbt A (HNode A h2 bt2))
+    as [h2_sound | ] eqn : C_check_sound_bt2.
+  
+  assert (H_h1_sound_h1: project_height_hbt A (HNode A h1 bt1) = h1_sound).
+  exact (relating_soundness_and_projection A (HNode A h1 bt1) h1_sound
+                                           C_check_sound_bt1).
+
+  assert (H_h2_sound_h2: project_height_hbt A (HNode A h2 bt2) = h2_sound).
+  exact (relating_soundness_and_projection A (HNode A h2 bt2) h2_sound
+                                           C_check_sound_bt2).
+
+  rewrite -> unfold_traverse_to_check_balanced_hbt in H0.
+  rewrite -> unfold_traverse_to_check_balanced_bt_node in H0.
+  rewrite -> unfold_traverse_to_check_balanced_t in H0.
+  case (traverse_to_check_balanced_hbt A (HNode A h1 bt1))
+    as [h1_bal | ] eqn : C_check_balanced_bt1.
+  case (traverse_to_check_balanced_hbt A (HNode A h2 bt2))
+    as [h2_bal | ] eqn : C_check_balanced_bt2.
+  destruct (relating_soundness_and_balancedness A) as [H_hbt_sound_bal _].
+
+  assert (H_h1_sound_h1_bal : h1_sound = h1_bal).
+  exact (H_hbt_sound_bal (HNode A h1 bt1) h1_sound h1_bal
+                         C_check_sound_bt1 C_check_balanced_bt1).
+  unfold project_height_hbt in H_h1_sound_h1.
+  rewrite <- H_h1_sound_h1 in H_h1_sound_h1_bal.
+
+  assert (H_h2_sound_h2_bal : h2_sound = h2_bal).
+  exact (H_hbt_sound_bal (HNode A h2 bt2) h2_sound h2_bal
+                         C_check_sound_bt2 C_check_balanced_bt2).
+  unfold project_height_hbt in H_h2_sound_h2.
+  rewrite <- H_h2_sound_h2 in H_h2_sound_h2_bal.
+
+  rewrite <- H_h1_sound_h1_bal in H0.
+  rewrite <- H_h2_sound_h2_bal in H0.
+  case (differ_by_one h1 h2) as [ | ].
+  reflexivity.
+  discriminate.
+  discriminate.
+  discriminate.
+  discriminate.
+  discriminate.
+Qed.
+
+Lemma differ_by_one_false:
+  forall (h : nat),
+    differ_by_one (2 + h) h = false.
+Proof.
+  intros.
+  unfold differ_by_one.
+  
+  - case (2 + h =n= h + 1) as [ | ] eqn : C1.
+    apply beq_nat_true in C1.
+    rewrite -> (plus_comm h 1) in C1.
+    apply succ_eq in C1. 
+    assert (H_we_need: h <> S h).
+    exact (n_Sn h).
+    symmetry in C1.
+    contradiction.
+
+    + rewrite -> orb_false_l.
+      case (h =n= 2 + h + 1) as [ | ] eqn : C2.
+      apply beq_nat_true in C2.
+      rewrite -> plus_comm in C2.
+      rewrite -> plus_assoc in C2.
+      Search (_ <> _).
+      assert (H_we_need: h <> S (S (S h))).
+      exact (n_SSSn h).
+      contradiction.
+
+      rewrite -> orb_false_l.
+      case (h =n= 2 + h) as [ | ] eqn : C3.
+      apply beq_nat_true in C3.
+      assert (H_we_need: h <> S (S h)).
+      exact (n_SSn h).
+      contradiction.
+
+      reflexivity.
+Qed.
+
+(* ********** *)
+
+(* ********** Lemmas for insertion without rotations ********** *)
 
 Lemma right_insert_differ_by_one:
   forall (h1 h2 h_ret : nat),
@@ -428,6 +505,9 @@ Proof.
       reflexivity.
 Qed.
 
+(* ********** *)
+
+(* ********** Rotate right lemmas ********** *)
 
 Lemma rotate_right_differ_by_one_1: 
   forall (h121 h122 h11 h12: nat),
@@ -711,58 +791,6 @@ Proof.
 Qed.
 
 
-Lemma relate_heights:
-  forall (A : Type)
-         (h_res : nat)
-         (h1 : nat)
-         (bt1 : binary_tree A)
-         (e : A)
-         (h2 : nat)
-         (bt2 : binary_tree A),
-    is_sound_hbt
-      A
-      (HNode A h_res (Node A (Triple A (HNode A h1 bt1) e (HNode A h2 bt2)))) = true ->
-    h_res = 1 + max h1 h2.
-Proof.
-  intros.
-  unfold is_sound_hbt in H.
-  rewrite -> unfold_traverse_to_check_soundness_hbt in H.
-  rewrite -> unfold_traverse_to_check_soundness_bt_node in H.
-  rewrite -> unfold_traverse_to_check_soundness_t in H.
-  case (traverse_to_check_soundness_hbt A (HNode A h1 bt1))
-       as [h1' | ] eqn : C_h1.
-  case (traverse_to_check_soundness_hbt A (HNode A h2 bt2))
-       as [h2' | ] eqn : C_h2.
-  case (1 + max h1' h2' =n= h_res) as [ | ] eqn : C_sum.
-  apply beq_nat_true in C_sum.
-  
-  assert (H_h1'_h1: h1 = h1').
-  rewrite -> unfold_traverse_to_check_soundness_hbt in C_h1.
-  case (traverse_to_check_soundness_bt A bt1) as [h' | ] eqn : C.
-  case (h' =n= h1) as [ | ] eqn :C'.
-  rewrite -> some_x_equal_some_y in C_h1.
-  exact C_h1.
-  discriminate.
-  discriminate.
-
-  assert (H_h2'_h2: h2 = h2').
-  rewrite -> unfold_traverse_to_check_soundness_hbt in C_h2.
-  case (traverse_to_check_soundness_bt A bt2) as [h' | ] eqn : C.
-  case (h' =n= h2) as [ | ] eqn :C'.
-  rewrite -> some_x_equal_some_y in C_h2.
-  exact C_h2.
-  discriminate.
-  discriminate.  
-
-  rewrite <- H_h1'_h1 in C_sum. 
-  rewrite <- H_h2'_h2 in C_sum.
-  symmetry.
-  exact C_sum.
-  discriminate.
-  discriminate.
-  discriminate.
-Qed.
-
 Lemma rotate_right_preserves_balance:
   forall (A : Type)
          (h_ret : nat)
@@ -1013,6 +1041,11 @@ Proof.
 
     discriminate.
 Qed.
+
+
+(* ********** *)
+
+(* ********** Rotate left lemmas ********** *)
 
 Lemma rotate_left_differ_by_one_1:
   forall (h1 h211 h212 : nat),
@@ -1441,6 +1474,7 @@ Proof.
     unfold is_balanced_hbt.
     rewrite -> unfold_traverse_to_check_balanced_hbt.
     rewrite -> unfold_traverse_to_check_balanced_bt_node.
+
     rewrite -> unfold_traverse_to_check_balanced_t.
     rewrite -> unfold_traverse_to_check_balanced_hbt.
     rewrite -> unfold_traverse_to_check_balanced_bt_node.
@@ -1463,123 +1497,10 @@ Proof.
     discriminate.
 Qed.
 
-Lemma ltb_impossible_case:
-  forall (a : nat),
-    (a <n a) = false.
-Proof.
-  intros.
-  induction a as [ | a' IH_a'].
-  unfold ltb.
-  reflexivity.
-  rewrite -> unfold_ltb_Sn_Sm.
-  exact IH_a'.
-Qed.
 
-Lemma sound_and_balanced_imply_differ_by_one:
-  forall (A : Type)
-         (h_hbt : nat)
-         (h1 : nat)
-         (bt1 : binary_tree A)
-         (e : A)
-         (h2 : nat)
-         (bt2 : binary_tree A),
-    is_sound_hbt A (HNode A h_hbt (Node A (Triple A
-                                                  (HNode A h1 bt1)
-                                                  e
-                                                  (HNode A h2 bt2)))) = true ->
-    is_balanced_hbt A (HNode A h_hbt (Node A (Triple A
-                                                     (HNode A h1 bt1)
-                                                     e
-                                                     (HNode A h2 bt2)))) = true ->
-    differ_by_one h1 h2 = true.
-Proof.
-  intros.
-  unfold is_sound_hbt in H.
-  unfold is_balanced_hbt in H0.
-  rewrite -> unfold_traverse_to_check_soundness_hbt in H.
-  rewrite -> unfold_traverse_to_check_soundness_bt_node in H.
-  rewrite -> unfold_traverse_to_check_soundness_t in H.
-  case (traverse_to_check_soundness_hbt A (HNode A h1 bt1))
-    as [h1_sound | ] eqn : C_check_sound_bt1.
-  case (traverse_to_check_soundness_hbt A (HNode A h2 bt2))
-    as [h2_sound | ] eqn : C_check_sound_bt2.
-  
-  assert (H_h1_sound_h1: project_height_hbt A (HNode A h1 bt1) = h1_sound).
-  exact (relating_soundness_and_projection A (HNode A h1 bt1) h1_sound
-                                           C_check_sound_bt1).
+(* ********** *)
 
-  assert (H_h2_sound_h2: project_height_hbt A (HNode A h2 bt2) = h2_sound).
-  exact (relating_soundness_and_projection A (HNode A h2 bt2) h2_sound
-                                           C_check_sound_bt2).
-
-  rewrite -> unfold_traverse_to_check_balanced_hbt in H0.
-  rewrite -> unfold_traverse_to_check_balanced_bt_node in H0.
-  rewrite -> unfold_traverse_to_check_balanced_t in H0.
-  case (traverse_to_check_balanced_hbt A (HNode A h1 bt1))
-    as [h1_bal | ] eqn : C_check_balanced_bt1.
-  case (traverse_to_check_balanced_hbt A (HNode A h2 bt2))
-    as [h2_bal | ] eqn : C_check_balanced_bt2.
-  destruct (relating_soundness_and_balancedness A) as [H_hbt_sound_bal _].
-
-  assert (H_h1_sound_h1_bal : h1_sound = h1_bal).
-  exact (H_hbt_sound_bal (HNode A h1 bt1) h1_sound h1_bal
-                         C_check_sound_bt1 C_check_balanced_bt1).
-  unfold project_height_hbt in H_h1_sound_h1.
-  rewrite <- H_h1_sound_h1 in H_h1_sound_h1_bal.
-
-  assert (H_h2_sound_h2_bal : h2_sound = h2_bal).
-  exact (H_hbt_sound_bal (HNode A h2 bt2) h2_sound h2_bal
-                         C_check_sound_bt2 C_check_balanced_bt2).
-  unfold project_height_hbt in H_h2_sound_h2.
-  rewrite <- H_h2_sound_h2 in H_h2_sound_h2_bal.
-
-  rewrite <- H_h1_sound_h1_bal in H0.
-  rewrite <- H_h2_sound_h2_bal in H0.
-  case (differ_by_one h1 h2) as [ | ].
-  reflexivity.
-  discriminate.
-  discriminate.
-  discriminate.
-  discriminate.
-  discriminate.
-Qed.
-
-Lemma differ_by_one_false:
-  forall (h : nat),
-    differ_by_one (2 + h) h = false.
-Proof.
-  intros.
-  unfold differ_by_one.
-  
-  - case (2 + h =n= h + 1) as [ | ] eqn : C1.
-    apply beq_nat_true in C1.
-    rewrite -> (plus_comm h 1) in C1.
-    apply succ_eq in C1. 
-    assert (H_we_need: h <> S h).
-    exact (n_Sn h).
-    symmetry in C1.
-    contradiction.
-
-    + rewrite -> orb_false_l.
-      case (h =n= 2 + h + 1) as [ | ] eqn : C2.
-      apply beq_nat_true in C2.
-      rewrite -> plus_comm in C2.
-      rewrite -> plus_assoc in C2.
-      Search (_ <> _).
-      assert (H_we_need: h <> S (S (S h))).
-      exact (n_SSSn h).
-      contradiction.
-
-      rewrite -> orb_false_l.
-      case (h =n= 2 + h) as [ | ] eqn : C3.
-      apply beq_nat_true in C3.
-      assert (H_we_need: h <> S (S h)).
-      exact (n_SSn h).
-      contradiction.
-
-      reflexivity.
-Qed.
-
+(* ********** Important lemma: relating insertion and original height ********** *)
 
 Lemma relating_insertion_and_original_height: 
   forall (A : Type)
@@ -1736,8 +1657,8 @@ Proof.
     unfold compare_int in C_comp_h1'_h2.
     unfold project_height_hbt in C_comp_h1'_h2.
     rewrite -> H_h1'_eq_S_h1 in C_comp_h1'_h2.
-    Check (ltb_impossible_case).
-    rewrite -> (ltb_impossible_case (2 + h2)) in C_comp_h1'_h2.
+    Check (ltb_false_case).
+    rewrite -> (ltb_false_case 2 h2) in C_comp_h1'_h2.
     case (2 + h2 =n= 2 + h2) as [ | ].
     discriminate.
     discriminate.
@@ -2189,7 +2110,7 @@ Proof.
     unfold compare_int in C_comp_h2'_h1.
     unfold project_height_hbt in C_comp_h2'_h1.
     rewrite -> H_h2'_eq_S_h2 in C_comp_h2'_h1.
-    rewrite -> (ltb_impossible_case (2 + h1)) in C_comp_h2'_h1.
+    rewrite -> (ltb_false_case 2 h1) in C_comp_h2'_h1.
     case (2 + h1 =n= 2 + h1) as [ | ].
     discriminate.
     discriminate.
@@ -2580,7 +2501,9 @@ Proof.
     discriminate.
 Qed.  
 
+(* ********** *)
 
+(* ********** Main lemma: insertion preserves balanced ********** *)
 
 Lemma insertion_preserves_balance: 
   forall (A : Type)
