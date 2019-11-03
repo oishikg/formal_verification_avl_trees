@@ -59,54 +59,8 @@ Proof.
   unfold_tactic ltb.
 Qed.
 
-(* Unit tests for ltb *)
-Definition test_ltb (candidate : nat -> nat -> bool) :=
-  (candidate 3 4 =b= true)
-    &&
-    (candidate 5 7 =b= true)
-    &&
-    (candidate 13 32 =b= true)
-    &&
-    (candidate 5 2 =b= false)
-    &&
-    (candidate 90 32 =b= false).
-    
-Compute (test_ltb ltb).
-
 (* Notation for "less than" *) 
 Notation "A <n B" := (ltb A B) (at level 70, right associativity).
-
-(* Function to check if the first argument is greater than the second argument *)
-Fixpoint gtb (n m : nat) : bool :=
-  match n with
-  | 0    =>
-    false
-  | S n' =>
-    match m with
-    | 0    =>
-      true
-    | S m' =>
-      gtb n' m'
-    end
-  end.
-
-(* Unit tests for ltb *)
-Definition test_gtb (candidate : nat -> nat -> bool) :=
-  (candidate 3 4 =b= false)
-    &&
-    (candidate 5 7 =b= false)
-    &&
-    (candidate 13 32 =b= false)
-    &&
-    (candidate 5 2 =b= true)
-    &&
-    (candidate 90 32 =b= true).
-
-Compute (test_gtb gtb).
-
-(* Notation for "greater than" *) 
-Notation "A n> B" := (gtb A B) (at level 70, right associativity).
-
 
 
 (* Paraphernalia for comparison: *)
@@ -115,22 +69,17 @@ Inductive element_comparison :=
 | Eq : element_comparison
 | Gt : element_comparison.
 
-(* Capturing transitivity of comparison functions *)
-Axiom transitivity_of_comparisons:
-  forall (A : Type)
-         (x y z : A)
-         (compare : A -> A -> element_comparison)
-         (r : element_comparison), 
-    compare x y = r ->
-    compare y z = r ->
-    compare x z = r.
-
-
-Axiom relating_lt_gt:
+Lemma relating_lt_gt:
   forall (A : Type)
          (x y : A)
          (compare : A -> A -> element_comparison),
-    compare x y = Lt <-> compare y x = Gt. 
+    compare x y = Lt <-> compare y x = Gt.
+Proof.
+  intros.
+  split.
+  intro.
+  simpl.
+
 
 Definition compare_int (i j : nat) : element_comparison := 
   if i <n j then Lt else if i =n= j then Eq else Gt.
@@ -295,23 +244,4 @@ Proof.
   assert (H_trivial: b' = b').
   reflexivity.
   exact (prop_to_bool_helper b' H_trivial).
-Qed.  
-
-
-Lemma or_implication:
-  forall (A B C : Prop),
-    ((A \/ B) -> C) -> ((A -> C) /\ (B -> C)).
-Proof. 
-  intros A B C H_abc.
-  split.
-  - intro H_a.
-    apply H_abc.
-    Search (_ \/ _).
-    Check (or_introl).
-    apply (or_introl).
-    exact H_a.
-  - intro H_b.
-    apply H_abc.
-    apply (or_intror).
-    exact H_b.
 Qed.
