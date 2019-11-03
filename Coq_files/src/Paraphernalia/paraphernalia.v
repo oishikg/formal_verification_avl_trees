@@ -1,11 +1,20 @@
 Require Import Arith Bool List.
 Require Export Arith Bool List.
 
+(* ********** = and < operations ********** *)
+
 Ltac unfold_tactic name := intros; unfold name; (* fold name; *) reflexivity.
 
 (* Equality of natural numbers *)
 Notation "A =n= B" :=
   (beq_nat A B) (at level 70, right associativity).
+
+Lemma unfold_beq_nat_Sn_Sm:
+  forall (n m : nat),
+    beq_nat (S n) (S m) = beq_nat n m.
+Proof.
+  unfold_tactic beq_nat.
+Qed.
 
 (* Equality of boolean values *) 
 Notation "A =b= B" :=
@@ -62,6 +71,9 @@ Qed.
 (* Notation for "less than" *) 
 Notation "A <n B" := (ltb A B) (at level 70, right associativity).
 
+(* ********** *)
+
+(* ********** Datatype for data comparison ********** *)
 
 (* Paraphernalia for comparison: *)
 Inductive element_comparison :=
@@ -69,50 +81,68 @@ Inductive element_comparison :=
 | Eq : element_comparison
 | Gt : element_comparison.
 
-Lemma relating_lt_gt:
+
+Axiom relating_lt_gt:
   forall (A : Type)
          (x y : A)
          (compare : A -> A -> element_comparison),
     compare x y = Lt <-> compare y x = Gt.
-Proof.
-  intros.
-  split.
-  intro.
-  simpl.
 
 
 Definition compare_int (i j : nat) : element_comparison := 
   if i <n j then Lt else if i =n= j then Eq else Gt.
 
-(* A custom option type to handle three possible output values *)
-Inductive triple_option (A : Type) : Type := 
-| TError : triple_option A
-| TNone : triple_option A
-| TSome : A -> triple_option A.
 
-
-Axiom tsome_x_equal_tsome_y:
-  forall (A : Type)
-         (x y : A),
-    TSome A x = TSome A y <-> x = y.
-
-Axiom pairwise_equality:
+(* ********** ********** *)
+Lemma pairwise_equality:
   forall (A : Type)
          (x1 x2 y1 y2 : A),
     (x1, x2) = (y1, y2) <-> x1 = y1 /\ x2 = y2.
+Proof.
+  intros; split.
+  intro.
+  inversion H; split; reflexivity; reflexivity.
+  intro.
+  destruct H.
+  rewrite -> H; rewrite -> H0; reflexivity.
+Qed.  
 
-Axiom some_x_equal_some_y:
+Lemma some_x_equal_some_y:
   forall (A : Type)
          (x y : A),
     Some x = Some y <-> x = y.
-
-Lemma unfold_beq_nat_Sn_Sm:
-  forall (n m : nat),
-    beq_nat (S n) (S m) = beq_nat n m.
 Proof.
-  unfold_tactic beq_nat.
+  intros; split.
+  intro.
+  inversion H; reflexivity.
+  intro.
+  rewrite -> H; reflexivity.
 Qed.
+
+(* ********** *)
+
+(* ********** Lemmas for Max.max ********** *)
+
+Lemma max_cases:
+  forall (a b : nat),
+    max a b = a \/ max a b = b.
+Proof.
+  intros.
+  intros.
+  case (le_ge_dec a b) as [ | ].
+  - Search (max _ _ = _).
+    right.
+    exact (max_r a b l).
     
+  - Search (max _ _ = _).
+    
+    assert (H: b <= a).
+    auto.
+
+    left.
+    exact (max_l a b H).
+Qed.    
+
 Lemma unfold_max_Sn_Sm:
   forall (n m : nat),
     max (S n) (S m) = S (max n m).
@@ -120,32 +150,60 @@ Proof.
   unfold_tactic max.
 Qed.
 
-(* put this in paraphernalia *)
-Lemma pred_succ:
-  forall (n : nat),
-    pred (S n) = n.
-Proof.
+Lemma H_max_S:
+  forall (a : nat),
+    max (a + 1) a = a + 1.
+Proof.                      
   intros.
-  unfold pred.
+  induction a as [ | a' IH_a'].
+  rewrite -> plus_0_l.
+  unfold max.
+  reflexivity.
+  
+  Search (max _ _ = _).
+  rewrite -> (plus_comm (S a') 1).
+  Search (S _ = _).
+  rewrite <- plus_n_Sm.
+  rewrite -> unfold_max_Sn_Sm.
+  rewrite -> plus_comm in IH_a'.
+  rewrite -> IH_a'.
   reflexivity.
 Qed.
+
+
+(* ********** *)
+
+(* ********** Lemmas for operations on Peano nat numbers ********** *)
 
 Lemma succ_eq:
   forall (a b : nat),
     S a = S b -> a = b.
 Proof.
-  intros.
-  
-  assert (H_pred:
-            pred (S a) = pred (S b)).
-  rewrite H.
-  reflexivity.
-  
-  Check (pred_succ).
-  rewrite -> pred_succ in H_pred.
-  rewrite -> pred_succ in H_pred.
-  exact H_pred.
+  intros; inversion H; reflexivity.
 Qed.
+
+Lemma ltb_false_case:
+  forall (a x : nat),
+    (a + x <n a + x) = false.
+Proof.
+  intros.
+  induction a as [ | a' IH_a'].
+
+  Focus 2.
+  Search (S _ + _ = _).
+  rewrite -> plus_Sn_m.
+  rewrite -> unfold_ltb_Sn_Sm.
+  exact IH_a'.
+
+  rewrite -> plus_0_l.
+  induction x as [ | x' IH_x'].
+  unfold ltb.
+  reflexivity.
+
+  rewrite -> unfold_ltb_Sn_Sm.
+  exact IH_x'.
+Qed.
+
 
 Lemma add_to_both_sides:
   forall (x y z : nat),
@@ -190,25 +248,6 @@ Proof.
   reflexivity.
 Qed.
 
-Lemma max_cases:
-  forall (a b : nat),
-    max a b = a \/ max a b = b.
-Proof.
-  intros.
-  intros.
-  case (le_ge_dec a b) as [ | ].
-  - Search (max _ _ = _).
-    right.
-    exact (max_r a b l).
-    
-  - Search (max _ _ = _).
-    
-    assert (H: b <= a).
-    auto.
-
-    left.
-    exact (max_l a b H).
-Qed.    
 
 
 Lemma prop_to_bool_helper:
@@ -245,3 +284,4 @@ Proof.
   reflexivity.
   exact (prop_to_bool_helper b' H_trivial).
 Qed.
+

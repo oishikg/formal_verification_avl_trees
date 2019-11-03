@@ -261,6 +261,24 @@ Definition is_balanced_hbt (A : Type) (hbt : heightened_binary_tree A) :=
 
 (* ***** 3.3: In-orderedness ***** *)
 
+Inductive triple_option (A : Type) : Type := 
+| TError : triple_option A
+| TNone : triple_option A
+| TSome : A -> triple_option A.
+
+Lemma tsome_x_equal_tsome_y:
+  forall (A : Type)
+         (x y : A),
+    TSome A x = TSome A y <-> x = y.
+Proof.
+  intros; split.
+  intro.
+  inversion H; reflexivity.
+  intro.
+  rewrite -> H; reflexivity.
+Qed.
+
+
 
 Fixpoint traverse_to_check_ordered_hbt
          (A : Type)

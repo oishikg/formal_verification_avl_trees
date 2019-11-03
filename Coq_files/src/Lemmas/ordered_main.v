@@ -1,9 +1,3 @@
-Require Import Hbt.Implementation.hbt.
-Require Export Hbt.Implementation.hbt.
-
-Require Import Hbt.Lemmas.sound_balanced.
-Require Export Hbt.Lemmas.sound_balanced.
-
 Require Import Hbt.Lemmas.ordered_sub.
 Require Export Hbt.Lemmas.ordered_sub.
 
@@ -3312,7 +3306,7 @@ Proof.
                       A compare (HNode A h2 (Leaf A)) (HNode A h_ret bt_ret) x min_ret max_ret
                       C_insert_hbt2 C_traverse_ord_hbt_ret H_traverse_leaf)
             as [H_min_ret H_max_ret].
-          rewrite -> H_min_ret.
+          rewrite -> H_min_ret. 
           rewrite <- (relating_lt_gt A e x compare) in C_comp.
           rewrite -> C_comp.
           reflexivity. 

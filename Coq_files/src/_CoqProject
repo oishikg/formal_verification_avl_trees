@@ -1,7 +1,8 @@
 -R ./ Hbt
 ./Paraphernalia/paraphernalia.v
 ./Implementation/hbt.v
-./Lemmas/sound_balanced.v
+./Lemmas/sound.v
+./Lemmas/balanced.v
 ./Lemmas/ordered_sub.v
 ./Lemmas/ordered_main.v 
 
