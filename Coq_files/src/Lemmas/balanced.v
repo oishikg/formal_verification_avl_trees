@@ -547,7 +547,7 @@ Proof.
     + apply beq_nat_true in C_h122_h121.
       rewrite C_h122_h121 in H0.
       Search (max _ _ = _).
-      rewrite -> Max.max_comm in H0.
+      rewrite -> Nat.max_comm in H0.
       rewrite -> H_max_S in H0.
       apply prop_to_bool in H0.      
       rewrite -> H0.
@@ -557,7 +557,7 @@ Proof.
       apply beq_nat_true in H1.
       rewrite -> H1 in H0.
       Search (max _ _ = _).
-      rewrite -> Max.max_idempotent in H0.
+      rewrite -> Nat.max_idempotent in H0.
       symmetry in H0.
       apply prop_to_bool in H0.      
       rewrite -> H0.
@@ -594,7 +594,7 @@ Proof.
     rewrite -> H_max_S in H3.
     rewrite -> (plus_comm 1 (h122 + 1)) in H3.
     Search (max _ _ = _). 
-    rewrite -> Max.max_comm in H3.
+    rewrite -> Nat.max_comm in H3.
     rewrite -> H_max_S in H3. 
     Search (_ + _ = _).
     rewrite -> (plus_assoc_reverse h122 1 1) in H3.
@@ -619,9 +619,9 @@ Proof.
     + apply beq_nat_true in C_h122_eq_succ_h121.
       rewrite -> C_h122_eq_succ_h121.
       rewrite -> C_h122_eq_succ_h121 in H3.
-      rewrite -> (Max.max_comm h121 (h121 + 1)) in H3.
+      rewrite -> (Nat.max_comm h121 (h121 + 1)) in H3.
       rewrite -> H_max_S in H3.
-      rewrite -> (Max.max_comm (h121 + 1) (1 + (h121 + 1))) in H3.
+      rewrite -> (Nat.max_comm (h121 + 1) (1 + (h121 + 1))) in H3.
       rewrite -> (plus_comm 1 (h121 + 1)) in H3.
       rewrite -> H_max_S in H3.
       apply (succ_eq (h121 + 1 + 1) (1 + h2))in H3.
@@ -637,8 +637,8 @@ Proof.
       apply beq_nat_true in H.
       rewrite <- H in H3.
       Search (max _ _ = _).
-      rewrite -> Max.max_idempotent in H3.
-      rewrite -> Max.max_comm in H3.
+      rewrite -> Nat.max_idempotent in H3.
+      rewrite -> Nat.max_comm in H3.
       rewrite -> (plus_comm 1 h122) in H3.
       rewrite -> H_max_S in H3.
       apply (succ_eq (h122 + 1) (1 + h2)) in H3.
@@ -670,7 +670,7 @@ Proof.
   rewrite -> H1 in H3.
   rewrite -> H0 in H3.
   Search (max _ _ = _).
-  rewrite -> Max.max_comm in H3.
+  rewrite -> Nat.max_comm in H3.
   Check (H_max_S).
   rewrite -> (plus_comm 1 (max h121 h122)) in H3.
   rewrite -> H_max_S in H3.
@@ -690,10 +690,10 @@ Proof.
   - apply beq_nat_true in C_h121_eq_S_h122.
     rewrite -> C_h121_eq_S_h122.
     rewrite -> H_max_S.
-    rewrite -> (Max.max_comm h122 (h122 + 1)).
+    rewrite -> (Nat.max_comm h122 (h122 + 1)).
     rewrite -> H_max_S.
     Search (max _ _ = _).
-    rewrite -> Max.max_idempotent.
+    rewrite -> Nat.max_idempotent.
     rewrite -> same_nat_differs_by_one.
     reflexivity.
 
@@ -703,10 +703,10 @@ Proof.
     (* h122 = h121 + 1 *)
     + apply beq_nat_true in C_h122_eq_S_h121.
       rewrite -> C_h122_eq_S_h121.
-      rewrite -> (Max.max_comm h121 (h121 + 1)).
+      rewrite -> (Nat.max_comm h121 (h121 + 1)).
       rewrite -> H_max_S.
       rewrite -> H_max_S.      
-      rewrite -> Max.max_idempotent.
+      rewrite -> Nat.max_idempotent.
       rewrite -> same_nat_differs_by_one.      
       reflexivity.
 
@@ -714,7 +714,7 @@ Proof.
     + rewrite -> orb_false_l in H.
       apply beq_nat_true in H.
       rewrite -> H.
-      rewrite -> Max.max_idempotent.
+      rewrite -> Nat.max_idempotent.
       rewrite -> same_nat_differs_by_one.      
       reflexivity.
 Qed.
@@ -744,7 +744,7 @@ Proof.
       reflexivity.
 
     + rewrite <- C_S_h12_eq_h11.
-      rewrite -> Max.max_idempotent.
+      rewrite -> Nat.max_idempotent.
       rewrite -> plus_comm.
       rewrite -> same_nat_differs_by_one.
       reflexivity.
@@ -753,7 +753,7 @@ Proof.
     apply beq_nat_true in H.
     rewrite -> H in H1.
     Search (max _ _ = _).
-    rewrite -> Max.max_idempotent in H1.
+    rewrite -> Nat.max_idempotent in H1.
     rewrite H0 in H1.
     apply succ_eq in H1.
     rewrite <- H in H1.
@@ -1073,7 +1073,7 @@ Proof.
     + apply beq_nat_true in C_h212_eq_S_h211.
       rewrite -> C_h212_eq_S_h211.
       Search (max _ _ = _).
-      rewrite -> Max.max_comm.
+      rewrite -> Nat.max_comm.
       rewrite -> H_max_S.
       rewrite -> plus_comm.
       rewrite -> nat_and_succ_nat_differ_by_one.
@@ -1083,7 +1083,7 @@ Proof.
     + rewrite -> orb_false_l in H0.
       apply beq_nat_true in H0.
       rewrite -> H0.
-      rewrite -> Max.max_idempotent.
+      rewrite -> Nat.max_idempotent.
       rewrite -> same_nat_differs_by_one.
       reflexivity.
 Qed.
@@ -1112,14 +1112,14 @@ Proof.
 
     + apply beq_nat_true in C_h212_eq_S_h211.
       rewrite -> C_h212_eq_S_h211.
-      rewrite -> (Max.max_comm h211 (h211 + 1)).
+      rewrite -> (Nat.max_comm h211 (h211 + 1)).
       rewrite -> H_max_S.
       rewrite -> same_nat_differs_by_one.
       reflexivity.
 
     + apply beq_nat_true in H.
       rewrite -> H.
-      rewrite -> Max.max_idempotent.
+      rewrite -> Nat.max_idempotent.
       rewrite -> same_nat_differs_by_one.
       reflexivity.
 Qed.      
@@ -1140,8 +1140,8 @@ Proof.
   - apply beq_nat_true in C_h211_eq_S_h212.
     rewrite -> C_h211_eq_S_h212.
     rewrite -> H_max_S.
-    rewrite -> Max.max_idempotent.
-    rewrite -> Max.max_comm.
+    rewrite -> Nat.max_idempotent.
+    rewrite -> Nat.max_comm.
     rewrite -> H_max_S.
     rewrite -> same_nat_differs_by_one.
     reflexivity.
@@ -1151,17 +1151,17 @@ Proof.
 
     + apply beq_nat_true in C_h212_eq_S_h212.
       rewrite -> C_h212_eq_S_h212.
-      rewrite -> (Max.max_comm h211 (h211 + 1)).
+      rewrite -> (Nat.max_comm h211 (h211 + 1)).
       rewrite -> H_max_S.
       rewrite -> H_max_S.
-      rewrite -> Max.max_idempotent.
+      rewrite -> Nat.max_idempotent.
       rewrite -> same_nat_differs_by_one.
       reflexivity.
 
     + apply beq_nat_true in H1.
       rewrite -> H1.
-      rewrite -> Max.max_idempotent.
-      rewrite -> Max.max_idempotent.      
+      rewrite -> Nat.max_idempotent.
+      rewrite -> Nat.max_idempotent.      
       rewrite -> same_nat_differs_by_one.
       reflexivity.
 Qed.
@@ -1178,7 +1178,7 @@ Proof.
 
   - apply beq_nat_true in C_S_h21_eq_h22.
     rewrite <- C_S_h21_eq_h22 in H0.
-    rewrite -> Max.max_comm in H0.
+    rewrite -> Nat.max_comm in H0.
     rewrite -> H_max_S in H0.
     rewrite H0 in H1.
     apply succ_eq in H1.
@@ -1192,7 +1192,7 @@ Proof.
 
     + rewrite <- C_S_h21_eq_h22.
       rewrite H1.
-      rewrite -> Max.max_idempotent.
+      rewrite -> Nat.max_idempotent.
       rewrite -> plus_comm.
       rewrite -> same_nat_differs_by_one.
       reflexivity.
@@ -1200,7 +1200,7 @@ Proof.
   - rewrite -> orb_false_l in H.
     apply beq_nat_true in H.
     rewrite H in H0.
-    rewrite -> Max.max_idempotent in H0.
+    rewrite -> Nat.max_idempotent in H0.
     rewrite H0 in H1.
     apply succ_eq in H1.
     rewrite -> H.
@@ -1211,7 +1211,7 @@ Proof.
       rewrite -> nat_and_succ_nat_differ_by_one.
       reflexivity.
 
-    + rewrite -> (Max.max_comm h1 (S h1)).
+    + rewrite -> (Nat.max_comm h1 (S h1)).
 
       assert (H_trivial: S h1 = h1 + 1).
       rewrite -> plus_comm.
@@ -1671,10 +1671,10 @@ Proof.
     rewrite -> H_h1'_eq_S_h1.
     left.
     rewrite -> (plus_comm 1 h1).
-    rewrite -> Max.max_idempotent.
+    rewrite -> Nat.max_idempotent.
     rewrite -> H_h_hbt_h1_h2.
     rewrite -> C_h2_eq_S_h1.
-    rewrite -> Max.max_comm.
+    rewrite -> Nat.max_comm.
     rewrite -> H_max_S.
     reflexivity.  
 
@@ -1686,7 +1686,7 @@ Proof.
     right.
     rewrite -> H_h_hbt_h1_h2.
     rewrite -> H_h1_h2_diff_by_one.
-    rewrite -> Max.max_idempotent.
+    rewrite -> Nat.max_idempotent.
     rewrite -> (plus_comm 1 h1).
     rewrite -> H_max_S.
     reflexivity.
@@ -1773,7 +1773,7 @@ Proof.
     rewrite -> plus_comm in H_h12'_h121'_h122'.
     apply succ_eq in H_h12'_h121'_h122'.
     rewrite <- C_S_h11'_eq_h12' in H_h1'_h11'_h12'.
-    rewrite -> Max.max_comm in H_h1'_h11'_h12'.
+    rewrite -> Nat.max_comm in H_h1'_h11'_h12'.
     Check (H_max_S).
     rewrite -> H_max_S in H_h1'_h11'_h12'.
     rewrite -> (plus_comm h11' 1) in H_h1'_h11'_h12'.
@@ -1862,10 +1862,10 @@ Proof.
     destruct (max_cases h121' h122') as [H_h121'_max | H_h122'_max].
     left.
     rewrite -> H_h121'_max.
-    rewrite -> Max.max_idempotent.
-    rewrite -> (Max.max_comm h122' h121').
+    rewrite -> Nat.max_idempotent.
+    rewrite -> (Nat.max_comm h122' h121').
     rewrite -> H_h121'_max.
-    rewrite -> Max.max_idempotent.
+    rewrite -> Nat.max_idempotent.
 
     assert (H_S: S h121' = h121' + 1).
     rewrite -> plus_comm.
@@ -1878,10 +1878,10 @@ Proof.
 
     left.
     rewrite -> H_h122'_max.
-    rewrite -> Max.max_idempotent.
-    rewrite -> (Max.max_comm h122' h121').
+    rewrite -> Nat.max_idempotent.
+    rewrite -> (Nat.max_comm h122' h121').
     rewrite -> H_h122'_max.
-    rewrite -> Max.max_idempotent.
+    rewrite -> Nat.max_idempotent.
 
     assert (H_S: S h122' = h122' + 1).
     rewrite -> plus_comm.
@@ -2000,22 +2000,22 @@ Proof.
     rewrite <- H_h1'_eq_S_h1.
     rewrite <- C_h1'_eq_SS_h2.
     rewrite <- C_S_h12'_h11'.
-    rewrite -> Max.max_idempotent.
+    rewrite -> Nat.max_idempotent.
     rewrite -> H_max_S.
     rewrite -> (plus_comm 1 h12').
-    rewrite -> Max.max_idempotent.
+    rewrite -> Nat.max_idempotent.
     reflexivity.
 
     (* case where h12'= h11' *) 
     rewrite -> orb_false_l in C_h12'_leq_h11'.
     apply beq_nat_true in C_h12'_leq_h11'.
     rewrite -> C_h12'_leq_h11' in C_h1'_eq_SS_h2.
-    rewrite -> Max.max_idempotent in C_h1'_eq_SS_h2.
+    rewrite -> Nat.max_idempotent in C_h1'_eq_SS_h2.
 
     unfold project_height_hbt in H_h1'_eq_S_h1.
     rewrite -> H_h1'_h11'_h12' in H_h1'_eq_S_h1.
     rewrite -> C_h12'_leq_h11' in H_h1'_eq_S_h1.
-    rewrite -> Max.max_idempotent in H_h1'_eq_S_h1.
+    rewrite -> Nat.max_idempotent in H_h1'_eq_S_h1.
     apply succ_eq in H_h1'_eq_S_h1.
 
     
@@ -2032,7 +2032,7 @@ Proof.
 
     rewrite -> H_S.
     rewrite -> H_max_S.
-    rewrite -> Max.max_comm.
+    rewrite -> Nat.max_comm.
     rewrite -> (plus_comm 1 (h2 + 1)).
     rewrite -> H_max_S.
     reflexivity.
@@ -2096,7 +2096,7 @@ Proof.
     rewrite -> C_h1_eq_S_h2.
     rewrite -> H_h2'_eq_S_h2.
     rewrite -> H_max_S.
-    rewrite -> Max.max_idempotent.  
+    rewrite -> Nat.max_idempotent.  
     reflexivity.
 
     (* next, consider the case where h2 = h1 + 1; this is the impossible case *)
@@ -2123,9 +2123,9 @@ Proof.
     right.
     rewrite -> H_h_hbt_h1_h2.
     rewrite -> H_h1_h2_diff_by_one.
-    rewrite -> Max.max_idempotent.
+    rewrite -> Nat.max_idempotent.
     rewrite -> (plus_comm 1 h1).
-    rewrite -> (Max.max_comm).
+    rewrite -> (Nat.max_comm).
     rewrite -> H_max_S.
     reflexivity.
 
@@ -2212,9 +2212,9 @@ Proof.
     rewrite -> plus_comm in H_h21'_h211'_h212'.
     apply succ_eq in H_h21'_h211'_h212'.
     rewrite <- C_S_h22'_eq_h21' in H_h2'_h21'_h22'.
-    rewrite -> Max.max_comm in H_h2'_h21'_h22'.
+    rewrite -> Nat.max_comm in H_h2'_h21'_h22'.
     Check (H_max_S).
-    rewrite -> Max.max_comm in H_h2'_h21'_h22'.
+    rewrite -> Nat.max_comm in H_h2'_h21'_h22'.
     rewrite -> H_max_S in H_h2'_h21'_h22'.
     rewrite -> (plus_comm h22' 1) in H_h2'_h21'_h22'.
     rewrite -> plus_assoc in H_h2'_h21'_h22'.
@@ -2306,34 +2306,34 @@ Proof.
 
     (* h211' is max *)
     rewrite -> H_h211'_max.
-    rewrite -> Max.max_idempotent.
-    rewrite -> (Max.max_comm h212' h211').
+    rewrite -> Nat.max_idempotent.
+    rewrite -> (Nat.max_comm h212' h211').
     rewrite -> H_h211'_max.
-    rewrite -> Max.max_idempotent.
+    rewrite -> Nat.max_idempotent.
 
     assert (H_S: S h211' = h211' + 1).
     rewrite -> plus_comm.
     reflexivity.
 
     rewrite -> H_S.
-    rewrite -> Max.max_comm.
+    rewrite -> Nat.max_comm.
     rewrite -> (H_max_S h211').
     rewrite -> (plus_comm h211' 1).
     reflexivity.
 
     (* h212' max *)
     rewrite -> H_h212'_max.
-    rewrite -> Max.max_idempotent.
-    rewrite -> (Max.max_comm h212' h211').
+    rewrite -> Nat.max_idempotent.
+    rewrite -> (Nat.max_comm h212' h211').
     rewrite -> H_h212'_max.
-    rewrite -> Max.max_idempotent.
+    rewrite -> Nat.max_idempotent.
 
     assert (H_S: S h212' = h212' + 1).
     rewrite -> plus_comm.
     reflexivity.
 
     rewrite -> H_S.
-    rewrite -> Max.max_comm.
+    rewrite -> Nat.max_comm.
     rewrite -> (H_max_S h212').
     rewrite -> (plus_comm h212' 1).
     reflexivity.
@@ -2435,7 +2435,7 @@ Proof.
     case (h21' + 1 =n= h22') as [ | ] eqn : C_S_h21'_h22'.
     apply beq_nat_true in C_S_h21'_h22'.
     rewrite <- C_S_h21'_h22' in C_h2'_eq_SS_h1.
-    rewrite -> Max.max_comm in C_h2'_eq_SS_h1.
+    rewrite -> Nat.max_comm in C_h2'_eq_SS_h1.
     rewrite -> H_max_S in C_h2'_eq_SS_h1.
     rewrite -> plus_comm in C_h2'_eq_SS_h1.
     apply succ_eq in C_h2'_eq_SS_h1.
@@ -2444,7 +2444,7 @@ Proof.
     rewrite -> H_h2'_h21'_h22' in H_h2'_eq_S_h2.
     apply succ_eq in H_h2'_eq_S_h2.
     rewrite <- C_S_h21'_h22' in H_h2'_eq_S_h2.
-    rewrite -> Max.max_comm in H_h2'_eq_S_h2.
+    rewrite -> Nat.max_comm in H_h2'_eq_S_h2.
     rewrite -> H_max_S in H_h2'_eq_S_h2.
 
     
@@ -2453,10 +2453,10 @@ Proof.
     rewrite <- H_h2'_eq_S_h2.
     rewrite <- C_h2'_eq_SS_h1.
     rewrite <- C_S_h21'_h22'.
-    rewrite -> Max.max_idempotent.
+    rewrite -> Nat.max_idempotent.
     rewrite -> (plus_comm h21' 1).
-    rewrite -> Max.max_idempotent.  
-    rewrite -> Max.max_comm.
+    rewrite -> Nat.max_idempotent.  
+    rewrite -> Nat.max_comm.
     rewrite -> (plus_comm 1 h21').
     rewrite -> H_max_S.
     reflexivity.
@@ -2465,12 +2465,12 @@ Proof.
     rewrite -> orb_false_l in C_h21'_leq_h22'.
     apply beq_nat_true in C_h21'_leq_h22'.
     rewrite -> C_h21'_leq_h22' in C_h2'_eq_SS_h1.
-    rewrite -> Max.max_idempotent in C_h2'_eq_SS_h1.
+    rewrite -> Nat.max_idempotent in C_h2'_eq_SS_h1.
 
     unfold project_height_hbt in H_h2'_eq_S_h2.
     rewrite -> H_h2'_h21'_h22' in H_h2'_eq_S_h2.
     rewrite -> C_h21'_leq_h22' in H_h2'_eq_S_h2.
-    rewrite -> Max.max_idempotent in H_h2'_eq_S_h2.
+    rewrite -> Nat.max_idempotent in H_h2'_eq_S_h2.
     apply succ_eq in H_h2'_eq_S_h2.
 
     
@@ -2486,7 +2486,7 @@ Proof.
     reflexivity.
 
     rewrite -> H_S.
-    rewrite -> (Max.max_comm h1).
+    rewrite -> (Nat.max_comm h1).
     rewrite -> H_max_S.
     rewrite -> (plus_comm 1 (h1 + 1)).
     rewrite -> H_max_S.

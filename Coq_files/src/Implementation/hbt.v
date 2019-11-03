@@ -2,6 +2,7 @@
 Require Import Hbt.Paraphernalia.paraphernalia.
 Require Export Hbt.Paraphernalia.paraphernalia.
 
+
 (* ********** Section 1: Different AVL tree type definitions  ********** *)
 
 (* Coq formalization of polymorphic ordinary binary tree implementation *)
@@ -44,7 +45,7 @@ Fixpoint traverse_to_check_soundness_hbt
          (A : Type)
          (hbt : heightened_binary_tree A) : option nat :=
   match hbt with
-  | HNode h bt =>
+  | HNode _ h bt =>
     match traverse_to_check_soundness_bt A bt with
     | None =>
       None
@@ -58,16 +59,16 @@ with traverse_to_check_soundness_bt
        (A : Type)
        (bt : binary_tree A) : option nat :=
        match bt with
-       | Leaf =>
+       | Leaf _ =>
          Some 0
-       | Node t =>
+       | Node _ t =>
          traverse_to_check_soundness_t A t
        end
 with traverse_to_check_soundness_t
        (A : Type)
        (t : triple A) : option nat :=
        match t with
-       | Triple hbt1 _ hbt2 =>
+       | Triple _ hbt1 _ hbt2 =>
          match traverse_to_check_soundness_hbt A hbt1 with
          | None =>
            None
@@ -170,21 +171,21 @@ Compute (test_differ_by_one differ_by_one).
 Fixpoint traverse_to_check_balanced_hbt
          (A : Type) (hbt : heightened_binary_tree A) : option nat :=
   match hbt with
-  | HNode _ bt =>
+  | HNode _ _ bt =>
     traverse_to_check_balanced_bt A bt
   end
 with traverse_to_check_balanced_bt
        (A : Type) (bt : binary_tree A) : option nat :=
        match bt with
-       | Leaf =>
+       | Leaf _ =>
          Some 0
-       | Node t =>
+       | Node _ t =>
          traverse_to_check_balanced_t A t
        end
 with traverse_to_check_balanced_t
        (A : Type) (t : triple A) : option nat :=
        match t with
-       | Triple hbt1 _ hbt2 =>
+       | Triple _ hbt1 _ hbt2 =>
          match traverse_to_check_balanced_hbt A hbt1 with
          | None =>
            None
@@ -285,7 +286,7 @@ Fixpoint traverse_to_check_ordered_hbt
          (hbt : heightened_binary_tree A)
          (compare : A -> A -> element_comparison) : triple_option (A * A) :=
   match hbt with
-  | HNode h bt =>
+  | HNode _ h bt =>
     traverse_to_check_ordered_bt A bt compare
   end
 with traverse_to_check_ordered_bt
@@ -293,9 +294,9 @@ with traverse_to_check_ordered_bt
        (bt : binary_tree A)
        (compare : A -> A -> element_comparison) : triple_option (A * A) :=
        match bt with
-       | Leaf =>
+       | Leaf _ =>
          TNone (A * A)
-       | Node t =>
+       | Node _ t =>
          traverse_to_check_ordered_t A t compare
        end
 with traverse_to_check_ordered_t
@@ -303,22 +304,22 @@ with traverse_to_check_ordered_t
        (t : triple A)
        (compare : A -> A -> element_comparison) : triple_option (A * A) :=
        match t with
-       | Triple hbt1 e hbt2 =>
+       | Triple _ hbt1 e hbt2 =>
          match traverse_to_check_ordered_hbt A hbt1 compare with
          (* hbt1 is unordered *)
-         | TError =>
+         | TError _ =>
            TError (A * A)
          (* hbt1 is a leaf *)
-         | TNone =>
+         | TNone _ =>
            match traverse_to_check_ordered_hbt A hbt2 compare with
            (* hbt2 is unordered *)
-           | TError =>
+           | TError _ =>
              TError (A * A)
            (* hbt2 is a leaf *)
-           | TNone =>
+           | TNone _ =>
              TSome (A * A) (e, e)
            (*  hbt2 is an ordered heightened_binary_tree *)
-           | TSome (min2, max2) =>
+           | TSome _ (min2, max2) =>
              match compare e min2 with
              | Lt =>
                TSome (A * A) (e, max2)
@@ -329,18 +330,18 @@ with traverse_to_check_ordered_t
              end
            end
          (* hbt1 is an ordered heightened_binary_tree *)
-         | TSome (min1, max1) =>
+         | TSome _ (min1, max1) =>
            match compare max1 e with
            | Lt =>
              match traverse_to_check_ordered_hbt A hbt2 compare with
              (* hbt2 is unordered *)
-             | TError =>
+             | TError _ =>
                TError (A * A)
              (* hbt2 is a leaf *)
-             | TNone =>
+             | TNone _ =>
                TSome (A * A) (min1, e)
              (* hbt2 is an ordered heightened_binary_tree *)
-             | TSome (min2, max2) =>
+             | TSome _ (min2, max2) =>
                match compare e min2 with
                | Lt =>
                  TSome (A * A) (min1, max2)
@@ -397,25 +398,25 @@ Lemma unfold_traverse_to_check_ordered_t:
          (compare : A -> A -> element_comparison),
     traverse_to_check_ordered_t A (Triple A hbt1 e hbt2) compare =
     match traverse_to_check_ordered_hbt A hbt1 compare with
-    | TError => TError (A * A)
-    | TNone =>
+    | TError _ => TError (A * A)
+    | TNone _ =>
       match traverse_to_check_ordered_hbt A hbt2 compare with
-      | TError => TError (A * A)
-      | TNone => TSome (A * A) (e, e)
-      | TSome (min2, max2) =>
+      | TError _ => TError (A * A)
+      | TNone _ => TSome (A * A) (e, e)
+      | TSome _ (min2, max2) =>
         match compare e min2 with
         | Lt => TSome (A * A) (e, max2)
         | Eq => TError (A * A)
         | Gt => TError (A * A)
         end
       end
-    | TSome (min1, max1) =>
+    | TSome _ (min1, max1) =>
       match compare max1 e with
       | Lt =>
         match traverse_to_check_ordered_hbt A hbt2 compare with
-        | TError => TError (A * A)
-        | TNone => TSome (A * A) (min1, e)
-        | TSome (min2, max2) =>
+        | TError _ => TError (A * A)
+        | TNone _ => TSome (A * A) (min1, e)
+        | TSome _ (min2, max2) =>
           match compare e min2 with
           | Lt => TSome (A * A) (min1, max2)
           | Eq => TError (A * A)
@@ -436,7 +437,7 @@ Definition is_ordered_hbt
            (hbt : heightened_binary_tree A)
            (compare : A -> A -> element_comparison) : bool :=
   match traverse_to_check_ordered_hbt A hbt compare with
-  | TError =>
+  | TError _ =>
     false
   | _ =>
     true
@@ -453,7 +454,7 @@ Fixpoint occurs_hbt
          (e : A)
          (hbt : heightened_binary_tree A) : bool :=
   match hbt with
-  | HNode h bt =>
+  | HNode _ h bt =>
     occurs_bt A compare e bt
   end
 with occurs_bt
@@ -462,9 +463,9 @@ with occurs_bt
        (e : A)
        (bt : binary_tree A) : bool :=
        match bt with
-       | Leaf =>
+       | Leaf _ =>
          false
-       | Node t =>
+       | Node _ t =>
          occurs_t A compare e t
        end
 with occurs_t
@@ -473,7 +474,7 @@ with occurs_t
        (e : A)
        (t : triple A) : bool :=
        match t with
-       | Triple hbt1 e' hbt2 =>
+       | Triple _ hbt1 e' hbt2 =>
          match compare e e' with
          | Lt =>
            occurs_hbt A compare e hbt1
@@ -483,6 +484,7 @@ with occurs_t
            occurs_hbt A compare e hbt2
          end
        end.
+
 
 (* Unfold lemmas for occurs_hbt, occurs_bt, occurs_t *)
 Lemma unfold_occurs_hbt:
@@ -567,19 +569,19 @@ Fixpoint equal_lists
 (* Function to map a heightened_binary_tree into the in-order list of its elements *)
 Fixpoint hbt_to_list (A : Type) (hbt : heightened_binary_tree A) : list A :=
     match hbt with
-    | HNode _ bt =>
+    | HNode _ _ bt =>
       bt_to_list A bt
     end
 with bt_to_list (A : Type) (bt : binary_tree A) : list A :=
        match bt with
-       | Leaf =>
+       | Leaf _ =>
          nil
-       | Node t =>
+       | Node _ t =>
          t_to_list A t
        end
 with t_to_list (A : Type) (t : triple A) : list A :=
        match t with
-       | Triple hbt1 e hbt2 =>
+       | Triple _ hbt1 e hbt2 =>
          (hbt_to_list A hbt1) ++ e :: (hbt_to_list A hbt2)
        end.
 
@@ -717,15 +719,15 @@ Definition rotate_right_bt
            (h2 : nat)
            (bt2 : binary_tree A) :=
   match bt1 with
-  | Leaf =>
+  | Leaf _ =>
     None
-  | Node (Triple (HNode h11 bt11) e1 (HNode h12 bt12)) =>
+  | Node _ (Triple _ (HNode _ h11 bt11) e1 (HNode _ h12 bt12)) =>
     if h11 + 1 =n= h12
     then 
       match bt12 with
-      | Leaf =>
+      | Leaf _ =>
         None
-      | Node (Triple (HNode h121 bt121) e12 (HNode h122 bt122)) => 
+      | Node _ (Triple _ (HNode _ h121 bt121) e12 (HNode _ h122 bt122)) => 
         Some (HNode A
                     (1 + max (1 + max h11 h121) (1 + max h122 h2))
                     (Node A (Triple A
@@ -766,9 +768,9 @@ Definition rotate_right_hbt
          (e : A)
          (hbt2 : heightened_binary_tree A) :=
   match hbt1 with
-  | HNode _ bt1 =>
+  | HNode _ _ bt1 =>
     match hbt2 with
-    | HNode h2 bt2 =>
+    | HNode _ h2 bt2 =>
       rotate_right_bt A bt1 e h2 bt2
     end
   end.
@@ -780,15 +782,15 @@ Definition rotate_left_bt
            (e : A)
            (bt2 : binary_tree A) :=
   match bt2 with
-  | Leaf =>
+  | Leaf _ =>
     None
-  | Node (Triple (HNode h21 bt21) e2 (HNode h22 bt22)) =>
+  | Node _ (Triple _ (HNode _ h21 bt21) e2 (HNode _ h22 bt22)) =>
     if h22 + 1 =n= h21
     then
       match bt21 with
-      | Leaf =>
+      | Leaf _ =>
         None
-      | Node (Triple (HNode h211 bt211) e21 (HNode h212 bt212)) =>
+      | Node _ (Triple _ (HNode _ h211 bt211) e21 (HNode _ h212 bt212)) =>
         Some (HNode A
                     (1 + max (1 + max h1 h211) (1 + max h212 h22))
                     (Node A (Triple A
@@ -828,9 +830,9 @@ Definition rotate_left_hbt
          (e : A)
          (hbt2 : heightened_binary_tree A) :=
   match hbt1 with
-  | HNode h1 bt1 =>
+  | HNode _ h1 bt1 =>
     match hbt2 with
-    | HNode _ bt2 =>
+    | HNode _ _ bt2 =>
       rotate_left_bt A h1 bt1 e bt2
     end
   end.
@@ -839,14 +841,14 @@ Definition project_height_hbt
            (A : Type)
            (hbt : heightened_binary_tree A) : nat :=
   match hbt with
-  | HNode h _ => h
+  | HNode _ h _ => h
   end.
 
 Definition project_bt_hbt
            (A : Type)
            (hbt : heightened_binary_tree A) : binary_tree A :=
   match hbt with
-  | HNode _ bt => bt
+  | HNode _ _ bt => bt
   end.
            
 
@@ -854,9 +856,9 @@ Definition project_height_bt
            (A : Type)
            (bt : binary_tree A) :=
   match bt with
-  | Leaf =>
+  | Leaf _ =>
     0
-  | Node (Triple hbt1 _ hbt2) =>
+  | Node _ (Triple _ hbt1 _ hbt2) =>
     1 + max (project_height_hbt A hbt1) (project_height_hbt A hbt2)
   end.
 
@@ -864,7 +866,7 @@ Definition project_height_t
            (A : Type)
            (t : triple A) :=
   match t with
-  | Triple hbt1 _ hbt2 =>
+  | Triple _ hbt1 _ hbt2 =>
     1 + max (project_height_hbt A hbt1) (project_height_hbt A hbt2)
   end.
 
@@ -874,7 +876,7 @@ Fixpoint insert_hbt_helper
          (x : A) 
          (hbt : heightened_binary_tree A) :=
   match hbt with
-  | HNode h bt =>
+  | HNode _ h bt =>
     insert_bt_helper A compare x h bt
   end
 with insert_bt_helper
@@ -884,14 +886,14 @@ with insert_bt_helper
        (h_hbt : nat)
        (bt : binary_tree A) :=
        match bt with
-       | Leaf =>
+       | Leaf _ =>
          Some (HNode A
                      1
                      (Node A (Triple A
                                      (HNode A 0 (Leaf A))
                                      x 
                                      (HNode A 0 (Leaf A)))))
-       | Node t =>
+       | Node _ t =>
          insert_t_helper A compare x h_hbt t
        end
 with insert_t_helper
@@ -901,13 +903,13 @@ with insert_t_helper
        (h_hbt : nat)
        (t : triple A) :=
        match t with
-       | Triple hbt1 e hbt2 =>
+       | Triple _ hbt1 e hbt2 =>
          match compare x e with
          | Lt =>
            match insert_hbt_helper A compare x hbt1 with
            | None =>
              None 
-           | Some (HNode h1' bt1') =>
+           | Some (HNode _ h1' bt1') =>
              (* if (h1' =n= project_height_hbt A hbt1) *)
              (*    || (h1' =n= 1 + (project_height_hbt A hbt1)) *)
              (* then *)
@@ -930,7 +932,7 @@ with insert_t_helper
            match insert_hbt_helper A compare x hbt2 with 
            | None =>
              None 
-           | Some (HNode h2' bt2') =>
+           | Some (HNode _ h2' bt2') =>
              (* if (h2' =n= project_height_hbt A hbt2) *)
              (*    || (h2' =n= 1 + (project_height_hbt A hbt2)) *)
              (* then *)
@@ -1005,10 +1007,7 @@ Lemma unfold_insert_t_helper:
       match insert_hbt_helper A compare x hbt1 with
       | None =>
         None 
-      | Some (HNode h1' bt1') =>
-        (* if (h1' =n= project_height_hbt A hbt1) *)
-        (*    || (h1' =n= 1 + (project_height_hbt A hbt1)) *)
-        (* then *)
+      | Some (HNode _ h1' bt1') =>
         match compare_int h1' (2 + (project_height_hbt A hbt2)) with
         | Lt =>
           Some (HNode A
@@ -1019,8 +1018,6 @@ Lemma unfold_insert_t_helper:
         | Gt =>
           None 
         end
-          (* else *)
-          (*   None *)
       end
     | Eq =>
       None
@@ -1028,10 +1025,7 @@ Lemma unfold_insert_t_helper:
       match insert_hbt_helper A compare x hbt2 with 
       | None =>
         None 
-      | Some (HNode h2' bt2') =>
-        (* if (h2' =n= project_height_hbt A hbt2) *)
-        (*    || (h2' =n= 1 + (project_height_hbt A hbt2)) *)
-        (* then *)
+      | Some (HNode _ h2' bt2') =>
         match compare_int h2' (2 + (project_height_hbt A hbt1)) with
         | Lt =>
           Some (HNode A
@@ -1042,8 +1036,6 @@ Lemma unfold_insert_t_helper:
         | Gt =>
           None
         end
-          (* else *)
-          (*   None *)
       end
     end.
 Proof.
@@ -1065,3 +1057,4 @@ Definition insert_hbt
   end.
  
 Compute (test_insert_hbt insert_hbt).
+

@@ -1786,7 +1786,7 @@ Lemma non_zero_height:
 Proof.
   intros.
   rewrite <- H in H0.
-  rewrite -> Max.max_idempotent in H0.
+  rewrite -> Nat.max_idempotent in H0.
   rewrite <- H0 in H1.
   unfold project_height_hbt in H1.
 
