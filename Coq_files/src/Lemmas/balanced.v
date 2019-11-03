@@ -2795,34 +2795,3 @@ Proof.
 
       * discriminate.
 Qed.
-
-(* main lemma for deletion concerning soundness and balance *)
-Lemma deletion_preserves_soundness_and_balance: 
-  forall (A : Type)
-         (compare : A -> A -> element_comparison)
-         (x : A),
-    (forall (hbt : heightened_binary_tree A)
-            (hbt' : heightened_binary_tree A),
-        is_sound_hbt A hbt = true ->
-        is_balanced_hbt A hbt = true ->        
-        delete_hbt_helper A compare x hbt = Some hbt' ->
-        is_sound_hbt A hbt' = true /\ is_balanced_hbt A hbt' = true)
-    /\
-    (forall (bt : binary_tree A)
-            (h_hbt : nat)
-            (hbt' : heightened_binary_tree A),    
-        is_sound_hbt A (HNode A h_hbt bt) = true ->
-        is_balanced_hbt A (HNode A h_hbt bt) = true ->                
-        delete_bt_helper A compare x h_hbt bt = Some hbt' ->
-        is_sound_hbt A hbt' = true /\ is_balanced_hbt A hbt' = true)
-    /\
-    (forall (t : triple A)
-            (h_hbt : nat)
-            (hbt' : heightened_binary_tree A),    
-        is_sound_hbt A (HNode A h_hbt (Node A t)) = true ->
-        is_balanced_hbt A (HNode A h_hbt (Node A t)) = true ->                        
-        delete_t_helper A compare x h_hbt t = Some hbt' ->
-        is_sound_hbt A hbt' = true /\ is_balanced_hbt A hbt' = true).
-Proof.
-Admitted.
-

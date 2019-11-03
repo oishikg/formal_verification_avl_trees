@@ -714,5 +714,3 @@ Proof.
 
       * discriminate.
 Qed.
-
-
