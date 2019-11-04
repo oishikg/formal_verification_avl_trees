@@ -759,7 +759,6 @@ Definition rotate_right_bt
                                                               (HNode A h12 bt12)
                                                               e
                                                               (HNode A h2 bt2)))))))
-                (* impossible case *)
       else None
   end.
 
@@ -821,7 +820,6 @@ Definition rotate_left_bt
                                                               (HNode A h21 bt21))))
                                        e2
                                        (HNode A h22 bt22))))
-                (* impossible case *)
       else None
   end.
 
@@ -911,9 +909,6 @@ with insert_t_helper
            | None =>
              None 
            | Some (HNode _ h1' bt1') =>
-             (* if (h1' =n= project_height_hbt A hbt1) *)
-             (*    || (h1' =n= 1 + (project_height_hbt A hbt1)) *)
-             (* then *)
              match compare_int h1' (2 + (project_height_hbt A hbt2)) with
              | Lt =>
                Some (HNode A
@@ -924,8 +919,6 @@ with insert_t_helper
              | Gt =>
                None 
              end
-               (* else *)
-               (*   None *)
            end
          | Eq =>
            None
@@ -934,9 +927,6 @@ with insert_t_helper
            | None =>
              None 
            | Some (HNode _ h2' bt2') =>
-             (* if (h2' =n= project_height_hbt A hbt2) *)
-             (*    || (h2' =n= 1 + (project_height_hbt A hbt2)) *)
-             (* then *)
              match compare_int h2' (2 + (project_height_hbt A hbt1)) with
              | Lt =>
                Some (HNode A
@@ -947,13 +937,11 @@ with insert_t_helper
              | Gt =>
                None
              end
-               (* else *)
-               (*   None *)
            end
          end
        end.
 
-Check (insert_bt_helper).
+
 (* Unfold lemmas *)
 Lemma  unfold_insert_hbt_helper:
   forall (A : Type)
@@ -1060,6 +1048,8 @@ Definition insert_hbt
     hbt'
   end.
 
-(* Recursive Extraction insert_hbt. *)
- 
 Compute (test_insert_hbt insert_hbt).
+
+(* Commands to extract the certified program *)
+
+(* Recursive Extraction insert_hbt. *)

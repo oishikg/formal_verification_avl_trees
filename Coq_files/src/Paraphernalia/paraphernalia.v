@@ -20,80 +20,6 @@ Qed.
 Notation "A =b= B" :=
   (eqb A B) (at level 70, right associativity).
 
-
-(* Function to check if the first argument is less than the second argument *)
-(* Fixpoint ltb (n m : nat) : bool := *)
-(*   match n with *)
-(*   | 0    => *)
-(*     match m with *)
-(*     | 0   => *)
-(*       false *)
-(*     | S _ => *)
-(*       true *)
-(*     end *)
-(*   | S n' => *)
-(*     match m with *)
-(*     | 0    => *)
-(*       false *)
-(*     | S m' => *)
-(*       ltb n' m' *)
-(*     end *)
-(*   end. *)
-
-(* (* Unfold lemmas for ltb *) *)
-(* Lemma unfold_ltb_0_0: *)
-(*   ltb 0 0 = false. *)
-(* Proof. *)
-(*   unfold_tactic ltb. *)
-(* Qed. *)
-
-(* Lemma unfold_ltb_0_Sm: *)
-(*   forall (m : nat), *)
-(*     ltb 0 (S m) = true. *)
-(* Proof. *)
-(*   unfold_tactic ltb. *)
-(* Qed. *)
-
-(* Lemma unfold_ltb_Sn_0: *)
-(*   forall (n : nat), *)
-(*     ltb (S n) 0 = false. *)
-(* Proof.         *)
-(*   unfold_tactic ltb. *)
-(* Qed. *)
-
-(* Lemma unfold_ltb_Sn_Sm: *)
-(*   forall (n m : nat), *)
-(*     ltb (S n) (S m) = ltb n m. *)
-(* Proof.     *)
-(*   unfold_tactic ltb. *)
-(* Qed. *)
-
-(* (* Notation for "less than" *)  *)
-(* Notation "A <n B" := (ltb A B) (at level 70, right associativity). *)
-
-(* Lemma ltb_false_case: *)
-(*   forall (a x : nat), *)
-(*     (a + x <n a + x) = false. *)
-(* Proof. *)
-(*   intros. *)
-(*   induction a as [ | a' IH_a']. *)
-
-(*   Focus 2. *)
-(*   Search (S _ + _ = _). *)
-(*   rewrite -> plus_Sn_m. *)
-(*   rewrite -> unfold_ltb_Sn_Sm. *)
-(*   exact IH_a'. *)
-
-(*   rewrite -> plus_0_l. *)
-(*   induction x as [ | x' IH_x']. *)
-(*   unfold ltb. *)
-(*   reflexivity. *)
-
-(*   rewrite -> unfold_ltb_Sn_Sm. *)
-(*   exact IH_x'. *)
-(* Qed. *)
-
-
 (* ********** *)
 
 (* ********** Lemmas for operations on Peano nat numbers ********** *)
@@ -104,7 +30,6 @@ Lemma succ_eq:
 Proof.
   intros; inversion H; reflexivity.
 Qed.
-
 
 
 Lemma add_to_both_sides:

@@ -1791,7 +1791,7 @@ Proof.
   unfold project_height_hbt in H1.
 
   unfold compare_int in H1.
-  case (1 + h2 <n 2 + h') as [ | ].
+  case (1 + h2 <? 2 + h') as [ | ]. 
   discriminate.
   case (1 + h2 =n= 2 + h') as [ | ] eqn : C_S_h2_SS_h'.
 

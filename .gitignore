@@ -7,3 +7,4 @@ Coq_files/misc/*
 *.d
 Coq_files/src/Makefile.coq
 *.aux
+Coq_files/src/CoqMakefile.conf

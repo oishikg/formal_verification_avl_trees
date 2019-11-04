@@ -441,7 +441,8 @@ Proof.
       rewrite <- BinInt.ZL0 in H_h_ret_eq_S_h2.
       rewrite -> H_h_ret_eq_S_h2 in H1.
       unfold compare_int in H1.
-      rewrite -> ltb_false_case in H1.
+      Search (_ <? _).
+      rewrite -> (Nat.ltb_irrefl (2 + h1)) in H1.
       case (2 + h1 =n= 2 + h1) as [ | ].
       discriminate.
       discriminate.
@@ -483,7 +484,7 @@ Proof.
       rewrite <- BinInt.ZL0 in H_h_ret_eq_S_h1.
       rewrite -> H_h_ret_eq_S_h1 in H1.
       unfold compare_int in H1.
-      rewrite -> ltb_false_case in H1.
+      rewrite -> (Nat.ltb_irrefl (2 + h2)) in H1.      
       case (2 + h2 =n= 2 + h2) as [ | ].
       discriminate.
       discriminate.
@@ -938,7 +939,7 @@ Proof.
      * relation between h_ret and h2 *)
     unfold project_height_hbt in H4.
     unfold compare_int in H4.
-    case (h_ret <n 2 + h2) as [ | ].
+    case (h_ret <? 2 + h2) as [ | ].
     discriminate.
     case (h_ret =n= 2 + h2) as [ | ] eqn : C_diff_h_ret_h2.
     apply beq_nat_true in C_diff_h_ret_h2.
@@ -1024,7 +1025,7 @@ Proof.
 
     unfold project_height_hbt in H4.
     unfold compare_int in H4.
-    case (h_ret <n 2 + h2) as [ | ].
+    case (h_ret <? 2 + h2) as [ | ].
     discriminate.
     case (h_ret =n= 2 + h2) as [ | ] eqn : C_h_ret_eq_SS_h2.
     apply beq_nat_true in C_h_ret_eq_SS_h2.
@@ -1372,7 +1373,7 @@ Proof.
 
     (* finally, relate h1 and h_ret *)
     unfold compare_int in H4.
-    case (h_ret <n 2 + project_height_hbt A (HNode A h1 bt1)) as [ | ].
+    case (h_ret <? 2 + project_height_hbt A (HNode A h1 bt1)) as [ | ].
     discriminate.
     case (h_ret =n= 2 + project_height_hbt A (HNode A h1 bt1))
          as [ | ] eqn : H_h_ret_h1.
@@ -1465,7 +1466,7 @@ Proof.
 
     unfold project_height_hbt in H4.
     unfold compare_int in H4.
-    case ( h_ret <n 2 + h1) as [ | ].
+    case ( h_ret <? 2 + h1) as [ | ].
     discriminate.
     case (h_ret =n= 2 + h1) as [ | ] eqn : C_h_ret_h1.
     apply beq_nat_true in C_h_ret_h1.
@@ -1657,8 +1658,7 @@ Proof.
     unfold compare_int in C_comp_h1'_h2.
     unfold project_height_hbt in C_comp_h1'_h2.
     rewrite -> H_h1'_eq_S_h1 in C_comp_h1'_h2.
-    Check (ltb_false_case).
-    rewrite -> (ltb_false_case 2 h2) in C_comp_h1'_h2.
+    rewrite -> (Nat.ltb_irrefl (2 + h2)) in C_comp_h1'_h2.
     case (2 + h2 =n= 2 + h2) as [ | ].
     discriminate.
     discriminate.
@@ -1782,7 +1782,7 @@ Proof.
 
     (* establish a relationship between h2, h121', and h122' *)
     unfold compare_int in C_comp_h1'_h2.
-    case (h1' <n 2 + project_height_hbt A (HNode A h2 bt2)) as [ | ].
+    case (h1' <? 2 + project_height_hbt A (HNode A h2 bt2)) as [ | ].
     discriminate.
     case (h1' =n= 2 + project_height_hbt A (HNode A h2 bt2))
       as [ | ] eqn : C_h1'_eq_SS_h2.
@@ -1925,7 +1925,7 @@ Proof.
 
     (* establish relationship between h2 and h1' *)
     unfold compare_int in C_comp_h1'_h2.
-    case (h1' <n 2 + project_height_hbt A (HNode A h2 bt2)) as [ | ].
+    case (h1' <? 2 + project_height_hbt A (HNode A h2 bt2)) as [ | ].
     discriminate.
     case (h1' =n= 2 + project_height_hbt A (HNode A h2 bt2))
       as [ | ] eqn : C_h1'_eq_SS_h2.
@@ -2110,7 +2110,7 @@ Proof.
     unfold compare_int in C_comp_h2'_h1.
     unfold project_height_hbt in C_comp_h2'_h1.
     rewrite -> H_h2'_eq_S_h2 in C_comp_h2'_h1.
-    rewrite -> (ltb_false_case 2 h1) in C_comp_h2'_h1.
+    rewrite -> (Nat.ltb_irrefl (2 + h1)) in C_comp_h2'_h1.
     case (2 + h1 =n= 2 + h1) as [ | ].
     discriminate.
     discriminate.
@@ -2222,7 +2222,7 @@ Proof.
 
     (* establish a relationship between h2, h121', and h122' *)
     unfold compare_int in C_comp_h2'_h1.
-    case (h2' <n 2 + project_height_hbt A (HNode A h1 bt1)) as [ | ].
+    case (h2' <? 2 + project_height_hbt A (HNode A h1 bt1)) as [ | ].
     discriminate.
     case (h2' =n= 2 + project_height_hbt A (HNode A h1 bt1))
       as [ | ] eqn : C_h2'_eq_SS_h1.
@@ -2377,7 +2377,7 @@ Proof.
 
     (* establish relationship between h2 and h1' *)
     unfold compare_int in C_comp_h2'_h1. 
-    case (h2' <n 2 + project_height_hbt A (HNode A h1 bt1)) as [ | ].
+    case (h2' <? 2 + project_height_hbt A (HNode A h1 bt1)) as [ | ].
     discriminate.
     case (h2' =n= 2 + project_height_hbt A (HNode A h1 bt1))
       as [ | ] eqn : C_h2'_eq_SS_h1.
