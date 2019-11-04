@@ -22,76 +22,76 @@ Notation "A =b= B" :=
 
 
 (* Function to check if the first argument is less than the second argument *)
-Fixpoint ltb (n m : nat) : bool :=
-  match n with
-  | 0    =>
-    match m with
-    | 0   =>
-      false
-    | S _ =>
-      true
-    end
-  | S n' =>
-    match m with
-    | 0    =>
-      false
-    | S m' =>
-      ltb n' m'
-    end
-  end.
+(* Fixpoint ltb (n m : nat) : bool := *)
+(*   match n with *)
+(*   | 0    => *)
+(*     match m with *)
+(*     | 0   => *)
+(*       false *)
+(*     | S _ => *)
+(*       true *)
+(*     end *)
+(*   | S n' => *)
+(*     match m with *)
+(*     | 0    => *)
+(*       false *)
+(*     | S m' => *)
+(*       ltb n' m' *)
+(*     end *)
+(*   end. *)
 
-(* Unfold lemmas for ltb *)
-Lemma unfold_ltb_0_0:
-  ltb 0 0 = false.
-Proof.
-  unfold_tactic ltb.
-Qed.
+(* (* Unfold lemmas for ltb *) *)
+(* Lemma unfold_ltb_0_0: *)
+(*   ltb 0 0 = false. *)
+(* Proof. *)
+(*   unfold_tactic ltb. *)
+(* Qed. *)
 
-Lemma unfold_ltb_0_Sm:
-  forall (m : nat),
-    ltb 0 (S m) = true.
-Proof.
-  unfold_tactic ltb.
-Qed.
+(* Lemma unfold_ltb_0_Sm: *)
+(*   forall (m : nat), *)
+(*     ltb 0 (S m) = true. *)
+(* Proof. *)
+(*   unfold_tactic ltb. *)
+(* Qed. *)
 
-Lemma unfold_ltb_Sn_0:
-  forall (n : nat),
-    ltb (S n) 0 = false.
-Proof.        
-  unfold_tactic ltb.
-Qed.
+(* Lemma unfold_ltb_Sn_0: *)
+(*   forall (n : nat), *)
+(*     ltb (S n) 0 = false. *)
+(* Proof.         *)
+(*   unfold_tactic ltb. *)
+(* Qed. *)
 
-Lemma unfold_ltb_Sn_Sm:
-  forall (n m : nat),
-    ltb (S n) (S m) = ltb n m.
-Proof.    
-  unfold_tactic ltb.
-Qed.
+(* Lemma unfold_ltb_Sn_Sm: *)
+(*   forall (n m : nat), *)
+(*     ltb (S n) (S m) = ltb n m. *)
+(* Proof.     *)
+(*   unfold_tactic ltb. *)
+(* Qed. *)
 
-(* Notation for "less than" *) 
-Notation "A <n B" := (ltb A B) (at level 70, right associativity).
+(* (* Notation for "less than" *)  *)
+(* Notation "A <n B" := (ltb A B) (at level 70, right associativity). *)
 
-Lemma ltb_false_case:
-  forall (a x : nat),
-    (a + x <n a + x) = false.
-Proof.
-  intros.
-  induction a as [ | a' IH_a'].
+(* Lemma ltb_false_case: *)
+(*   forall (a x : nat), *)
+(*     (a + x <n a + x) = false. *)
+(* Proof. *)
+(*   intros. *)
+(*   induction a as [ | a' IH_a']. *)
 
-  Focus 2.
-  Search (S _ + _ = _).
-  rewrite -> plus_Sn_m.
-  rewrite -> unfold_ltb_Sn_Sm.
-  exact IH_a'.
+(*   Focus 2. *)
+(*   Search (S _ + _ = _). *)
+(*   rewrite -> plus_Sn_m. *)
+(*   rewrite -> unfold_ltb_Sn_Sm. *)
+(*   exact IH_a'. *)
 
-  rewrite -> plus_0_l.
-  induction x as [ | x' IH_x'].
-  unfold ltb.
-  reflexivity.
+(*   rewrite -> plus_0_l. *)
+(*   induction x as [ | x' IH_x']. *)
+(*   unfold ltb. *)
+(*   reflexivity. *)
 
-  rewrite -> unfold_ltb_Sn_Sm.
-  exact IH_x'.
-Qed.
+(*   rewrite -> unfold_ltb_Sn_Sm. *)
+(*   exact IH_x'. *)
+(* Qed. *)
 
 
 (* ********** *)
@@ -159,6 +159,7 @@ Inductive element_comparison :=
 | Eq : element_comparison
 | Gt : element_comparison.
 
+
 (* Predicate to check if a compare function returns an Lt or Eq constructor; 
  * we use this to define a total order *)
 Definition leq (ce : element_comparison) : bool :=
@@ -182,8 +183,8 @@ Axiom relating_Eq_eq:
 (* A compare function is anti-symmetric if it meets the following definition *)
 Definition anti_symmetry 
            (A : Type)
-           (a b : A)
-           (compare : A -> A -> element_comparison) :=
+           (compare : A -> A -> element_comparison) :=           
+  forall (a b : A),
     leq (compare a b) = true -> 
     leq (compare b a) = true ->
     compare a b = Eq.
@@ -191,8 +192,8 @@ Definition anti_symmetry
 (* A compare function is transitive if it meets the following definition *)
 Definition transitivity 
            (A : Type)
-           (a b c : A)
            (compare : A -> A -> element_comparison) :=
+  forall (a b c : A),
     leq (compare a b) = true -> 
     leq (compare b c) = true ->
     leq (compare a c) = true.
@@ -201,130 +202,300 @@ Definition transitivity
  * definition *)
 Definition connexity 
            (A : Type)
-           (a b : A)
-           (compare : A -> A -> element_comparison) := 
-  leq (compare a b) = true 
-  \/
-  leq (compare b a) = true.
+           (compare : A -> A -> element_comparison) :=
+  forall (a b : A),
+    (leq (compare a b) = true)
+    \/
+    (leq (compare b a) = true).
 
 (* For a compare function of type A -> A -> element_comparison to define a total 
  * order on A, it should meet the following specification: *)
 Definition specification_of_compare_defining_total_order
            (A : Type)
            (compare : A -> A -> element_comparison) :=
-  forall (a b c : A),
-    anti_symmetry A a b compare
-    /\
-    transitivity A a b c compare
-    /\
-    connexity A a b compare.
+  anti_symmetry A compare 
+  /\
+  transitivity A compare 
+  /\
+  connexity A compare.
 
 (* Now we derive the property of reflexivity for a compare function that defines 
  * a total order on a set A *)
 Lemma reflexivity_total_order:
   forall (A : Type)
-         (x : A)
-         (compare : A -> A -> element_comparison),
+         (compare : A -> A -> element_comparison)
+         (x : A), 
     specification_of_compare_defining_total_order A compare -> 
     leq (compare x x) = true.
 Proof.
   intros.
   unfold specification_of_compare_defining_total_order in H.
-  destruct (H x x x) as [_ [_ H_conn]].
+  destruct H as [_ [_ H_conn]].
   unfold connexity in H_conn.
-  destruct H_conn.
-  exact H0.
-  exact H0.
+  destruct (H_conn x x).
+  exact H.
+  exact H.
 Qed.
 
 (* An important lemma that relates the Gt and Lt constructor values *)
 Lemma relating_Lt_Gt_total_order:
   forall (A : Type)
-         (a b : A)
-         (compare : A -> A -> element_comparison),
+         (compare : A -> A -> element_comparison)
+         (a b : A),
     specification_of_compare_defining_total_order A compare ->
     (compare a b = Lt <-> compare b a = Gt).
 Proof.
   intros.
   
   assert (H_duplicate: specification_of_compare_defining_total_order A compare).
-  exact H. 
+  exact H.
+
+  unfold specification_of_compare_defining_total_order in H.
+  destruct H as [H_anti_symm [H_trans H_conn]].
+  
+  unfold connexity in H_conn.
+  assert (H_conn_quantified: leq (compare a b) = true \/ leq (compare b a) = true).
+  exact (H_conn a b).
+
+  unfold anti_symmetry in H_anti_symm.
+  assert (H_anti_symm_quantified:
+            leq (compare a b) = true -> leq (compare b a) = true ->
+            compare a b = Eq).
+  exact (H_anti_symm a b).
   
   split.
   
   - intro.
-    unfold specification_of_compare_defining_total_order in H.
-    destruct (H a b b) as [H_anti_symm [H_trans H_conn]].
-    unfold connexity in H_conn.
-    rewrite -> H0 in H_conn.
+    rewrite -> H in H_conn_quantified.
     case (compare b a) as [ | | ] eqn : C_comp_ba.
 
-    + unfold anti_symmetry in H_anti_symm.
-      rewrite -> C_comp_ba in H_anti_symm.
-      rewrite -> H0 in H_anti_symm.
-      destruct H_conn.
-      apply H_anti_symm in H1.
+    + (* rewrite -> C_comp_ba in H_anti_symm_quantified. *)
+      rewrite -> H in H_anti_symm_quantified.
+      destruct H_conn_quantified.
+      apply H_anti_symm_quantified in H0.
       discriminate.
-      exact H1.
-      apply H_anti_symm in H1.
+      exact H0.
+      apply H_anti_symm_quantified in H0.
       discriminate.
-      exact H1.
+      exact H0.
 
-    + unfold anti_symmetry in H_anti_symm.
-      rewrite -> H0 in H_anti_symm.
-      rewrite -> C_comp_ba in H_anti_symm.
-      unfold leq in H_anti_symm.
+    + rewrite -> H in H_anti_symm_quantified.
+      unfold leq in H_anti_symm_quantified.
 
       assert (H_trivial: true = true).
       reflexivity.
 
-      apply H_anti_symm in H_trivial.
+      apply H_anti_symm_quantified in H_trivial.
       discriminate.
       reflexivity.
 
     + reflexivity.
 
   - intro.
-    unfold specification_of_compare_defining_total_order in H.
-    destruct (H a b b) as [H_anti_symm [H_trans H_conn]].
-    unfold connexity in H_conn.
-    rewrite -> H0 in H_conn.
-    case (compare a b) as [ | | ] eqn : C_comp_ba.
+    rewrite -> H in H_conn_quantified.
+    case (compare a b) as [ | | ] eqn : C_comp_ab.
 
     + reflexivity.
 
-    + destruct H_conn.
+    + destruct H_conn_quantified.
 
       * Check (relating_Eq_eq).
         destruct (relating_Eq_eq A a b compare).
-        apply H2 in C_comp_ba.
-        rewrite -> C_comp_ba in H0.
+        apply H1 in C_comp_ab.
+        rewrite -> C_comp_ab in H.
         
-        Check (reflexivity_total_order A b compare H).
+        Check (reflexivity_total_order A compare).
         assert (H_refl: leq (compare b b) = true).
-        exact (reflexivity_total_order A b compare H).
-
-        rewrite -> H0 in H_refl.
+        exact (reflexivity_total_order A compare b H_duplicate).
+        
+        rewrite -> H in H_refl.
         unfold leq in H_refl.
         discriminate.
 
-      * unfold leq in H1.
+      * unfold leq in H0.
         discriminate.
 
-    + unfold leq in H_conn.
-      destruct H_conn.
+    + unfold leq in H_conn_quantified.
+      destruct H_conn_quantified.
       discriminate.
       discriminate.
 Qed.
 
-
-
-
+(* Defining a comparison function for integers *) 
 Definition compare_int (i j : nat) : element_comparison := 
-  if i <n j then Lt else if i =n= j then Eq else Gt.
+  if i <? j then Lt else if i =n= j then Eq else Gt.
+
+(* Theorem to show that compare_int meets the ordering specification *)
+Theorem compare_int_defines_a_total_order:
+  specification_of_compare_defining_total_order nat compare_int.
+Proof.
+  unfold specification_of_compare_defining_total_order.
+  intros.
+  split.
+
+  - unfold anti_symmetry.
+    intros.
+    unfold compare_int in H.
+    unfold compare_int in H0.
+    case (a <? b) as [ | ] eqn : C_a_lt_b.
+
+    + case (b <? a) as [ | ] eqn : C_b_lt_a.
+
+      * Search (Nat.ltb).
+        destruct (Nat.ltb_lt a b) as [H_ltb_lt_ab _].
+        apply H_ltb_lt_ab in C_a_lt_b.
+        destruct (Nat.ltb_lt b a) as [H_ltb_lt_ba _].
+        apply H_ltb_lt_ba in C_b_lt_a.
+
+        assert (H_impossible: a < a).
+        exact (Nat.lt_trans a b a C_a_lt_b C_b_lt_a).
+
+        destruct (Nat.ltb_lt a a) as [_ H_ltb_lt_aa].
+        apply H_ltb_lt_aa in H_impossible.
+
+        Search (Nat.ltb).
+        assert (H_contradictory: (a <? a) = false).
+        exact (Nat.ltb_irrefl a).
+        
+        rewrite -> H_contradictory in H_impossible.
+        discriminate.
+
+      * case (b =n= a) as [ | ] eqn : C_b_eq_a.
+        apply beq_nat_true in C_b_eq_a.
+        rewrite C_b_eq_a in C_a_lt_b.
+
+        assert (H_contradictory: (a <? a) = false).
+        exact (Nat.ltb_irrefl a).
+
+        rewrite -> H_contradictory in C_a_lt_b.
+        discriminate.
+
+        unfold leq in H0. 
+        discriminate.
+
+    + case (a =n= b) as [ | ] eqn : C_a_eq_b.
+      apply beq_nat_true in C_a_eq_b.
+      destruct (relating_Eq_eq nat a b compare_int).
+      apply H2 in C_a_eq_b.
+      exact C_a_eq_b.
+
+      unfold leq in H.
+      discriminate.
+
+  - split.
+
+    + unfold transitivity.
+      intros.
+      unfold compare_int in H.
+      unfold compare_int in H0.      
+
+      case (a <? b) as [ | ] eqn : C_a_lt_b.
+
+      * case (b <? c) as [ | ] eqn : C_b_lt_c.
+
+        {
+          destruct (Nat.ltb_lt a b).
+          apply H1 in C_a_lt_b.
+
+          destruct (Nat.ltb_lt b c).
+          apply H3 in C_b_lt_c.
+
+          assert (H_a_lt_c_prop: a < c).
+          exact (Nat.lt_trans a b c C_a_lt_b C_b_lt_c).
+
+          destruct (Nat.ltb_lt a c).
+          apply H6 in H_a_lt_c_prop.
+
+          unfold compare_int.
+          rewrite -> H_a_lt_c_prop.
+          unfold leq.
+          reflexivity.
+        }
+
+        {
+          case (b =n= c) as [ | ] eqn : C_b_eq_c.
+          apply beq_nat_true in C_b_eq_c.
+          rewrite -> C_b_eq_c in C_a_lt_b.
+          unfold compare_int.
+          rewrite -> C_a_lt_b.
+          unfold leq.
+          reflexivity.
+
+          unfold leq in H0.
+          discriminate.
+        }
+
+      * case (a =n= b) as [ | ] eqn : C_a_eq_b.
+
+        apply beq_nat_true in C_a_eq_b.
+        rewrite <- C_a_eq_b in H0.
+        case (a <? c) as [ | ] eqn : C_a_lt_c.
+
+        {
+          unfold compare_int.
+          rewrite -> C_a_lt_c.
+          unfold leq.
+          reflexivity.
+        }
+
+        {
+          case (a =n= c) as [ | ] eqn : C_a_eq_c.
+          unfold compare_int.
+          rewrite -> C_a_lt_c.
+          rewrite -> C_a_eq_c.
+          unfold leq.
+          reflexivity.
+
+          unfold leq in H0.
+          discriminate.
+        }
+        
+        unfold leq in H.
+        discriminate.
+
+    + unfold connexity.
+      intros.
+      unfold compare_int.
+
+      case (a <? b) as [ | ] eqn : C_a_lt_b.
+
+      * unfold leq.
+
+        assert (H_trivial: true = true).
+        reflexivity.
+        left.
+        exact H_trivial.
+
+      * case (a =n= b) as [ | ] eqn : C_a_eq_b.
+        left.
+        unfold leq.
+        reflexivity.
+
+        right.
+        case (b <? a) as [ | ] eqn : C_b_lt_a.
+        unfold leq.
+        reflexivity.
+
+        Search (_ <? _).
+        destruct (Nat.ltb_ge a b).
+        apply H in C_a_lt_b.
+
+        destruct (Nat.ltb_ge b a).
+        apply H1 in C_b_lt_a.
+
+        Search (_ <= _).
+        Check (Nat.le_antisymm a b C_b_lt_a C_a_lt_b).
+        rewrite (Nat.le_antisymm a b C_b_lt_a C_a_lt_b) in C_a_eq_b.
+        Search (_ =n= _).
+        rewrite -> (Nat.eqb_refl b) in C_a_eq_b.
+        discriminate.
+Qed.
+
+(* ********** *)
 
 
-(* ********** ********** *)
+(* ********** Equality of pairs and option types ********** *)
+
 Lemma pairwise_equality:
   forall (A : Type)
          (x1 x2 y1 y2 : A),
@@ -405,8 +576,7 @@ Qed.
 (* ********** *)
 
 
-
-
+(* ********** Reflections ********** *)
 
 Lemma prop_to_bool_helper:
   forall (a : nat),
@@ -478,6 +648,7 @@ Proof.
     reflexivity.
 Qed.
 
+
 Lemma disjunction_to_prop:
   forall (b1 b2 : bool),
     (b1 || b2 = true) -> (b1 = true) \/ (b2 = true).
@@ -503,3 +674,4 @@ Proof.
   intros; reflexivity.
 Qed.
 
+(* ********** *)

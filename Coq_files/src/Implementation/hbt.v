@@ -1,6 +1,7 @@
 (* ********** Imports ********** *)
 Require Import Hbt.Paraphernalia.paraphernalia.
 Require Export Hbt.Paraphernalia.paraphernalia.
+Require Extraction.
 
 
 (* ********** Section 1: Different AVL tree type definitions  ********** *)
@@ -965,6 +966,9 @@ Proof.
   unfold_tactic insert_hbt_helper.
 Qed.
 
+
+
+
 Lemma unfold_insert_bt_helper_leaf:
   forall (A : Type)
          (compare : A -> A -> element_comparison)
@@ -1055,6 +1059,7 @@ Definition insert_hbt
   | Some hbt' =>
     hbt'
   end.
+
+(* Recursive Extraction insert_hbt. *)
  
 Compute (test_insert_hbt insert_hbt).
-
