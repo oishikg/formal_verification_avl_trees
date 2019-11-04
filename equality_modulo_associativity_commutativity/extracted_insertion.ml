@@ -398,12 +398,150 @@ type name = string ;;
 
 type exp = Ide of name | BinOp of exp * exp ;;
 
+(* Testing paraphernalia for equality modulo associative and commutativity *)
+
+module Tests =
+  struct 
+    let random_char () =
+      let i = Random.int 26
+      in char_of_int (97 + i);;
+
+    let random_singleton_string () =
+      String.make 1 (random_char ());;
+
+    let random_Char () =
+      let i = Random.int 26
+      in char_of_int (65 + i);;
+
+    let random_singleton_String () =
+      String.make 1 (random_Char ());;
+
+    (* Random expression generator *)
+
+    let generate_random_exp depth =
+      let rec visit n =
+        if n = 0
+        then Ide (random_singleton_String ())
+        else match Random.int 3 with
+             | 0 ->
+                Ide (random_singleton_string ())
+             | _ ->
+                BinOp (visit (pred n), visit (pred n))
+      in visit depth;;    
+
+    (* Function to randomly modify an expression such that the expression and modified
+     * expression are equal modulo commutativity *)
+
+    let randomize_exp_modulo_commutativity e_init =
+      let rec visit e = 
+        match e with
+        | Ide x ->
+           e
+        | BinOp (t1, t2) ->
+           if Random.bool ()
+           then BinOp (visit t1, visit t2)
+           else BinOp (visit t2, visit t1)
+      in visit e_init;;
+
+
+    (* Function to randomly modify an expression such that the expression and 
+     * modified  expression are equal modulo commutativity *)
+
+    exception Impossible_Case ;;
+
+    let randomize_exp_modulo_associativity e_init =
+      let rec rotate_right e11 e12 e2 = BinOp (e11, (BinOp (e12, e2)))
+      and rotate_left e1 e21 e22 = BinOp (BinOp (e1, e21), e22)
+      and randomize_rotated_exp e =
+        match e with
+        | Ide _ ->
+           raise Impossible_Case
+        | BinOp (e1', e2') ->
+           begin
+             match Random.int 3 with
+             | 0 ->
+                BinOp (e1', traverse_exp e2')
+             | 1 ->
+                BinOp (traverse_exp e1', e2')
+             | _ ->
+                BinOp (e1', e2')
+           end
+      and traverse_exp e =
+        match e with
+        | Ide _ ->
+           e
+        | BinOp (Ide _, Ide _) ->
+           e
+        | BinOp (BinOp (e11, e12), Ide x) ->
+           randomize_rotated_exp (rotate_right e11 e12 (Ide x))
+        | BinOp (Ide x, BinOp (e21, e22)) ->
+           randomize_rotated_exp (rotate_left (Ide x) e21 e22)
+        | BinOp (BinOp (e11, e12), BinOp (e21, e22)) ->
+           begin
+             match Random.int 2 with
+             | 0 ->
+                randomize_rotated_exp (rotate_right e11 e12 (BinOp (e21, e22)))
+             | _ ->
+                randomize_rotated_exp (rotate_left (BinOp (e11, e12)) e21 e22)
+           end
+      in traverse_exp e_init
+    ;;
+
+    (* Function to randomly modify an expression using both 
+     * randomize_exp_modulo_associativity and randomize_exp_modulo_commutativity *)
+
+    let randomize_exp_modulo_assoc_comm e =
+      randomize_exp_modulo_associativity (randomize_exp_modulo_commutativity e)
+    ;;
+
+    (* Function which _messes up_ a term, that is, modifies a term such that it
+     * is _not_ equal to the original term modulo commutativity *)
+
+    let mess_up_exp_modulo_assoc_comm e_init =
+      let rec visit_exp e =
+        match e with
+        | Ide x ->
+           Ide "something completely different"
+        | BinOp (e1, e2) ->
+           match Random.int 6 with
+           | 0 ->
+              BinOp (Ide (random_singleton_string ()), visit_exp e2)
+           | 1 ->
+              BinOp (visit_exp e1, Ide (random_singleton_string ()))
+           | 2 | 3 ->
+              BinOp (visit_exp e1, e2)
+           | _ ->
+              BinOp (e1, visit_exp e2)
+      in visit_exp e_init
+    ;;
+
+    (* Function to generate a pair of equal expressions, given a depth *)
+    
+    let generate_pair_equal_modulo_assoc_comm depth = 
+      let e = generate_random_exp depth in
+      let e' = randomize_exp_modulo_assoc_comm e
+      in (e, e')
+    ;;
+    
+    (* Function to generate a pair of equal expressions, given a depth *)
+
+    let generate_pair_not_equal_modulo_assoc_comm depth =
+      let e = generate_random_exp depth in
+      let e' = mess_up_exp_modulo_assoc_comm e
+      in (e, e')
+    ;;
+
+
+  end
+  
+             
+
 (* Checking for equality modulo associativity and commutativity between two 
  * expressions boils down to checking if the two expressions have exactly the same
- * elements.
- * 
- * The naive way to do this would involve flattening both expressions into lists, and
- * then sorting the lists *)
+ * elements. *)
+
+(* The naive predicate: 
+ * Flatten both expressions into lists, and then sorting the lists *)
 
 let flatten_exp e_init =
   let rec traverse_exp e acc = 
@@ -412,48 +550,13 @@ let flatten_exp e_init =
        n :: acc
     | BinOp (e1, e2) ->
        traverse_exp e1 (traverse_exp e2 acc)
-  in flatten_exp e_init []
+  in traverse_exp e_init []
 ;;
 
 let eq_assoc_comm_naive e1 e2 =
+  List.sort compare (flatten_exp e1) = List.sort compare (flatten_exp e2)
+;;
   
-
-
-(* Testing paraphernalia *)
-
-let random_char () =
-  let i = Random.int 26
-  in char_of_int (97 + i);;
-
-let random_singleton_string () =
-  String.make 1 (random_char ());;
-
-let random_Char () =
-  let i = Random.int 26
-  in char_of_int (65 + i);;
-
-let random_singleton_String () =
-  String.make 1 (random_Char ());;
-
-let generate_random_exp depth =
-  let rec visit n =
-    if n = 0
-    then Ide (random_singleton_String ())
-    else match Random.int 3 with
-         | 0 ->
-            Ide (random_singleton_string ())
-         | _ ->
-            BinOp (visit (pred n), visit (pred n))
-  in visit depth;;    
-
-let randomize_term_modulo_commutativity t =
-  let rec visit t =
-    match t with
-    | Ide x ->
-       t
-    | Add (t1, t2) ->
-       if Random.bool ()
-       then Add (visit t1, visit t2)
-       else Add (visit t2, visit t1)
-  in visit t;;
+(* Alternative approach: 
+ * Traverse the expression and insert each Ide 
 
