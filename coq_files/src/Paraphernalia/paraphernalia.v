@@ -573,7 +573,6 @@ Proof.
     reflexivity.
 Qed.
 
-
 Lemma disjunction_to_prop:
   forall (b1 b2 : bool),
     (b1 || b2 = true) -> (b1 = true) \/ (b2 = true).
@@ -598,5 +597,7 @@ Lemma trivial_equality:
 Proof.
   intros; reflexivity.
 Qed.
+
+
 
 (* ********** *)

@@ -1052,4 +1052,7 @@ Compute (test_insert_hbt insert_hbt).
 
 (* Commands to extract the certified program *)
 
-(* Recursive Extraction insert_hbt. *)
+Set Extraction Optimize.
+Set Extraction AutoInline.
+
+(* Extraction insert_hbt "/home/oishik/YNC/Y4S1/Capstone_copy/Code/extracted_files/extracted_insertion.ml". *)
