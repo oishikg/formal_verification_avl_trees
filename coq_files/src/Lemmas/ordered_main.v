@@ -1,9 +1,3 @@
-Require Import Hbt.Implementation.hbt.
-Require Export Hbt.Implementation.hbt.
-
-Require Import Hbt.Lemmas.sound_balanced.
-Require Export Hbt.Lemmas.sound_balanced.
-
 Require Import Hbt.Lemmas.ordered_sub.
 Require Export Hbt.Lemmas.ordered_sub.
 
@@ -1091,15 +1085,6 @@ Proof.
     + discriminate.
 Qed.
 
-
-Lemma trivial_equality:
-  forall (A : Type)
-         (v : A),
-    v = v.
-Proof.
-  intros.
-  reflexivity.
-Qed.
 
 
 Lemma rotate_right_intermediate_tree_ordered:
@@ -2780,12 +2765,11 @@ Proof.
 Qed.    
     
 
-
-
 Lemma insertion_preserves_order: 
   forall (A : Type)
          (compare : A -> A -> element_comparison)
          (x : A),
+    specification_of_compare_defining_total_order A compare -> 
     (forall (hbt : heightened_binary_tree A)
             (hbt' : heightened_binary_tree A),
         is_sound_hbt A hbt = true ->
@@ -2812,7 +2796,7 @@ Lemma insertion_preserves_order:
         insert_t_helper A compare x h_hbt t = Some hbt' ->
         is_ordered_hbt A hbt' compare = true).
 Proof.
-  intros A compare x.
+  intros A compare x H_compare.
   apply heightened_binary_tree_mutual_induction.
 
   (* Specification for hbt holds, given bt as inductive case *)
@@ -3110,7 +3094,7 @@ Proof.
         unfold project_height_hbt in C_hbt1_possible_heights.
         unfold project_height_hbt in C_height_diff.
         unfold compare_int in C_height_diff.
-        case (h_ret <n 2 + h2) as [ | ].
+        case (h_ret <? 2 + h2) as [ | ].
         discriminate.
         case (h_ret =n= 2 + h2) as [ | ] eqn : C_h_ret_eq_SS_h2.
 
@@ -3313,7 +3297,9 @@ Proof.
                       C_insert_hbt2 C_traverse_ord_hbt_ret H_traverse_leaf)
             as [H_min_ret H_max_ret].
           rewrite -> H_min_ret.
-          rewrite <- (relating_lt_gt A e x compare) in C_comp.
+          destruct (relating_Lt_Gt_total_order A compare e x H_compare)
+            as [_ H_we_need].
+          apply H_we_need in C_comp.
           rewrite -> C_comp.
           reflexivity. 
 
@@ -3358,7 +3344,9 @@ Proof.
           
           (* prove case for H_min_ret_x *)
           rewrite -> H_min_ret_x.
-          rewrite <- relating_lt_gt in C_comp.
+          destruct (relating_Lt_Gt_total_order A compare e x H_compare)
+            as [_ H_we_need].
+          apply H_we_need in C_comp.
           rewrite -> C_comp.
           reflexivity.
 
@@ -3412,7 +3400,9 @@ Proof.
                       C_insert_hbt2 C_traverse_ord_hbt_ret H_traverse_leaf)
             as [H_min_ret H_max_ret].
           rewrite -> H_min_ret.
-          rewrite <- (relating_lt_gt A e x compare) in C_comp.
+          destruct (relating_Lt_Gt_total_order A compare e x H_compare)
+            as [_ H_we_need].
+          apply H_we_need in C_comp.
           rewrite -> C_comp.
           reflexivity. 
 
@@ -3456,7 +3446,9 @@ Proof.
           
           (* prove case for H_min_ret_x *)
           rewrite -> H_min_ret_x.
-          rewrite <- relating_lt_gt in C_comp.
+          destruct (relating_Lt_Gt_total_order A compare e x H_compare)
+            as [_ H_we_need].
+          apply H_we_need in C_comp.
           rewrite -> C_comp.
           reflexivity.
 
@@ -3520,7 +3512,7 @@ Proof.
         unfold project_height_hbt in C_hbt2_possible_heights.
         unfold project_height_hbt in C_height_diff.
         unfold compare_int in C_height_diff.
-        case (h_ret <n 2 + h1) as [ | ].
+        case (h_ret <? 2 + h1) as [ | ].
         discriminate.
         case (h_ret =n= 2 + h1) as [ | ] eqn : C_h_ret_eq_SS_h1.
 
@@ -3567,11 +3559,11 @@ Proof.
 
         (* case 1 : min_ret = x *)
         rewrite -> H_min_ret_eq_x.
-        Check (relating_lt_gt).
-        Check (relating_lt_gt A e x compare).
-        apply (relating_lt_gt A e x compare).
+        destruct (relating_Lt_Gt_total_order A compare e x H_compare)
+          as [_ H_we_need].
+        apply H_we_need in C_comp.
         exact C_comp.
-
+        
         (* case 2 : min_ret min2 *)
         rewrite -> H_min_ret_eq_min2.
 
@@ -3659,38 +3651,3 @@ Proof.
 
       * discriminate.
 Qed.
-
-
-(* Main theorem for deletion concerning ordering *)
-Lemma deletion_preserves_order: 
-  forall (A : Type)
-         (compare : A -> A -> element_comparison)
-         (x : A),
-    (forall (hbt : heightened_binary_tree A)
-            (hbt' : heightened_binary_tree A),
-        is_sound_hbt A hbt = true ->
-        is_balanced_hbt A hbt = true ->
-        is_ordered_hbt A hbt compare = true -> 
-        delete_hbt_helper A compare x hbt = Some hbt' ->
-        is_ordered_hbt A hbt' compare = true)
-    /\
-    (forall (bt : binary_tree A)
-            (h_hbt : nat)
-            (hbt' : heightened_binary_tree A),    
-        is_sound_hbt A (HNode A h_hbt bt) = true ->
-        is_balanced_hbt A (HNode A h_hbt bt) = true ->
-        is_ordered_hbt A (HNode A h_hbt bt) compare = true ->
-        delete_bt_helper A compare x h_hbt bt = Some hbt' ->
-        is_ordered_hbt A hbt' compare = true)
-    /\
-    (forall (t : triple A)
-            (h_hbt : nat)
-            (hbt' : heightened_binary_tree A),    
-        is_sound_hbt A (HNode A h_hbt (Node A t)) = true ->
-        is_balanced_hbt A (HNode A h_hbt (Node A t)) = true ->
-        is_ordered_hbt A (HNode A h_hbt (Node A t)) compare = true ->        
-        delete_t_helper A compare x h_hbt t = Some hbt' ->
-        is_ordered_hbt A hbt' compare = true).
-Proof.
-  Admitted.
-

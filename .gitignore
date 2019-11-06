@@ -6,3 +6,5 @@ Coq_files/misc/*
 *.glob
 *.d
 Coq_files/src/Makefile.coq
+*.aux
+Coq_files/src/CoqMakefile.conf
