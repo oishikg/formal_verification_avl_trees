@@ -1,22 +1,18 @@
+(* ********** sound.v ********** *)
+
+(** The [sound] library contains lemmas concerning the soundness property of AVL 
+trees *)
+
 Require Import Hbt.Implementation.hbt.
 Require Export Hbt.Implementation.hbt.
 
-(* ********** Lemmas concerning soundness ********** *)
+(* ********** *)
 
-Lemma equal_nats_implies_true_prop:
-  forall (h1 h2 : nat),
-    (1 + max h1 h2 =n= 1 + max h1 h2) = true.
-Proof.
-  intros.
-  
-  assert (H_trivial:
-            1 + max h1 h2 = 1 + max h1 h2).
-  reflexivity.
-  
-  Check (prop_to_bool_helper (1 + max h1 h2) H_trivial).
-  exact (prop_to_bool_helper (1 + max h1 h2) H_trivial).
-Qed.
+(** * General Lemmas Concerning Soundness of Heightened Binary Trees *)
 
+(** Lemma to show that if a heightened binary tree is sound, then its height is equal
+to <<1 + max h1 h2>>, where <<h1>> and <<h2>> are the heights of its left and right
+subtrees respectively *)
 Lemma relate_heights:
   forall (A : Type)
          (h_res : nat)
@@ -70,7 +66,8 @@ Proof.
 Qed.
 
 
-(* Given a triple that is sound, its binary trees should also be sound *)
+(** Lemma to show that if a [triple] is sound, the [heightened_binary_tree]s it 
+contains should also be sound *)
 Lemma triple_sound_implies_hbts_sound:
   forall (A : Type)
          (h_hbt : nat)
@@ -123,8 +120,9 @@ Proof.
   discriminate.
 Qed.
 
-(* If the helper function to check soundness for hbts returns some hbt, then 
- * the helper function to check soundness for bts should give the same hbt *)
+(** Lemma to show that if the helper function to check soundness for 
+[heightened_binary_tree]s returns [Some] value, then the helper function to check
+ soundness for [binary_tree]s should return the same value *)
 Lemma traverse_to_check_soundness_hbt_bt_same:
   forall (A : Type)
          (h h_hbt : nat)
@@ -135,10 +133,9 @@ Proof.
   intros A h h_hbt bt H.
   rewrite -> (unfold_traverse_to_check_soundness_hbt A h bt) in H.
   case (traverse_to_check_soundness_bt A bt) as [h_ret | ]  eqn : C_soundness.
-  case (h_ret =n= h) as [ | ] eqn : C_equal_nats_implies_true_prop.
-  Check (beq_nat_true).
-  apply (beq_nat_true h_ret h) in C_equal_nats_implies_true_prop.
-  rewrite <- C_equal_nats_implies_true_prop in H.
+  case (h_ret =n= h) as [ | ] eqn : C.
+  apply (beq_nat_true h_ret h) in C.
+  rewrite <- C in H.
   exact H.
 
   discriminate.
@@ -146,6 +143,25 @@ Proof.
   discriminate.
 Qed.
 
+(** Lemma to show that if the helper function to check soundness for 
+[binary_tree]s returns [Some] value, then the helper function to check
+ soundness for [triple]s should return the same value *)
+Lemma traverse_to_check_soundness_bt_t_same:
+  forall (A : Type)
+         (h_hbt : nat)
+         (t : triple A),
+    traverse_to_check_soundness_bt A (Node A t) = Some h_hbt ->
+    traverse_to_check_soundness_t A t = Some h_hbt.
+Proof.
+  intros A h_hbt t H.
+  rewrite -> (unfold_traverse_to_check_soundness_bt_node A t) in H.
+  case (traverse_to_check_soundness_t A t) as [h_ret | ] eqn : C_h.
+  exact H.
+  discriminate.
+Qed.
+
+(** Lemma to show that if a [heightened_binary_tree] is sound, then it should have 
+[Some] height *)
 Lemma soundness_implies_some_height:
   forall (A : Type)
          (h : nat)
@@ -170,27 +186,11 @@ Proof.
   discriminate.
 Qed.
 
-
-
-
-(* If the helper function to check soundness for bts returns some hbt, then 
- * the helper function to check soundness for ts should give the same hbt *)
-Lemma traverse_to_check_soundness_bt_t_same:
-  forall (A : Type)
-         (h_hbt : nat)
-         (t : triple A),
-    traverse_to_check_soundness_bt A (Node A t) = Some h_hbt ->
-    traverse_to_check_soundness_t A t = Some h_hbt.
-Proof.
-  intros A h_hbt t H.
-  rewrite -> (unfold_traverse_to_check_soundness_bt_node A t) in H.
-  case (traverse_to_check_soundness_t A t) as [h_ret | ] eqn : C_h.
-  exact H.
-  discriminate.
-Qed.
-
-(* This is an important lemma: it provides the condition for which sound hbts 
- * imply soundness of a triple that they are part of *)
+(** Lemma that lays the condition which must hold for the soundness of two sub-trees
+to imply the soundness of the tree itself. The condition is that the height stored
+in the [heightened_binary_tree] concerend should be equal to <<1 + max h1 h2>>, 
+where <<h1>> is the height of the left sub-tree and <<h2>> is the height of the 
+right sub-tree *)
 Lemma hbts_sound_implies_triple_sound_weak:
     forall (A : Type)
            (h_hbt : nat)
@@ -246,7 +246,6 @@ Proof.
   assert (H_trivial: h_hbt = h_hbt).
   reflexivity.
   
-  Check (prop_to_bool).
   rewrite -> (prop_to_bool_helper h_hbt H_trivial).
   reflexivity.
 
@@ -255,6 +254,13 @@ Proof.
   discriminate.
 Qed.
 
+(* ********** *)
+
+(* ********** *)
+
+(** * Rotation Lemmas for Soundness *)
+
+(** Lemma to show that right rotating a tree preserves soundness *)
 Lemma rotate_right_preserves_soundness:
   forall (A : Type)
          (h_ret : nat)
@@ -289,7 +295,6 @@ Proof.
     rewrite <- H1.
 
     (* show that all the subtrees are sound *)
-    Check (triple_sound_implies_hbts_sound).
     destruct (triple_sound_implies_hbts_sound
                 A h_ret
                 (HNode A h11 bt11) e1
@@ -302,7 +307,6 @@ Proof.
                 (HNode A h122 bt122) H_right_subtree_sound) as [ H_bt121_sound H_bt122_sound].
 
     (* now obtain the heights for the subtrees by unfolding *)
-    Check (soundness_implies_some_height).
     assert (H_bt11_h11:
               traverse_to_check_soundness_hbt A (HNode A h11 bt11) = Some h11).
     exact (soundness_implies_some_height A h11 bt11 H_bt11_sound).
@@ -340,10 +344,9 @@ Proof.
     rewrite -> H_bt121_h121.            
     rewrite -> H_bt122_h122.        
     rewrite -> H_bt2_h2.
-    Check (equal_nats_implies_true_prop).
-    rewrite -> equal_nats_implies_true_prop.
-    rewrite -> equal_nats_implies_true_prop.
-    rewrite -> equal_nats_implies_true_prop.    
+    rewrite -> Nat.eqb_refl.
+    rewrite -> Nat.eqb_refl.
+    rewrite -> Nat.eqb_refl.    
     reflexivity.
 
   - case ((h12 + 1 =n= h11) || (h12 =n= h11)) as [ | ] eqn : C_h12_h11.
@@ -351,13 +354,11 @@ Proof.
     rewrite <- H1.
 
     (* show that all the subtrees are sound *)
-    Check (triple_sound_implies_hbts_sound).
     destruct (triple_sound_implies_hbts_sound
                 A h_ret (HNode A h11 bt11) e1 (HNode A h12 bt12) H)
              as [H_bt11_sound H_bt12_sound].
 
     (* now obtain the heights for the subtrees by unfolding *)
-    Check (soundness_implies_some_height).
     assert (H_bt11_h11:
               traverse_to_check_soundness_hbt A (HNode A h11 bt11) = Some h11).
     exact (soundness_implies_some_height A h11 bt11 H_bt11_sound).
@@ -380,15 +381,14 @@ Proof.
     rewrite -> unfold_traverse_to_check_soundness_t.
     rewrite -> H_bt12_h12.
     rewrite -> H_bt2_h2.
-    rewrite -> equal_nats_implies_true_prop.
-    rewrite -> equal_nats_implies_true_prop.
+    rewrite -> Nat.eqb_refl.
+    rewrite -> Nat.eqb_refl.
     reflexivity.
 
     discriminate.
 Qed.
 
-
-
+(** Lemma to show that left rotating a tree preserves soundness *)
 Lemma rotate_left_preserves_soundness:
   forall (A : Type)
          (hbt1 : heightened_binary_tree A)
@@ -423,7 +423,6 @@ Proof.
     rewrite <- H1.
 
     (* show that all the subtrees are sound *)
-    Check (triple_sound_implies_hbts_sound).
     destruct (triple_sound_implies_hbts_sound
                 A h_ret
                 (HNode A h21
@@ -439,7 +438,6 @@ Proof.
                 H_left_subtree_sound) as [H_bt211_sound H_bt212_sound].
     
     (* now obtain the heights for the subtrees by unfolding *)
-    Check (soundness_implies_some_height).
     assert (H_bt22_h22:
               traverse_to_check_soundness_hbt A (HNode A h22 bt22) = Some h22).
     exact (soundness_implies_some_height A h22 bt22 H_bt22_sound).
@@ -466,14 +464,14 @@ Proof.
     rewrite -> unfold_traverse_to_check_soundness_t.
     rewrite -> H_bt1_h1.
     rewrite -> H_bt211_h211.
-    rewrite -> equal_nats_implies_true_prop.
+    rewrite -> Nat.eqb_refl.
     rewrite -> unfold_traverse_to_check_soundness_hbt.
     rewrite -> unfold_traverse_to_check_soundness_bt_node.
     rewrite -> unfold_traverse_to_check_soundness_t.
     rewrite -> H_bt212_h212.
     rewrite -> H_bt22_h22.
-    rewrite -> equal_nats_implies_true_prop.
-    rewrite -> equal_nats_implies_true_prop.
+    rewrite -> Nat.eqb_refl.
+    rewrite -> Nat.eqb_refl.
     reflexivity.
 
   - case ((h21 + 1 =n= h22) || (h21 =n= h22)) as [ | ] eqn : C_h21_h22.
@@ -481,7 +479,6 @@ Proof.
     rewrite <- H1.
 
     (* show that all the subtrees are sound *)
-    Check (triple_sound_implies_hbts_sound).
     destruct (triple_sound_implies_hbts_sound
                 A h_ret
                 (HNode A h21 bt21) e2 (HNode A h22 bt22) H0)
@@ -495,7 +492,6 @@ Proof.
               traverse_to_check_soundness_hbt A (HNode A h1 bt1) = Some h1).
     exact (soundness_implies_some_height A h1 bt1 H).
 
-    Check (soundness_implies_some_height).
     assert (H_bt21_h21:
               traverse_to_check_soundness_hbt A (HNode A h21 bt21) = Some h21).
     exact (soundness_implies_some_height A h21 bt21 H_bt21_sound).
@@ -509,14 +505,25 @@ Proof.
     rewrite -> unfold_traverse_to_check_soundness_t.
     rewrite -> H_bt1_h1.
     rewrite -> H_bt21_h21.
-    rewrite -> equal_nats_implies_true_prop.
+    rewrite -> Nat.eqb_refl.
     rewrite -> H_bt22_h22.
-    rewrite -> equal_nats_implies_true_prop.
+    rewrite -> Nat.eqb_refl.
     reflexivity.
     
     discriminate.
 Qed.
 
+(* ********** *)
+
+(* ********** *)
+
+(** * Insertion Preserves Soundness *)
+
+(** This section contains the most important lemma concerning soundness in this 
+project, namely, that inserting an element into a sound [heightened_binary_tree]
+using [insert_hbt_helper] returns a [heightened_binary_tree] which is also sound. The 
+proof proceeds by unfolding the [insert_hbt_helper] function, and performing a 
+sequence of case analyses. *)
 Lemma insertion_preserves_soundness:
   forall (A : Type)
          (compare : A -> A -> element_comparison)
@@ -546,7 +553,6 @@ Proof.
 
   (* Specification for hbt holds, given bt as inductive case *)  
   - intros h bt H_bt_inductive_assumption hbt' H_sound_hbt_init H_insert_hbt.
-    Check (H_bt_inductive_assumption h hbt' H_sound_hbt_init H_insert_hbt).
     exact (H_bt_inductive_assumption h hbt' H_sound_hbt_init H_insert_hbt).
 
     (* Specification for bt leaf constructor holds *)
@@ -565,7 +571,6 @@ Proof.
     unfold beq_nat at 1.
     unfold beq_nat at 1.
     unfold max at 1.
-    Search (_ + 0 = _).
     rewrite -> (plus_0_r 1) at 1.
     unfold beq_nat at 1.
     reflexivity.
@@ -640,10 +645,6 @@ Proof.
                  (HNode A h_ret bt_ret)
                  H_hbt1_is_sound P_some_eq).
         
-        Check (rotate_right_preserves_soundness).
-        Check (rotate_right_preserves_soundness
-                 A h_ret bt_ret e hbt2 hbt'
-                 H_hbt_ret_sound H_hbt2_is_sound H_insert_t).
         exact (rotate_right_preserves_soundness
                  A h_ret bt_ret e hbt2 hbt'
                  H_hbt_ret_sound H_hbt2_is_sound H_insert_t).
@@ -683,7 +684,6 @@ Proof.
         unfold project_height_hbt at 3.
         reflexivity.
 
-        Check (hbts_sound_implies_triple_sound_weak).
         exact (hbts_sound_implies_triple_sound_weak
                  A
                  (1 + max (project_height_hbt A hbt1) h_ret)
@@ -702,15 +702,15 @@ Proof.
                  (HNode A h_ret bt_ret)
                 H_hbt2_is_sound P_some_eq).
         
-        Check (rotate_left_preserves_soundness).
-        Check (rotate_left_preserves_soundness
-                 A hbt1 e h_ret bt_ret hbt'
-                 H_hbt1_is_sound H_hbt_ret_sound H_insert_t).
         exact (rotate_left_preserves_soundness
                  A hbt1 e h_ret bt_ret hbt'
                  H_hbt1_is_sound H_hbt_ret_sound H_insert_t).
 
       * discriminate.
 
-      * discriminate.
+      * discriminate. 
 Qed.
+
+(* ********** *)
+
+(* ********** End of sound.v ********** *)

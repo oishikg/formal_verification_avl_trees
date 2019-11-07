@@ -1,17 +1,32 @@
-(* ********** Imports ********** *)
+(* ********** hbt.v ********** *)
+
+(** This library contains the Gallina implementation of AVL trees, and the predicates
+that check if the insertion operation on AVL trees preserves the AVL trees invariants.
+Note that we use the terms 'heightened binary tree' (abbreviated as 'hbt') and 
+AVL trees interchangeably in this project *)
+
 Require Import Hbt.Paraphernalia.paraphernalia.
 Require Export Hbt.Paraphernalia.paraphernalia.
 Require Extraction.
 
+(* ********** *)
 
-(* ********** Section 1: Different AVL tree type definitions  ********** *)
+(** * Inductive Type for Heightened Binary Trees *)
 
-(* Coq formalization of polymorphic ordinary binary tree implementation *)
-Inductive ordinary_binary_tree (A : Type) : Type :=
-| OLeaf : ordinary_binary_tree A
-| ONode : ordinary_binary_tree A -> A -> ordinary_binary_tree A.
+(** Inductive type for heightened binary trees defined using three mutually recursive
+types:
 
-(* Coq formalization of polymorphic AVL tree type *) 
+(1) [heightened_binary_tree]: Contains a single constructor [HNode], which takes
+two arguments: the height, and the binary tree. 
+
+(2) [binary_tree]: May either be a [Leaf] or a [Node]. The [Node] constructor takes
+as [triple] as its argument. 
+
+(3) [triple]: Captures the recursive nature of heightened binary trees. Has a single 
+constructor, [Triple], which takes three arguments: the left [heightened_binary_tree],
+the payload, and the right [heightened_binary_tree]. 
+
+Note that the type is polymorphic in its payloads *)
 Inductive heightened_binary_tree (A : Type) : Type := 
   HNode : nat -> binary_tree A -> heightened_binary_tree A 
 with binary_tree (A : Type) : Type :=
@@ -20,8 +35,9 @@ with binary_tree (A : Type) : Type :=
 with triple (A : Type) : Type :=
      | Triple : heightened_binary_tree A -> A -> heightened_binary_tree A -> triple A.
 
-(* We need define an induction principle for mutually inductive types; this is done as 
- * follows: *)
+(** Induction principle for the three mutually recursive types 
+[heightened_binary_tree], [binary_tree], and [triple]. See 
+https://coq.inria.fr/refman/user-extensions/proof-schemes.html *) 
 Scheme heightened_binary_tree_induction := Induction for heightened_binary_tree Sort Prop
   with binary_tree_induction := Induction for binary_tree Sort Prop
   with triple_induction := Induction for triple Sort Prop.
@@ -29,19 +45,14 @@ Scheme heightened_binary_tree_induction := Induction for heightened_binary_tree 
 Combined Scheme heightened_binary_tree_mutual_induction
          from heightened_binary_tree_induction,binary_tree_induction,triple_induction.
 
-(* See: https://coq.inria.fr/refman/user-extensions/proof-schemes.html *) 
- 
-Check heightened_binary_tree_mutual_induction.
+(* ********** *)
 
-(* This property requires that the height stored in each node of an AVL Tree is
- *  accurate *)
+(* ********** *)
 
-(* ********** Section 3: The invariant properties of AVL trees ********** *)
+(** * Soundness of Heightened Binary Trees *)
 
-(* ***** 3.1: Soundness ***** *)
-
-(* Recursive helper functions to traverse the different structures
- * Note that we might need to use a compare function instead of =n=. *)
+(** Structurally recursive function to check if a given heightened binary tree 
+stores the correct heights at each node *)
 Fixpoint traverse_to_check_soundness_hbt
          (A : Type)
          (hbt : heightened_binary_tree A) : option nat :=
@@ -83,7 +94,7 @@ with traverse_to_check_soundness_t
          end
        end.
 
-(* Unfold lemmas for traverse_to_check_soundness_hbt, traverse_to_check_soundness_bt, and traverse_to_check_soundness_t *)
+(** Unfold lemma for traverse_to_check_soundness_hbt *)
 Lemma unfold_traverse_to_check_soundness_hbt:
   forall (A : Type)
          (h : nat)
@@ -101,6 +112,7 @@ Proof.
   unfold_tactic traverse_to_check_soundness_hbt.
 Qed.
 
+(** Unfold lemma for traverse_to_check_soundness_bt when the tree is a [Leaf] *)
 Lemma unfold_traverse_to_check_soundness_bt_leaf:
   forall (A : Type),
     traverse_to_check_soundness_bt A (Leaf A) = Some 0.
@@ -108,6 +120,7 @@ Proof.
     unfold_tactic traverse_to_check_soundness_bt.
 Qed.
 
+(** Unfold lemma for traverse_to_check_soundness_bt when the tree is a [Node] *)
 Lemma unfold_traverse_to_check_soundness_bt_node:
   forall (A : Type)
          (t : triple A),
@@ -116,6 +129,7 @@ Proof.
   unfold_tactic traverse_to_check_soundness_bt.
 Qed.
 
+(** Unfold lemma for traverse_to_check_soundness_t *)
 Lemma unfold_traverse_to_check_soundness_t:
   forall (A : Type)
          (hbt1 hbt2 : heightened_binary_tree A)
@@ -136,7 +150,7 @@ Proof.
   unfold_tactic traverse_to_check_soundness_t.
 Qed.
 
-(* Function to test soundness of a heightened_binary_tree *)
+(** Predicate to check the soundness of a [heightened_binary_tree] *)
 Definition is_sound_hbt (A : Type) (hbt : heightened_binary_tree A) :=
   match traverse_to_check_soundness_hbt A hbt with
   | None =>
@@ -145,30 +159,18 @@ Definition is_sound_hbt (A : Type) (hbt : heightened_binary_tree A) :=
     true
   end.
 
-(* ***** *)
+(* ********** *)
 
-(* ***** 3.2: Balancedness ***** *)
+(* ********** *)
 
-(* This property requires that for every node in the tree, the heights of its 
- * subtrees differ by at most 1 *)
-
-(* Unit tests for differ_by_one *)
-Definition test_differ_by_one (cand : nat -> nat -> bool) : bool :=
-  (cand 3 4 =b= true)
-  &&
-  (cand 4 6 =b= false)
-  &&
-  (cand 3 2 =b= true)
-  &&
-  (cand 8 2 =b= false).
+(** * Balancedness of Heightened Binary Trees *)
                   
-(* Helper function to check if two heights differ by 1 *) 
+(** Function to check if two heights differ by the balancing factor, i.e., 1 *)
 Definition differ_by_one (h1 h2 : nat) : bool :=
    (h1 =n= h2 + 1) || (h2 =n= h1 + 1) || (h2 =n= h1).
   
-Compute (test_differ_by_one differ_by_one).
- 
-(* Recursive helper function to traverse binary tree to check for balanced *)
+(** Structurally recursive helper function to traverse a heightened binary tree 
+and check for balancedness *)
 Fixpoint traverse_to_check_balanced_hbt
          (A : Type) (hbt : heightened_binary_tree A) : option nat :=
   match hbt with
@@ -202,8 +204,7 @@ with traverse_to_check_balanced_t
          end
        end.
 
-(* Unfold lemmas for traverse_to_check_balanced_hbt, traverse_to_check_balanced_bt, and
- * traverse_to_check_balanced_t *)
+(** Unfold lemma for traverse_to_check_balanced_hbt *)
 Lemma unfold_traverse_to_check_balanced_hbt:
   forall (A : Type)
          (h : nat)
@@ -213,6 +214,7 @@ Proof.
   unfold_tactic traverse_to_check_balanced_hbt.
 Qed.
 
+(** Unfold lemma for traverse_to_check_balanced_bt, when the tree is a [Leaf] *)
 Lemma unfold_traverse_to_check_balanced_bt_leaf:
   forall (A : Type),
     traverse_to_check_balanced_bt A (Leaf A) = Some 0.
@@ -220,6 +222,7 @@ Proof.
     unfold_tactic traverse_to_check_balanced_bt.
 Qed.
 
+(** Unfold lemma for traverse_to_check_balanced_bt, when the tree is a [Node] *)
 Lemma unfold_traverse_to_check_balanced_bt_node:
   forall (A : Type)
          (t : triple A),
@@ -228,6 +231,7 @@ Proof.
   unfold_tactic traverse_to_check_balanced_bt.
 Qed.
 
+(** Unfold lemma for traverse_to_check_balanced_t *)
 Lemma unfold_traverse_to_check_balanced_t:
   forall (A : Type)
          (hbt1 hbt2 : heightened_binary_tree A)
@@ -250,7 +254,7 @@ Proof.
   unfold_tactic traverse_to_check_balanced_t.
 Qed.
 
-(* Function to test balanced of a heightened_binary_tree *)
+(** Predicate to check the balancedness of a [heightened_binary_tree] *)
 Definition is_balanced_hbt (A : Type) (hbt : heightened_binary_tree A) :=
   match traverse_to_check_balanced_hbt A hbt with
   | None =>
@@ -259,15 +263,22 @@ Definition is_balanced_hbt (A : Type) (hbt : heightened_binary_tree A) :=
     true
   end.
 
-(* ***** *)
+(* ********** *)
 
-(* ***** 3.3: In-orderedness ***** *)
+(* ********** *)
 
+(** * Orderedness of Heightened Binary Trees *)
+
+(** Inductive sum type to capture the three possibilities when checking for 
+orderedness: the input tree is either not ordered ([TError]), is a leaf ([TNone]),
+or is a node that is ordered ([TSome]) *)
 Inductive triple_option (A : Type) : Type := 
 | TError : triple_option A
 | TNone : triple_option A
 | TSome : A -> triple_option A.
 
+(** Lemma to show that the equality values constructed with the [TSome] constructor 
+is equivalent to the equality of the values contained by the [TSome]] constructor *)
 Lemma tsome_x_equal_tsome_y:
   forall (A : Type)
          (x y : A),
@@ -280,8 +291,13 @@ Proof.
   rewrite -> H; reflexivity.
 Qed.
 
+(** Structurally recursive helper function to check if a heightened binary tree is 
+ordered. The algorithm is non-trivial and warrants discussion. The function 
+traverses a heightened binary tree structurally, and does the following:
 
+- Base case: When a [Leaf] is encountered, the function returns a [TNone] value which captures the notion that a [Leaf] has no maximum or minimum values 
 
+- Inductive case: When a triple of the form <<hbt1 e hbt2>> is encountered, then the function recursively traverses <<hbt1>> and <<hbt2>>, returning either a [TNone] (if the sub-tree is a [Leaf]), or a [TSome] value containing a pair with the maximum and minimum payloads. The function then checks if <<compare max1 e = Lt>> and <<compare e min2 = Lt>>, where <<compare>> is comparison function that defines an ordering on the type of the payloads, and <<max1>> is the maximum value of <<hbt1>>. If the two comparisons are true, then the function returns <<TSome (min1, max2)>> as the minimum and maximum values of the node. Note that if one of the sub-trees is a [Leaf], then the payload <<e>> itself becomes the minimum/maximum value *)
 Fixpoint traverse_to_check_ordered_hbt
          (A : Type)
          (hbt : heightened_binary_tree A)
@@ -360,7 +376,7 @@ with traverse_to_check_ordered_t
          end
        end.
 
-(* Unfold lemmas for the helper functions *)
+(** Unfold lemma for traverse_to_check_ordered_hbt *)
 Lemma unfold_traverse_to_check_ordered_hbt:
   forall (A : Type)
          (h : nat)
@@ -372,6 +388,7 @@ Proof.
   unfold_tactic traverse_to_check_ordered_hbt.
 Qed.             
 
+(** Unfold lemma for traverse_to_check_ordered_bt, when the tree is a [Leaf] *)
 Lemma unfold_traverse_to_check_ordered_bt_leaf:
   forall (A : Type)
          (compare : A -> A -> element_comparison),
@@ -381,6 +398,7 @@ Proof.
   unfold_tactic traverse_to_check_ordered_bt.
 Qed.             
 
+(** Unfold lemma for traverse_to_check_ordered_bt, when the tree is a [Node] *)
 Lemma unfold_traverse_to_check_ordered_bt_node:
   forall (A : Type)
          (t : triple A) 
@@ -390,7 +408,8 @@ Lemma unfold_traverse_to_check_ordered_bt_node:
 Proof.
   unfold_tactic traverse_to_check_ordered_t.
 Qed.             
-       
+
+(** Unfold lemma for traverse_to_check_ordered_t *)
 Lemma unfold_traverse_to_check_ordered_t: 
   forall (A : Type)
          (hbt1 : heightened_binary_tree A)
@@ -432,7 +451,7 @@ Proof.
   unfold_tactic traverse_to_check_ordered_t.
 Qed.
 
-(* Function to check if a heightened_binary_tree is ordered *)
+(** Predicate to check if a heightened_binary_tree is ordered *)
 Definition is_ordered_hbt
            (A : Type)
            (hbt : heightened_binary_tree A)
@@ -444,11 +463,14 @@ Definition is_ordered_hbt
     true
   end.
 
-(* ********** Section 4 : The lookup operation in AVL trees ********** *)
+(* ********** *)
 
-(* ***** Section 4.1: Implementations of occurs for both AVL trees type ***** *) 
+(* ********** *)
 
-(* Function to traverse hbt and check if an element occurs *)
+(** * Lookup Operation on Heightened Binary Trees *)
+
+(** Structurally recursive function to check if a given element occurs in 
+a tree *)
 Fixpoint occurs_hbt
          (A : Type)
          (compare : A -> A -> element_comparison)
@@ -487,7 +509,7 @@ with occurs_t
        end.
 
 
-(* Unfold lemmas for occurs_hbt, occurs_bt, occurs_t *)
+(** Unfold lemma for occurs_hbt *)
 Lemma unfold_occurs_hbt:
   forall (A : Type)
          (compare : A -> A -> element_comparison)
@@ -499,6 +521,7 @@ Proof.
   unfold_tactic occurs_hbt.
 Qed.
 
+(** Unfold lemma for occurs_bt, when the tree is a [Leaf] *)
 Lemma unfold_occurs_bt_leaf: 
   forall (A : Type)
          (compare : A -> A -> element_comparison)
@@ -508,6 +531,7 @@ Proof.
   unfold_tactic occurs_bt.
 Qed.
 
+(** Unfold lemma for occurs_bt, when the tree is a [Node] *)
 Lemma unfold_occurs_bt_node:
   forall (A : Type)
          (compare : A -> A -> element_comparison)
@@ -518,6 +542,7 @@ Proof.
   unfold_tactic occurs_bt.
 Qed.
 
+(** Unfold lemma for occurs_t *)
 Lemma unfold_occurs_t:
   forall (A : Type)
          (compare : A -> A -> element_comparison)
@@ -536,11 +561,19 @@ Proof.
   unfold_tactic occurs_t.
 Qed.
 
-(* ********** Section 5: The insert operation on trees ********** *)
+(* ********** *)
 
-(* ***** Section 5.1: Tests  ***** *)
+(* ********** *)
 
-(* Helper function to check the equality of lists *) 
+(** * Insertion in Heightened Binary Trees *)
+
+(** This section contains the Gallina implementation of an insertion function for
+the [heightened_binary_tree] type. The algorithm to implement the insertion and 
+rotations is standard, and so has not been discussed here. *)
+
+(** ** Unit tests for the Insertion Function *)
+
+(** Helper function to check the equality of lists *) 
 Fixpoint equal_lists
          (A : Type)
          (compare : A -> A -> element_comparison)
@@ -567,7 +600,7 @@ Fixpoint equal_lists
     end
   end.
 
-(* Function to map a heightened_binary_tree into the in-order list of its elements *)
+(** Function to map a heightened_binary_tree into the in-order list of its elements *)
 Fixpoint hbt_to_list (A : Type) (hbt : heightened_binary_tree A) : list A :=
     match hbt with
     | HNode _ _ bt =>
@@ -587,14 +620,14 @@ with t_to_list (A : Type) (t : triple A) : list A :=
        end.
 
 
-(* Function to check equality of heightened_binary_tree s *)
+(** Function to check equality of heightened_binary_tree s *)
 Definition equal_hbt
          (A : Type)
          (compare : A -> A -> element_comparison)
          (hbt1 hbt2 : heightened_binary_tree A) : bool := 
   equal_lists A compare (hbt_to_list A hbt1) (hbt_to_list A hbt2).
 
-(* Function to insert a list of values into a heightened_binary_tree *)
+(** Function to insert a list of values into a heightened_binary_tree *)
 Fixpoint insert_list
          (A : Type)
          (insert : forall (A' : Type),
@@ -612,7 +645,7 @@ Fixpoint insert_list
     insert_list A insert compare xs' (insert A compare x hbt)
   end.
 
-(* Function to generate values between 1 and n *)
+(** Function to generate values between 1 and n *)
 Fixpoint atoi (n : nat) :=
   match n with
   | 0 =>
@@ -621,7 +654,7 @@ Fixpoint atoi (n : nat) :=
     (S n') :: (atoi n')
   end.
 
-(* Function to generate values between n and 1 *)
+(** Function to generate values between n and 1 *)
 Fixpoint traverse (n : nat) (acc : list nat) :=
   match n with
   | 0 =>
@@ -630,12 +663,14 @@ Fixpoint traverse (n : nat) (acc : list nat) :=
     traverse n' ((S n') :: acc)
   end.
 
+(** Function to generate a list of the first <<n>> natural numbers *)
 Definition iota (n : nat) :=
   traverse n nil.
 
-(* Sample heightened_binary_tree s for testing *)
+(** Empty [heightened_binary_tree] for testing *)
 Definition hbt_empty := HNode nat 0 (Leaf nat).
 
+(** Non-empty [heightened_binary_tree] for testing *)
 Definition hbt_1 :=
   HNode nat 2 (Node nat (Triple nat
                             (HNode nat 0 (Leaf nat))
@@ -645,6 +680,8 @@ Definition hbt_1 :=
                                                        2
                                                        (HNode nat 0 (Leaf nat))))))).
 
+(** Unit tests for an insert function: an insertion should preserve the invariant 
+properties of heightened binary trees *)
 Definition test_insert_hbt
            (candidate : forall (A' : Type),
                (A' -> A' -> element_comparison)
@@ -707,12 +744,9 @@ Definition test_insert_hbt
           nat
           (insert_list nat candidate compare_int (iota 50) hbt_empty)).
 
-(* ***** *)
+(** ** Implementation of Insertion Opertaion *)
 
-(* ***** Section 5.2: Implementation of rotation and insert functions *) 
-
-(* Implementing rotate right *)
-
+(** Implementation of a right rotation *)
 Definition rotate_right_bt
            (A : Type)
            (bt1 : binary_tree A)
@@ -775,6 +809,7 @@ Definition rotate_right_hbt
     end
   end.
 
+(** Implementation of a left rotation *)
 Definition rotate_left_bt
            (A : Type)
            (h1 : nat)
@@ -836,6 +871,7 @@ Definition rotate_left_hbt
     end
   end.
 
+(** Function to project the height stored in a heightened_binary_tree *)
 Definition project_height_hbt
            (A : Type)
            (hbt : heightened_binary_tree A) : nat :=
@@ -843,6 +879,7 @@ Definition project_height_hbt
   | HNode _ h _ => h
   end.
 
+(** Function to project the [binary_tree] stored in a heightened_binary_tree *)
 Definition project_bt_hbt
            (A : Type)
            (hbt : heightened_binary_tree A) : binary_tree A :=
@@ -850,7 +887,7 @@ Definition project_bt_hbt
   | HNode _ _ bt => bt
   end.
            
-
+(** Function to project the height of a [binary_tree] *)
 Definition project_height_bt
            (A : Type)
            (bt : binary_tree A) :=
@@ -861,6 +898,7 @@ Definition project_height_bt
     1 + max (project_height_hbt A hbt1) (project_height_hbt A hbt2)
   end.
 
+(** Function to project the height of a [triple] *)
 Definition project_height_t
            (A : Type)
            (t : triple A) :=
@@ -869,6 +907,8 @@ Definition project_height_t
     1 + max (project_height_hbt A hbt1) (project_height_hbt A hbt2)
   end.
 
+(** Structurally recursive function  to insert a given value into a
+ heightened_binary_tree *)
 Fixpoint insert_hbt_helper
          (A : Type)
          (compare : A -> A -> element_comparison)
@@ -942,7 +982,7 @@ with insert_t_helper
        end.
 
 
-(* Unfold lemmas *)
+(** Unfold lemma for insert_hbt_helper *)
 Lemma  unfold_insert_hbt_helper:
   forall (A : Type)
          (compare : A -> A -> element_comparison)
@@ -954,9 +994,7 @@ Proof.
   unfold_tactic insert_hbt_helper.
 Qed.
 
-
-
-
+(** Unfold lemma for insert_bt_helper, when the tree is a [Leaf] *)
 Lemma unfold_insert_bt_helper_leaf:
   forall (A : Type)
          (compare : A -> A -> element_comparison)
@@ -973,6 +1011,7 @@ Proof.
   unfold_tactic insert_bt_helper.
 Qed.
 
+(** Unfold lemma for insert_bt_helper, when the tree is a [Node] *)
 Lemma unfold_insert_bt_helper_node:
   forall (A : Type)
          (compare : A -> A -> element_comparison)
@@ -985,6 +1024,7 @@ Proof.
   unfold_tactic insert_bt_helper.
 Qed.
 
+(** Unfold lemma for insert_t_helper *)
 Lemma unfold_insert_t_helper:
   forall (A : Type)
          (compare : A -> A -> element_comparison)
@@ -1036,6 +1076,9 @@ Proof.
   reflexivity.
 Qed.
 
+(** Main insertion function, which calls the [insert_hbt_helper] helper. Note that 
+if the helper function returns a [None] value (indicating an error), then this
+function simply returns the original tree *)
 Definition insert_hbt
          (A : Type)
          (compare : A -> A -> element_comparison)
@@ -1048,11 +1091,13 @@ Definition insert_hbt
     hbt'
   end.
 
+(* Test [insert_hbt] *)
 Compute (test_insert_hbt insert_hbt).
 
 (* Commands to extract the certified program *)
-
 Set Extraction Optimize.
 Set Extraction AutoInline.
 
-(* Extraction insert_hbt "/home/oishik/YNC/Y4S1/Capstone_copy/Code/extracted_files/extracted_insertion.ml". *)
+(* ********** *)
+
+(* ********** End of hbt.v ********** *)
