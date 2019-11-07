@@ -1,5 +1,5 @@
 (* Imports: *) 
-Require Import Hbt.Lemmas.ordered_main.
+Require Import Hbt.Lemmas.Ordered.ordered_main.
 
 
 (* ***** Section 1: Specification and associated theorems for lookup ***** *)

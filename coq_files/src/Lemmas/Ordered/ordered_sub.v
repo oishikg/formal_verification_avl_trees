@@ -1,5 +1,5 @@
-Require Import Hbt.Lemmas.balanced.
-Require Export Hbt.Lemmas.balanced.
+Require Import Hbt.Lemmas.Balanced.balanced.
+Require Export Hbt.Lemmas.Balanced.balanced.
 
 (* ********** General lemmas ********** *)
 

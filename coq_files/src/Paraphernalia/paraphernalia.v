@@ -1,14 +1,21 @@
+(** The Paraphernalia library contains general definitions and lemmas which are 
+important across the entire project *)
+
 Require Import Arith Bool List.
 Require Export Arith Bool List.
 
-(* ********** = and < operations ********** *)
+(* ********** *)
 
-Ltac unfold_tactic name := intros; unfold name; (* fold name; *) reflexivity.
+(** * Operators and Unfolding *)
 
-(* Equality of natural numbers *)
+(** Tactic to prove simple unfold lemmas *)
+Ltac unfold_tactic name := intros; unfold name; reflexivity.
+
+(** Operator for equality predicate [beq_nat], defined for peano natural numbers *)
 Notation "A =n= B" :=
   (beq_nat A B) (at level 70, right associativity).
 
+(** Lemma to unfold [beq_nat] *)
 Lemma unfold_beq_nat_Sn_Sm:
   forall (n m : nat),
     beq_nat (S n) (S m) = beq_nat n m.
@@ -16,14 +23,54 @@ Proof.
   unfold_tactic beq_nat.
 Qed.
 
-(* Equality of boolean values *) 
+(** Lemma to prove the symmetric property of the [=n=] operator *)
+Lemma beq_nat_symm:
+  forall (x y : nat),
+    (x =n= y) = (y =n= x).
+Proof.
+  intros.
+  
+  case (x =n= y) as [ | ] eqn : C_xy.
+
+  - apply beq_nat_true in C_xy.
+    case (y =n= x) as [ | ] eqn : C_yx.
+    reflexivity.
+
+    apply beq_nat_false in C_yx.
+    rewrite -> C_xy in C_yx.
+    unfold not in C_yx.
+
+    assert (H_trivial: y = y).
+    reflexivity.
+
+    apply C_yx in H_trivial.
+    apply False_ind.
+
+    exact H_trivial.
+
+  - apply beq_nat_false in C_xy.
+    unfold not in C_xy.
+    case (y =n= x) as [ | ] eqn : C_yx.
+    apply beq_nat_true in C_yx.
+    symmetry in C_yx.
+    apply C_xy in C_yx.
+    apply False_ind.
+    exact C_yx.
+    reflexivity.
+Qed.
+
+(** Defining an operator for equality of boolean values *) 
 Notation "A =b= B" :=
   (eqb A B) (at level 70, right associativity).
 
 (* ********** *)
 
-(* ********** Lemmas for operations on Peano nat numbers ********** *)
+(* ********** *)
 
+(** * Lemmas For Peano Natural Numbers *)
+
+(** Lemma to show that the equality the successors of two natural numbers implies 
+the equality of the two natural number *)
 Lemma succ_eq:
   forall (a b : nat),
     S a = S b -> a = b.
@@ -31,7 +78,8 @@ Proof.
   intros; inversion H; reflexivity.
 Qed.
 
-
+(** Lemma to show that adding some value to equal natural numbers results in
+ equal natural number *) 
 Lemma add_to_both_sides:
   forall (x y z : nat),
     x = y -> x + z = y + z.
@@ -47,6 +95,7 @@ Lemma add_to_both_sides:
   reflexivity.
 Qed.
 
+(** Lemma to unfold [minus] for the successor of some natural number and 0 *)
 Lemma minus_Sn_0:
   forall (n : nat),
     S n - 0 = S n.
@@ -54,6 +103,7 @@ Proof.
   unfold_tactic minus.
 Qed.
 
+(** Lemma to unfold [minus] for the successors of two natural numbers *)
 Lemma minus_Sn_Sm:
   forall (n m : nat),
     S n - S m = n - m.
@@ -61,6 +111,7 @@ Proof.
   unfold_tactic minus.
 Qed.
 
+(** Lemma to show that subtracting 0 from a natural number gives the same number *)
 Lemma minus_n_0:
   forall (n : nat),
     n - 0 = n.
@@ -75,18 +126,32 @@ Proof.
   reflexivity.
 Qed.
 
+(* ********** *)
 
-(* ********** Defining an ordering ********** *)
+(* ********** *)
 
-(* Type alias for the predefined inductive type compairson *)
+(** * Defining Ordered Types *)
+
+(** A relation <<R>> defines a total order on a set <<A>> iff for some <<x, y, z>> in <<A>>: 
+
+   (1) <<(x R y) /\ (<y R x)>> => <<x = y>> (Anti-symmtery)
+
+   (2) <<(x R y) /\ (y R z)>> => <<(x R z)>> (Transitivity)
+
+   (3) <<(x R y) \/ (y R x)>> (Connexity) 
+
+In this project, such a relation is captured through comparison functions of type
+[A -> A -> element_comparison]. This section defines a specification for comparison
+functions to define a total ordering on the type whose elements it compares *)
+
+(** Type alias for the predefined inductive type [comparison] *)
 Inductive element_comparison :=
 | Lt : element_comparison
 | Eq : element_comparison
 | Gt : element_comparison.
 
-
-(* Predicate to check if a compare function returns an Lt or Eq constructor; 
- * we use this to define a total order *)
+(** Predicate to check if a value of type [element_comparison] is an [Lt] or an [Eq];
+ we use this to define a total order *)
 Definition leq (ce : element_comparison) : bool :=
   match ce with
   | Lt =>
@@ -97,15 +162,15 @@ Definition leq (ce : element_comparison) : bool :=
     false
   end.
 
+(** Axiom requiring comparison functions defined for some type <<A>> to map to 
+[Eq] if and only if the values being compared are equal *)
 Axiom relating_Eq_eq:
   forall (A : Type)
          (a b : A)
          (compare : A -> A -> element_comparison),
-  compare a b = Eq <-> a = b.
+  compare a b = Eq <-> a = b. 
 
-(* See: https://en.wikipedia.org/wiki/Total_order *)
-
-(* A compare function is anti-symmetric if it meets the following definition *)
+(** Definition of anti-symmetric property for comparison functions *)
 Definition anti_symmetry 
            (A : Type)
            (compare : A -> A -> element_comparison) :=           
@@ -114,7 +179,7 @@ Definition anti_symmetry
     leq (compare b a) = true ->
     compare a b = Eq.
 
-(* A compare function is transitive if it meets the following definition *)
+(** Defintion of transitive property for comparison functions *)
 Definition transitivity 
            (A : Type)
            (compare : A -> A -> element_comparison) :=
@@ -123,8 +188,7 @@ Definition transitivity
     leq (compare b c) = true ->
     leq (compare a c) = true.
 
-(* A compare function has the connexity property if it meets the following
- * definition *)
+(** Defintion of connexity property for comparison functions *)
 Definition connexity 
            (A : Type)
            (compare : A -> A -> element_comparison) :=
@@ -133,8 +197,8 @@ Definition connexity
     \/
     (leq (compare b a) = true).
 
-(* For a compare function of type A -> A -> element_comparison to define a total 
- * order on A, it should meet the following specification: *)
+(** Specifiction of a comparison function to define a total order on the set whose
+elements the function compares *)
 Definition specification_of_compare_defining_total_order
            (A : Type)
            (compare : A -> A -> element_comparison) :=
@@ -144,8 +208,10 @@ Definition specification_of_compare_defining_total_order
   /\
   connexity A compare.
 
-(* Now we derive the property of reflexivity for a compare function that defines 
- * a total order on a set A *)
+(** For some relation <<R>> defined on some set <<A>>, the reflexive property states
+that for all <<x>> in <<A>>, it must be the case that <<(x R x)>>. This lemma shows
+that if a comparison function defines a total order on some type <<A>>, then it
+also has the property of reflexivity *)
 Lemma reflexivity_total_order:
   forall (A : Type)
          (compare : A -> A -> element_comparison)
@@ -162,7 +228,8 @@ Proof.
   exact H.
 Qed.
 
-(* An important lemma that relates the Gt and Lt constructor values *)
+(** Lemma relating the [Lt] and [Gt] constructors for a comparison function which 
+defines a total order *)
 Lemma relating_Lt_Gt_total_order:
   forall (A : Type)
          (compare : A -> A -> element_comparison)
@@ -246,11 +313,11 @@ Proof.
       discriminate.
 Qed.
 
-(* Defining a comparison function for integers *) 
+(** Definition of comparison function over Coq's Peano natural numbers  *) 
 Definition compare_int (i j : nat) : element_comparison := 
   if i <? j then Lt else if i =n= j then Eq else Gt.
 
-(* Theorem to show that compare_int meets the ordering specification *)
+(** Theorem to show that [compare_int] defines a total order over [nat] *)
 Theorem compare_int_defines_a_total_order:
   specification_of_compare_defining_total_order nat compare_int.
 Proof.
@@ -266,8 +333,7 @@ Proof.
 
     + case (b <? a) as [ | ] eqn : C_b_lt_a.
 
-      * Search (Nat.ltb).
-        destruct (Nat.ltb_lt a b) as [H_ltb_lt_ab _].
+      * destruct (Nat.ltb_lt a b) as [H_ltb_lt_ab _].
         apply H_ltb_lt_ab in C_a_lt_b.
         destruct (Nat.ltb_lt b a) as [H_ltb_lt_ba _].
         apply H_ltb_lt_ba in C_b_lt_a.
@@ -278,7 +344,6 @@ Proof.
         destruct (Nat.ltb_lt a a) as [_ H_ltb_lt_aa].
         apply H_ltb_lt_aa in H_impossible.
 
-        Search (Nat.ltb).
         assert (H_contradictory: (a <? a) = false).
         exact (Nat.ltb_irrefl a).
         
@@ -401,26 +466,26 @@ Proof.
         unfold leq.
         reflexivity.
 
-        Search (_ <? _).
         destruct (Nat.ltb_ge a b).
         apply H in C_a_lt_b.
 
         destruct (Nat.ltb_ge b a).
         apply H1 in C_b_lt_a.
 
-        Search (_ <= _).
         Check (Nat.le_antisymm a b C_b_lt_a C_a_lt_b).
         rewrite (Nat.le_antisymm a b C_b_lt_a C_a_lt_b) in C_a_eq_b.
-        Search (_ =n= _).
         rewrite -> (Nat.eqb_refl b) in C_a_eq_b.
         discriminate.
 Qed.
 
 (* ********** *)
 
+(* ********** *)
 
-(* ********** Equality of pairs and option types ********** *)
+(** * Pairwise and Option Type Equalities *)
 
+(** Lemma to show that the equality of a pair of values is equivalent to the equality
+of the corresponding elements of each pair *)
 Lemma pairwise_equality:
   forall (A : Type)
          (x1 x2 y1 y2 : A),
@@ -434,6 +499,8 @@ Proof.
   rewrite -> H; rewrite -> H0; reflexivity.
 Qed.  
 
+(** Lemma to show that the equality of two values of the [option] type is equivalent
+to the equality of the values contained by the [option] type values *)
 Lemma some_x_equal_some_y:
   forall (A : Type)
          (x y : A),
@@ -448,8 +515,12 @@ Qed.
 
 (* ********** *)
 
-(* ********** Lemmas for Max.max ********** *)
+(* ********** *)
 
+(** * Lemmas for [max] *)
+
+(** Lemma to show that for two values of type [nat], one or the other must be the
+maximum values *)
 Lemma max_cases:
   forall (a b : nat),
     max a b = a \/ max a b = b.
@@ -457,19 +528,17 @@ Proof.
   intros.
   intros.
   case (le_ge_dec a b) as [ | ].
-  - Search (max _ _ = _).
-    right.
+  - right.
     exact (max_r a b l).
     
-  - Search (max _ _ = _).
-    
-    assert (H: b <= a).
+  - assert (H: b <= a).
     auto.
 
     left.
     exact (max_l a b H).
 Qed.    
 
+(** Lemma to unfold [max] the successors of two natural numbers *)
 Lemma unfold_max_Sn_Sm:
   forall (n m : nat),
     max (S n) (S m) = S (max n m).
@@ -477,6 +546,8 @@ Proof.
   unfold_tactic max.
 Qed.
 
+(** Lemma to show that given a value of type [nat] and its successor, the latter is 
+always the maximum value *)
 Lemma H_max_S:
   forall (a : nat),
     max (a + 1) a = a + 1.
@@ -497,12 +568,13 @@ Proof.
   reflexivity.
 Qed.
 
+(* ********** *)
 
 (* ********** *)
 
+(** * Reflections *)
 
-(* ********** Reflections ********** *)
-
+(** Lemma to relate [=] and [=n=] for the same [nat] values *)
 Lemma prop_to_bool_helper:
   forall (a : nat),
     a = a -> ((a =n= a) = true).
@@ -517,6 +589,7 @@ Proof.
   exact (succ_eq a' a' H).
 Qed.  
 
+(** Lemma to relate [=] and [=n=] for different [nat] values *)
 Lemma prop_to_bool:
   forall (a b : nat),
     a = b -> ((a =n= b) = true).
@@ -538,41 +611,7 @@ Proof.
   exact (prop_to_bool_helper b' H_trivial).
 Qed.
 
-Lemma beq_nat_symm:
-  forall (x y : nat),
-    (x =n= y) = (y =n= x).
-Proof.
-  intros.
-  
-  case (x =n= y) as [ | ] eqn : C_xy.
-
-  - apply beq_nat_true in C_xy.
-    case (y =n= x) as [ | ] eqn : C_yx.
-    reflexivity.
-
-    apply beq_nat_false in C_yx.
-    rewrite -> C_xy in C_yx.
-    unfold not in C_yx.
-
-    assert (H_trivial: y = y).
-    reflexivity.
-
-    apply C_yx in H_trivial.
-    apply False_ind.
-
-    exact H_trivial.
-
-  - apply beq_nat_false in C_xy.
-    unfold not in C_xy.
-    case (y =n= x) as [ | ] eqn : C_yx.
-    apply beq_nat_true in C_yx.
-    symmetry in C_yx.
-    apply C_xy in C_yx.
-    apply False_ind.
-    exact C_yx.
-    reflexivity.
-Qed.
-
+(** Lemma to relate [||] and [\/] *)
 Lemma disjunction_to_prop:
   forall (b1 b2 : bool),
     (b1 || b2 = true) -> (b1 = true) \/ (b2 = true).
@@ -590,6 +629,7 @@ Proof.
   exact H.
 Qed.
 
+(** Lemma to assert trivial equalities *)
 Lemma trivial_equality:
   forall (A : Type)
          (v : A),
@@ -598,6 +638,6 @@ Proof.
   intros; reflexivity.
 Qed.
 
-
-
 (* ********** *)
+
+(* ********** End of Paraphernalia ********** *)

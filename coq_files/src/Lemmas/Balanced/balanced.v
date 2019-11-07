@@ -1,5 +1,5 @@
-Require Import Hbt.Lemmas.sound.
-Require Export Hbt.Lemmas.sound.
+Require Import Hbt.Lemmas.Sound.sound.
+Require Export Hbt.Lemmas.Sound.sound.
 
 (* ********** General lemmas related to balancedness ********** *)
 
