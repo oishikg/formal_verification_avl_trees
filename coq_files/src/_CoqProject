@@ -3,6 +3,6 @@
 ./Implementation/hbt.v
 ./Lemmas/Sound/sound.v
 ./Lemmas/Balanced/balanced.v
-./Lemmas/Ordered/ordered_helper.v
-./Lemmas/Ordered/ordered_main.v
+./Lemmas/Ordered/Helper/ordered_helper.v
+./Lemmas/Ordered/Main/ordered_main.v
 ./Theorems/theorems.v

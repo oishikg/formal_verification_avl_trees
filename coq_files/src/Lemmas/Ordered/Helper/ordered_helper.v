@@ -180,6 +180,166 @@ Proof.
   exact C_traverse_bt.
 Qed.
 
+(** Lemma to show that a tree with a triple (i.e., a tree that is not a leaf) is
+ordered, i.e., traversing the tree to check for orderedness returns a [TSome] value
+with minimum and maximum payloads *)
+Lemma single_node_tree_is_ordered: 
+  forall (A : Type)
+         (compare : A -> A -> element_comparison)
+         (h1 : nat)
+         (bt1 : binary_tree A)
+         (e : A)
+         (h2 : nat)
+         (bt2 : binary_tree A),
+    is_ordered_hbt A (HNode A h1 bt1) compare = true -> 
+    (forall min1 max1 : A,
+        traverse_to_check_ordered_hbt A (HNode A h1 bt1) compare =
+        TSome (A * A) (min1, max1) -> compare max1 e = Lt) ->
+    is_ordered_hbt A (HNode A h2 bt2) compare = true -> 
+    (forall min2 max2 : A,
+        traverse_to_check_ordered_hbt A (HNode A h2 bt2) compare =
+        TSome (A * A) (min2, max2) -> compare e min2 = Lt) ->
+    exists min1 max2, 
+      traverse_to_check_ordered_hbt
+        A
+        (HNode A (1 + max h1 h2)
+               (Node A
+                     (Triple A
+                             (HNode A h1 bt1)
+                             e
+                             (HNode A h2 bt2))))
+        compare = TSome (A * A) (min1, max2).
+Proof.  
+  intros.
+
+  (* assert that hbt1 and hbt2 are either leaves or nodes *)
+  Check (is_ordered_true_implies_leaf_or_ordered_node).
+  assert (H_hbt1_leaf_or_node:
+            traverse_to_check_ordered_hbt A (HNode A h1 bt1) compare =
+            TNone (A * A)
+            \/
+            (exists min max : A,
+                traverse_to_check_ordered_hbt A (HNode A h1 bt1) compare =
+                TSome (A * A) (min, max))).
+  exact (is_ordered_true_implies_leaf_or_ordered_node
+           A compare (HNode A h1 bt1) H).
+  
+  assert (H_hbt2_leaf_or_node:
+            traverse_to_check_ordered_hbt A (HNode A h2 bt2) compare =
+            TNone (A * A)
+            \/
+            (exists min max : A,
+                traverse_to_check_ordered_hbt A (HNode A h2 bt2) compare =
+                TSome (A * A) (min, max))).
+  exact (is_ordered_true_implies_leaf_or_ordered_node
+           A compare (HNode A h2 bt2) H1).
+
+  (* unfold the goal before destructing to avoid repeated unfolds *)
+  rewrite -> unfold_traverse_to_check_ordered_hbt.
+  rewrite -> unfold_traverse_to_check_ordered_bt_node.
+  rewrite -> unfold_traverse_to_check_ordered_t.
+  
+  destruct H_hbt1_leaf_or_node as [H_hbt1_leaf | H_hbt1_node].
+
+  (* hbt1 is a leaf *)
+  - destruct H_hbt2_leaf_or_node as [H_hbt2_leaf | H_hbt2_node].
+
+    (* hbt2 is a leaf *)
+    {
+      rewrite -> H_hbt1_leaf.
+      rewrite -> H_hbt2_leaf.
+      exists e.
+      exists e.
+      reflexivity.
+    }
+
+    (* hbt2 is a node *)
+    {
+      rewrite -> H_hbt1_leaf.
+      destruct H_hbt2_node as [min2 [max2 H_hbt2_node]].
+      rewrite -> H_hbt2_node.
+      rewrite -> (H2 min2 max2 H_hbt2_node).
+      exists e.
+      exists max2.
+      reflexivity.
+    }
+
+    (* hbt1 is a node *)
+  - destruct H_hbt2_leaf_or_node as [H_hbt2_leaf | H_hbt2_node].
+
+    (* hbt2 is a leaf *)
+    {
+      destruct H_hbt1_node as [min1 [max1 H_hbt1_node]].
+      rewrite -> H_hbt1_node.
+      rewrite -> H_hbt2_leaf.
+      rewrite -> (H0 min1 max1 H_hbt1_node).
+      exists min1.
+      exists e.
+      reflexivity.
+    }
+
+    (* hbt2 is a node *)
+    {
+      destruct H_hbt1_node as [min1 [max1 H_hbt1_node]].
+      destruct H_hbt2_node as [min2 [max2 H_hbt2_node]].
+      rewrite -> H_hbt1_node.
+      rewrite -> (H0 min1 max1 H_hbt1_node).
+      rewrite -> H_hbt2_node.
+      rewrite -> (H2 min2 max2 H_hbt2_node).
+      exists min1.
+      exists max2.
+      reflexivity.
+    }
+Qed.
+
+(** Lemma to show that a sound tree with non-zero height must be a node *)
+Lemma non_zero_height_implies_node:
+  forall (A : Type)
+         (h_ret h1 h2 : nat)
+         (bt1 : binary_tree A),
+    (h_ret = h1) \/ (h_ret = 1 + h1) -> 
+    (h_ret =n= 2 + h2) = true ->
+    is_sound_hbt A (HNode A h1 bt1) = true ->
+    exists (t1 : triple A),
+      bt1 = Node A t1.
+Proof.
+  intros.
+  apply beq_nat_true in H0.
+  destruct H as [H_ret_eq_h1 | H_ret_eq_S_h1].
+
+  - rewrite -> H_ret_eq_h1 in H0.
+    rewrite H0 in H1.
+    case bt1 as [ | t1].
+    unfold is_sound_hbt in H1.
+    rewrite -> unfold_traverse_to_check_soundness_hbt in H1.
+    rewrite -> unfold_traverse_to_check_soundness_bt_leaf in H1.
+    case h2 as [ | h2'].
+    rewrite -> plus_0_r in H1.
+    unfold beq_nat in H1.
+    discriminate.
+    rewrite -> plus_Sn_m in H1.
+    unfold beq_nat in H1.
+    discriminate.
+    exists t1.
+    reflexivity.
+
+  - rewrite H_ret_eq_S_h1 in H0.
+    Check (succ_eq).
+    apply succ_eq in H0.
+    rewrite H0 in H1.
+    case bt1 as [ | t1].    
+    unfold is_sound_hbt in H1.
+    rewrite -> unfold_traverse_to_check_soundness_hbt in H1.
+    rewrite -> unfold_traverse_to_check_soundness_bt_leaf in H1.
+    case h2 as [ | h2'].
+    unfold beq_nat in H1.
+    discriminate.
+    unfold beq_nat in H1.
+    discriminate.
+    exists t1.
+    reflexivity.
+Qed.    
+
 (** Lemma to show that if traversing a [heightened_binary_tree] to check its
 orderedness yields a [TSome] value containg the minimum and maximum payload
 values, then reducing the left subtree to a leaf also yields an ordered 

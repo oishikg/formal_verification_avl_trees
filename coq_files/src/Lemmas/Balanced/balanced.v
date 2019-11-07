@@ -2477,11 +2477,11 @@ Proof.
 Qed.  
 
 
-(** This is the most important lemma concerning balanced in this 
-project. It claims that inserting an element into a sound and balanced 
-[heightened_binary_tree] using [insert_hbt_helper] returns a [heightened_binary_tree]
-which is also balanced. The proof proceeds by unfolding the [insert_hbt_helper]
-function, and performing a sequence of case analyses. *)
+(** This is the most important lemma concerning balanced in this project. It claims
+that inserting an element into a sound and balanced [heightened_binary_tree] using
+[insert_hbt_helper] returns a [heightened_binary_tree] which is also balanced. The 
+proof proceeds by unfolding the [insert_hbt_helper] function, and performing a
+sequence of case analyses. *)
 Lemma insertion_preserves_balance: 
   forall (A : Type)
          (compare : A -> A -> element_comparison)

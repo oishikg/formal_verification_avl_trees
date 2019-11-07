@@ -1,9 +1,18 @@
-Require Import Hbt.Lemmas.Ordered.ordered_helper.
-Require Export Hbt.Lemmas.Ordered.ordered_helper.
+(* ********** ordered_main.v ********** *)
 
-(* The main lemma required to prove the orderedness case of the insertion specification in 
- * Hbt.Theorems.theorems: given an insertion into a subtree, show that the maximum and 
- * minimum values of a subtree are as specified in the theorem *)
+(** The [ordered_main] library contains all the main lemmas concerned with the 
+orderedness of AVL trees. These lemmas build on those define in [ordered_helper] *)
+
+Require Import Hbt.Lemmas.Ordered.Helper.ordered_helper.
+Require Export Hbt.Lemmas.Ordered.Helper.ordered_helper.
+
+(* ********** *)
+
+(** * Maximum and Minimum Elements After Insertion *)
+
+(** Lemma to show that post an operation on a tree to insert some element <<x>>:
+- the maximum element is either <<x>> or the maximum element of the original tree
+- the minimum element is either <<x>> or the minimum element of the original tree *)
 Lemma insertion_in_node_min_max: 
   forall (A : Type)
          (compare : A -> A -> element_comparison),
@@ -46,7 +55,6 @@ Proof.
   intros h bt H_ind_bt hbt' x min min' max max' H_sound_hbt H_bal_hbt H_insert_hbt H_ord_hbt' H_ord_hbt.
   rewrite -> (unfold_insert_hbt_helper A compare x h bt) in H_insert_hbt.
   rewrite -> (unfold_traverse_to_check_ordered_hbt A h bt compare) in H_ord_hbt.
-  Check (H_ind_bt h hbt' x min min' max max' H_sound_hbt H_bal_hbt H_insert_hbt H_ord_hbt' H_ord_hbt).
   exact (H_ind_bt h hbt' x min min' max max' H_sound_hbt H_bal_hbt H_insert_hbt H_ord_hbt' H_ord_hbt).
 
   (* a leaf provides a vacuous case *)
@@ -58,7 +66,6 @@ Proof.
   intros t H_ind_t h hbt' x min min' max max' H_sound_hbt H_bal_hbt H_insert_bt H_ord_hbt' H_ord_bt.
   rewrite -> (unfold_insert_bt_helper_node A compare x h t) in H_insert_bt.
   rewrite -> (unfold_traverse_to_check_ordered_bt_node A t compare) in H_ord_bt.
-  Check (H_ind_t h hbt' x min min' max max' H_sound_hbt H_bal_hbt H_insert_bt H_ord_hbt' H_ord_bt).
   exact (H_ind_t h hbt' x min min' max max' H_sound_hbt H_bal_hbt H_insert_bt H_ord_hbt' H_ord_bt).
 
   (* proof for t, with inductive hypotheses for hbt1 and hbt2 *)
@@ -409,7 +416,6 @@ Proof.
  
       induction hbt1 as [h1 bt1].
       assert (H_impossible_hbt1 : bt1 <> Leaf A).
-      Check (rotate_right_1_impossible_case).
       exact (rotate_right_1_impossible_case
                A compare x h1 bt1
                h1' h11' h12' h121' h122' 
@@ -423,7 +429,6 @@ Proof.
       reflexivity.
       apply H_impossible_hbt1 in H_trivial_leaf.
       discriminate.
-      Check (traverse_node_impossible_case).
       apply traverse_node_impossible_case in C_traverse_ord_hbt1.
       apply False_ind.
       exact C_traverse_ord_hbt1.
@@ -450,7 +455,6 @@ Proof.
                   C_insert_hbt1
                   H_traverse_ord_hbt_ret_org
                   H_trivial_equality) as [_ H_t_min'].
-      Check (rotate_right_1_min_max).
       exact (rotate_right_1_min_max
                A
                compare
@@ -468,7 +472,6 @@ Proof.
 
       (* important lemma: assert that the returned tree is ordered to 
        * use inductive hypothesis *) 
-      Check (rotate_right_2_tree_ordered_implies_returned_tree_ordered).
       destruct (rotate_right_2_tree_ordered_implies_returned_tree_ordered
                   A compare
                   h1' h11' h12' h2 bt11' bt12' bt2
@@ -484,13 +487,11 @@ Proof.
       
       induction hbt1 as [h1 bt1].
 
-      Check (disjunction_to_prop).
       destruct (disjunction_to_prop (h12' + 1 =n= h11') (h12' =n= h11') C_h12'_h11')
                as [H_h12'_gt_h11' | H_ht12'_eq_h11'].
 
       (* case 1: H_h12'_gt_h11' *) 
       assert (H_impossible_hbt1 : bt1 <> Leaf A).
-      Check (rotate_right_2_impossible_case_1).
       exact (rotate_right_2_impossible_case_1
                A compare x h1 bt1
                h1' h11' h12'
@@ -499,7 +500,6 @@ Proof.
                H_h12'_gt_h11').
       
       assert (H_contradiction: bt1 = Leaf A).
-      Check (tnone_implies_leaf).
       exact (tnone_implies_leaf A h1 bt1 compare C_traverse_ord_hbt1).
 
       apply False_ind.
@@ -513,7 +513,6 @@ Proof.
 
       (* case 2: H_h12'_eq_h11' *)
       assert (H_impossible_hbt1 : bt1 <> Leaf A).
-      Check (rotate_right_2_impossible_case_2).
       exact (rotate_right_2_impossible_case_2
                A compare 
                x h1 bt1 h1' h11' h12'
@@ -525,7 +524,6 @@ Proof.
                C_comp_heights).
       
       assert (H_contradiction: bt1 = Leaf A).
-      Check (tnone_implies_leaf).
       exact (tnone_implies_leaf A h1 bt1 compare C_traverse_ord_hbt1).
 
       apply False_ind.
@@ -550,7 +548,6 @@ Proof.
                   C_insert_hbt1
                   H_traverse_ord_hbt_ret_org
                   H_trivial_equality) as [_ H_t_min']. 
-      Check (rotate_right_2_min_max).
       exact (rotate_right_2_min_max
                A compare
                h11' h12' h2 bt11' bt12' bt2
@@ -868,8 +865,6 @@ Proof.
       induction hbt22' as [h22' bt22'].
       
       (* required also for the inductive hypothesis: hbt2 is ordered *)
-      Check (triple_ordered_implies_hbts_ordered).
-      
       assert (H_fold_t_ord:
                 is_ordered_hbt A (HNode A h (Node A ((Triple A (HNode A h1 bt1) e hbt2))))
                                compare = true).
@@ -899,7 +894,6 @@ Proof.
         
       (* crucial assertion to use inductive hypothesis: the tree returned after insertion and
        * before rotation is also ordered *)
-        Check (rotate_left_1_tree_ordered_implies_returned_tree_ordered).
         destruct (rotate_left_1_tree_ordered_implies_returned_tree_ordered
                     A
                     compare
@@ -918,7 +912,6 @@ Proof.
       induction hbt2 as [h2 bt2].
       
       assert (H_impossible_hbt2 : bt2 <> Leaf A).
-      Check (rotate_left_1_impossible_case).
       exact (rotate_left_1_impossible_case
                A compare
                x h2 bt2 h2' h21' h211' h212' h22'
@@ -934,7 +927,6 @@ Proof.
       reflexivity.
       apply H_impossible_hbt2 in H_trivial_leaf.
       discriminate.
-      Check (traverse_node_impossible_case).
       apply traverse_node_impossible_case in C_traverse_ord_hbt2.
       apply False_ind.
       exact C_traverse_ord_hbt2.
@@ -962,7 +954,6 @@ Proof.
                   C_insert_hbt2
                   H_traverse_ord_hbt_ret_org
                   H_trivial_equality) as [H_t_max' _].
-      Check (rotate_left_1_min_max).
       exact (rotate_left_1_min_max
                A
                compare
@@ -982,7 +973,6 @@ Proof.
 
       (* important lemma: assert that the returned tree is ordered to 
        * use inductive hypothesis *)
-      Check (rotate_left_2_tree_ordered_implies_returned_tree_ordered).
       destruct (rotate_left_2_tree_ordered_implies_returned_tree_ordered
                   A compare
                   h1 h21' h22' h2'
@@ -1004,7 +994,6 @@ Proof.
 
       (* case 1: H_h22'_ht_h21' *)
       assert (H_impossible_hbt2 : bt2 <> Leaf A).
-      Check (rotate_left_2_impossible_case_1).
       exact (rotate_left_2_impossible_case_1
                A compare x h2 bt2
                h2' h21' h22'
@@ -1013,7 +1002,6 @@ Proof.
                H_h22'_gt_h21').
       
       assert (H_contradiction: bt2 = Leaf A).
-      Check (tnone_implies_leaf).
       exact (tnone_implies_leaf A h2 bt2 compare C_traverse_ord_hbt2).
 
       apply False_ind.
@@ -1026,7 +1014,6 @@ Proof.
       
       (* case 2: H_ht12'_eq_h21' *)
       assert (H_impossible_hbt2 : bt2 <> Leaf A).
-      Check (rotate_left_2_impossible_case_2).
       exact (rotate_left_2_impossible_case_2
                A compare
                x h2 bt2 h2' h21' h22'
@@ -1038,7 +1025,6 @@ Proof.
                C_comp_heights).
       
       assert (H_contradiction: bt2 = Leaf A).
-      Check (tnone_implies_leaf).
       exact (tnone_implies_leaf A h2 bt2 compare C_traverse_ord_hbt2).
 
       apply False_ind.
@@ -1064,7 +1050,6 @@ Proof.
                   C_insert_hbt2
                   H_traverse_ord_hbt_ret_org
                   H_trivial_equality) as [H_t_max' _].
-      Check (rotate_left_2_min_max).
       exact (rotate_left_2_min_max
                A compare
                h1 h21' h22'
@@ -1085,8 +1070,38 @@ Proof.
     + discriminate.
 Qed.
 
+(* ********** *)
 
+(* ********** *)
 
+(** * Rotations Preserves Order *)
+
+(** When dealing with rotations in [ordered_helper], the notions of a first rotation
+and a second rotation were used to refer to the double and single rotations. While
+this corresponds to the way rotations are treated in the implementation of
+rotations in [hbt], the resulting proofs were repetitive and long. Thus, in this
+section, we instead develop our proofs with the following ideas in mind:
+
+- <<rotate_right_2>> and <<rotate_left_2>> correspond to the elementary rotate right and rotate left opertations
+- The double rotation <<rotate_right_1>> results from composing an elementery rotate left operation on a sub-tree followed by an elementary rotate right operation on the entire tree
+- The double rotation <<rotate_left_1>> results from composing an elementery rotate right operation on a sub-tree followed by an elementary rotate left operation on the entire tree. 
+*)
+
+(* ***** *)
+
+(** ** Helper Lemmas for Rotations *)
+
+(** Lemma to show that given two sub-trees <<hbt1>>, <<hbt2>> and a payload <<e>> such that: 
+
+- <<hbt1>> is ordered and has a minimum and maximum payload
+- the maximum payload of <<hbt1>> is less than <<e>>
+- <<hbt2>> is ordered
+- if <<hbt2>> has a minimum and a maximum, then <<e>> is less than this minimum, 
+
+then the tree with <<e>> as root, <<hbt1>> as left sub-tree and <<hbt2>> as right 
+sub-tree is ordered, i.e., traversing the tree to check if it is ordered returns a 
+minimum and maximum
+*)
 Lemma rotate_right_intermediate_tree_ordered:
   forall (A : Type)
          (compare : A -> A -> element_comparison)
@@ -1123,7 +1138,6 @@ Proof.
   rewrite -> H.
 
   (* next, consider the two cases for bt2 *)
-  Check (is_ordered_true_implies_leaf_or_ordered_node).  
   destruct (is_ordered_true_implies_leaf_or_ordered_node
               A compare (HNode A h2 bt2) H1)
     as [H_hbt2_leaf | [min2 [max2 H_hbt2_node]]].
@@ -1142,6 +1156,17 @@ Proof.
     reflexivity.
 Qed.
 
+(** Lemma to show that given two sub-trees <<hbt1>>, <<hbt2>> and a payload <<e>> such that: 
+
+- <<hbt2>> is ordered and has a minimum and maximum payload
+- the minimum payload of <<hbt2>> is less than <<e>>
+- <<hbt1>> is ordered
+- if <<hbt1>> has a minimum and a maximum, then this maximum is less than <<e>>, 
+
+then the tree with <<e>> as root, <<hbt1>> as left sub-tree and <<hbt2>> as right 
+sub-tree is ordered, i.e., traversing the tree to check if it is ordered returns a 
+minimum and maximum
+*)
 Lemma rotate_left_intermediate_tree_ordered:
   forall (A : Type)
          (compare : A -> A -> element_comparison)
@@ -1178,7 +1203,6 @@ Proof.
   rewrite -> H1.
 
   (* now consider the two cases for bt1 *)
-  Check (is_ordered_true_implies_leaf_or_ordered_node).  
   destruct (is_ordered_true_implies_leaf_or_ordered_node
               A compare (HNode A h1 bt1) H) as [H_hbt1_leaf | H_hbt1_node].
 
@@ -1197,117 +1221,7 @@ Proof.
     reflexivity.
 Qed.
 
-
-Lemma single_node_tree_is_ordered: 
-  forall (A : Type)
-         (compare : A -> A -> element_comparison)
-         (h1 : nat)
-         (bt1 : binary_tree A)
-         (e : A)
-         (h2 : nat)
-         (bt2 : binary_tree A),
-    is_ordered_hbt A (HNode A h1 bt1) compare = true -> 
-    (forall min1 max1 : A,
-        traverse_to_check_ordered_hbt A (HNode A h1 bt1) compare =
-        TSome (A * A) (min1, max1) -> compare max1 e = Lt) ->
-    is_ordered_hbt A (HNode A h2 bt2) compare = true -> 
-    (forall min2 max2 : A,
-        traverse_to_check_ordered_hbt A (HNode A h2 bt2) compare =
-        TSome (A * A) (min2, max2) -> compare e min2 = Lt) ->
-    exists min1 max2, 
-      traverse_to_check_ordered_hbt
-        A
-        (HNode A (1 + max h1 h2)
-               (Node A
-                     (Triple A
-                             (HNode A h1 bt1)
-                             e
-                             (HNode A h2 bt2))))
-        compare = TSome (A * A) (min1, max2).
-Proof.  
-  intros.
-
-  (* assert that hbt1 and hbt2 are either leaves or nodes *)
-  Check (is_ordered_true_implies_leaf_or_ordered_node).
-  assert (H_hbt1_leaf_or_node:
-            traverse_to_check_ordered_hbt A (HNode A h1 bt1) compare =
-            TNone (A * A)
-            \/
-            (exists min max : A,
-                traverse_to_check_ordered_hbt A (HNode A h1 bt1) compare =
-                TSome (A * A) (min, max))).
-  exact (is_ordered_true_implies_leaf_or_ordered_node
-           A compare (HNode A h1 bt1) H).
-  
-  assert (H_hbt2_leaf_or_node:
-            traverse_to_check_ordered_hbt A (HNode A h2 bt2) compare =
-            TNone (A * A)
-            \/
-            (exists min max : A,
-                traverse_to_check_ordered_hbt A (HNode A h2 bt2) compare =
-                TSome (A * A) (min, max))).
-  exact (is_ordered_true_implies_leaf_or_ordered_node
-           A compare (HNode A h2 bt2) H1).
-
-  (* unfold the goal before destructing to avoid repeated unfolds *)
-  rewrite -> unfold_traverse_to_check_ordered_hbt.
-  rewrite -> unfold_traverse_to_check_ordered_bt_node.
-  rewrite -> unfold_traverse_to_check_ordered_t.
-  
-  destruct H_hbt1_leaf_or_node as [H_hbt1_leaf | H_hbt1_node].
-
-  (* hbt1 is a leaf *)
-  - destruct H_hbt2_leaf_or_node as [H_hbt2_leaf | H_hbt2_node].
-
-    (* hbt2 is a leaf *)
-    {
-      rewrite -> H_hbt1_leaf.
-      rewrite -> H_hbt2_leaf.
-      exists e.
-      exists e.
-      reflexivity.
-    }
-
-    (* hbt2 is a node *)
-    {
-      rewrite -> H_hbt1_leaf.
-      destruct H_hbt2_node as [min2 [max2 H_hbt2_node]].
-      rewrite -> H_hbt2_node.
-      rewrite -> (H2 min2 max2 H_hbt2_node).
-      exists e.
-      exists max2.
-      reflexivity.
-    }
-
-    (* hbt1 is a node *)
-  - destruct H_hbt2_leaf_or_node as [H_hbt2_leaf | H_hbt2_node].
-
-    (* hbt2 is a leaf *)
-    {
-      destruct H_hbt1_node as [min1 [max1 H_hbt1_node]].
-      rewrite -> H_hbt1_node.
-      rewrite -> H_hbt2_leaf.
-      rewrite -> (H0 min1 max1 H_hbt1_node).
-      exists min1.
-      exists e.
-      reflexivity.
-    }
-
-    (* hbt2 is a node *)
-    {
-      destruct H_hbt1_node as [min1 [max1 H_hbt1_node]].
-      destruct H_hbt2_node as [min2 [max2 H_hbt2_node]].
-      rewrite -> H_hbt1_node.
-      rewrite -> (H0 min1 max1 H_hbt1_node).
-      rewrite -> H_hbt2_node.
-      rewrite -> (H2 min2 max2 H_hbt2_node).
-      exists min1.
-      exists max2.
-      reflexivity.
-    }
-Qed.
-
-
+(** Lemma to show that an elementary right rotation operation preserves order *)
 Lemma rotate_right_preserves_order:
   forall (A : Type)
          (compare : A -> A -> element_comparison)
@@ -1366,7 +1280,6 @@ Proof.
   reflexivity.
 
   (* next, we left reduce the original tree; this will be helpful in our proofs *)
-  Check (reduce_ordered_hbt_left).
   assert (H_hbt_org_left_reduced:
             traverse_to_check_ordered_hbt
               A
@@ -1382,7 +1295,6 @@ Proof.
            t_min t_max H).
   
   (* assert orderedness of the left subtree and hbt2 *)
-  Check (triple_ordered_implies_hbts_ordered).
   destruct (triple_ordered_implies_hbts_ordered
               A compare (1 + max (1 + max h11 h12) h2)
               (HNode A (1 + max h11 h12)
@@ -1497,7 +1409,6 @@ Proof.
    * rotated tree *)
 
   (* we first show that the right subtree in the goal is ordered *)
-  Check (single_node_tree_is_ordered).
   destruct (single_node_tree_is_ordered
               A compare h12 bt12 e h2 bt2 H_bt12_ord H_comp_max12_e
               H_bt2_ord H_comp_e_min2)
@@ -1509,7 +1420,6 @@ Proof.
   assert (H_relate_max2_t_max: max2 = t_max).
   
   (* we may conveniently reduce the right subtree in the goal *)
-  Check (reduce_ordered_hbt_left).
   assert (H_right_subtree_in_goal_reduced_ord:
             traverse_to_check_ordered_hbt
               A
@@ -1541,7 +1451,6 @@ Proof.
   assert (H_e1_lt_min12: compare e1 min12 = Lt).
 
   (* first, right reduce the right subtree in goal *)
-  Check (reduce_ordered_hbt_right).
   assert (H_right_subtree_right_reduced:
             traverse_to_check_ordered_hbt
               A
@@ -1621,7 +1530,6 @@ Proof.
     (* with H_e1_lt_min12 finally established, we may use 
      * rotate_left_intermediate_tree_ordered to show that the tree in the 
      * goal is ordered *)
-    Check (rotate_left_intermediate_tree_ordered).
     destruct (rotate_left_intermediate_tree_ordered
                 A compare h11 bt11 e1 (1 + max h12 h2)
                 (Node A (Triple A (HNode A h12 bt12) e (HNode A h2 bt2)))
@@ -1636,7 +1544,6 @@ Proof.
     assert (H_min11_t_min: min11 = t_min). 
     
     (* first, right reduce the rotated tree *)
-    Check (reduce_ordered_hbt_right).    
     assert (H_rotated_tree_reduced:
               traverse_to_check_ordered_hbt
                 A
@@ -1664,7 +1571,6 @@ Proof.
     rewrite -> unfold_traverse_to_check_ordered_bt_leaf in H_rotated_tree_reduced.
     
     (* now left reduce the original tree *)
-    Check (reduce_ordered_hbt_right).
     assert (H_org_tree_right_reduced:
               traverse_to_check_ordered_hbt
                 A
@@ -1702,7 +1608,6 @@ Proof.
     
     discriminate.
     
-    Check (ordered_node_has_min_max).
     destruct (ordered_node_has_min_max
                   A compare (1 + max h11 h12)
                   (HNode A h11 bt11) e1 (HNode A h12 bt12) H_left_subtree_ord)
@@ -1718,7 +1623,6 @@ Proof.
 
     (* with the required relationship between min11' and t_min established, we now
      * reduce thte left subtree further *)
-    Check (reduce_ordered_hbt_right).
     assert (H_reduced_left_subtree_ord:
               traverse_to_check_ordered_hbt
                 A
@@ -1758,7 +1662,7 @@ Proof.
     exact H_rotated_tree_ordered.
 Qed.
 
-
+(** Lemma to show that an elementary left rotation operation preserves order *)
 Lemma rotate_left_preserves_order:
   forall (A : Type)
          (compare : A -> A -> element_comparison)
@@ -1817,7 +1721,6 @@ Proof.
   reflexivity.
 
   (* next, right reduce the original tree *)
-  Check (reduce_ordered_hbt_right).
   assert (H_hbt_org_right_reduced:
             traverse_to_check_ordered_hbt
               A
@@ -1838,7 +1741,6 @@ Proof.
   
 
   (* assert orderedness of the left subtree and hbt2 *)
-  Check (triple_ordered_implies_hbts_ordered).
   destruct (triple_ordered_implies_hbts_ordered
               A compare (1 + max h1 (1 + max h21 h22))
               (HNode A h1 bt1)
@@ -1854,7 +1756,6 @@ Proof.
 
 
   (* left reduce the original tree *)
-  Check (reduce_ordered_hbt_left).
   assert (H_hbt_org_left_reduced:
             traverse_to_check_ordered_hbt
               A
@@ -1895,7 +1796,6 @@ Proof.
                  (Node A (Triple A (HNode A h21 bt21) e2 (HNode A h22 bt22))))
           compare) as [ | | (min21, max22)] eqn : C_check_ord_right_subtree.
   discriminate.
-  Check (ordered_node_has_min_max).
   destruct (ordered_node_has_min_max
               A compare (1 + max h21 h22)
               (HNode A h21 bt21) e2 (HNode A h22 bt22)
@@ -2027,7 +1927,6 @@ Proof.
    * rotated tree *)
 
   (* we first show that the left subtree in the goal is ordered *)
-  Check (single_node_tree_is_ordered).
   destruct (single_node_tree_is_ordered
               A compare h1 bt1 e h21 bt21 H_bt1_ord H_comp_max1_e
               H_bt21_ord H_comp_e_min21)
@@ -2036,7 +1935,6 @@ Proof.
   (* next, show that min1 = t_min; use the reduced tree for this *)
   assert (H_relate_min1_t_min: min1 = t_min).
   
-  Check (reduce_ordered_hbt_right).
   assert (H_left_subtree_in_goal_reduced_ord:
             traverse_to_check_ordered_hbt
               A
@@ -2071,7 +1969,6 @@ Proof.
   assert (H_max21_lt_e2: compare max21 e2 = Lt).
 
   (* we first left reduce the left subtree of the goal *)
-  Check (reduce_ordered_hbt_left).
   assert (H_left_subtree_in_goal_reduced:
             traverse_to_check_ordered_hbt
               A
@@ -2085,7 +1982,6 @@ Proof.
            H_left_subtree_in_goal_ordered).
   
   (* next, right reduce the right subtree of the orginal tree *)
-  Check (reduce_ordered_hbt_right).
   assert (H_hbt_org_right_subtree_reduced:
             traverse_to_check_ordered_hbt
               A
@@ -2184,7 +2080,6 @@ Proof.
   (* with H_max21_lt_e2 finally established, we may use 
    * rotate_right_intermediate_tree_ordered to show that the tree in the 
    * goal is ordered *)
-  Check (rotate_right_intermediate_tree_ordered).
   destruct (rotate_right_intermediate_tree_ordered
               A compare (1 + max h1 h21)
               (Node A (Triple A (HNode A h1 bt1) e (HNode A h21 bt21)))
@@ -2200,7 +2095,6 @@ Proof.
   assert (H_max2_t_max: max2 = t_max).
 
   (* first, left reduce the rotated tree *)
-  Check (reduce_ordered_hbt_left).
   assert (H_rotate_tree_reduced:
             traverse_to_check_ordered_hbt
               A
@@ -2217,7 +2111,6 @@ Proof.
            t_min max2 H_rotated_tree_ordered).
   
   (* next, left reduce the right subtree of the original tree *)
-  Check (reduce_ordered_hbt_left).
   assert (H_hbt_org_right_subtree_left_reduced:
             traverse_to_check_ordered_hbt
               A
@@ -2259,8 +2152,20 @@ Proof.
   exact H_rotated_tree_ordered.
 Qed.
 
+(* ***** *)
 
-(* Rotation lemmas for insertion *)
+(* ***** *)
+
+(** ** Main Lemmas for Rotations *)
+
+(** Lemma to show that post an insertion operation on the left sub-tree of a given tree such that the resultant tree is unbalanced, and assuming:
+
+- the modified left sub-tree [hbt_ret] is sound, ordered, and not a leaf,
+- the maximum payload of [hbt_ret] sub-tree is less than the root payload,
+- the right sub-tree is ordered
+- if the right sub-tree were a node with a maximum and minimum value, then the root payload would be less than the minimum value, 
+
+applying [rotate_right_hbt] on this unbalanced tree returns a tree which is ordered *)
 Lemma insertion_rotate_right_preserves_order:
   forall (A : Type)
          (compare : A -> A -> element_comparison)
@@ -2306,7 +2211,6 @@ Proof.
      * right rotated *)
 
     (* first, we must use the soundness of hbt_ret to rewrite the correct heights *)
-    Check (triple_sound_implies_hbts_sound).
     destruct (triple_sound_implies_hbts_sound
                 A
                 h_ret
@@ -2317,14 +2221,12 @@ Proof.
                                        (HNode A h121 bt121)
                                        e12 (HNode A h122 bt122)))) H1)
       as [_ H_right_subtree_sound].
-    Check (relate_heights).
-    Check (relate_heights A h12 h121 bt121 e12 h122 bt122 H_right_subtree_sound).
 
     assert (H_h12_h121_h122: h12 = 1 + max h121 h122).
     exact (relate_heights A h12 h121 bt121 e12 h122 bt122 H_right_subtree_sound).
 
     rewrite -> H_h12_h121_h122 in H1.
-    Check (relate_heights).
+    
     assert (H_h_ret_h11_h121_h122: h_ret = 1 + max h11 (1 + max h121 h122)).
     exact (relate_heights
              A h_ret h11 bt11 e1 (1 + max h121 h122) 
@@ -2332,7 +2234,6 @@ Proof.
              H1).
 
     rewrite -> H_h_ret_h11_h121_h122 in H.
-    Check (rotate_left_preserves_order).
     assert (H_first_left_rotation:
               traverse_to_check_ordered_hbt
                 A
@@ -2348,7 +2249,6 @@ Proof.
     
     (* next, we attach the left rotate tree to e and hbt2, and show that the
      * intermediate tree is ordered *)
-    Check (rotate_right_intermediate_tree_ordered).
     destruct (rotate_right_intermediate_tree_ordered
                 A compare
                 (1 + max (1 + max h11 h121) h122)
@@ -2369,7 +2269,6 @@ Proof.
     
     (* now rotate the intermediate tree to the right, and show that the doubly
      * rotated tree is also ordered *)
-      Check (rotate_right_preserves_order).
       assert (H_double_rotation_preserves_order:
                 traverse_to_check_ordered_hbt
                   A
@@ -2377,9 +2276,16 @@ Proof.
                          (Node A
                                (Triple A
                                        (HNode A (1 + max h11 h121)
-                                              (Node A (Triple A (HNode A h11 bt11) e1 (HNode A h121 bt121)))) e12
+                                              (Node A (Triple A
+                                                              (HNode A h11 bt11)
+                                                              e1
+                                                              (HNode A h121 bt121))))
+                                       e12
                                        (HNode A (1 + max h122 h2)
-                                              (Node A (Triple A (HNode A h122 bt122) e (HNode A h2 bt2)))))))
+                                              (Node A (Triple A
+                                                              (HNode A h122 bt122)
+                                                              e
+                                                              (HNode A h2 bt2)))))))
                   compare = TSome (A * A) (min_ret, max2)).
       exact (rotate_right_preserves_order
                A compare 
@@ -2396,7 +2302,6 @@ Proof.
 
       (* the final step involves using 
        * traverse_to_check_ordered_hbt_some_implies_is_ordered *)
-      Check (traverse_to_check_ordered_hbt_some_implies_is_ordered).
       exact (traverse_to_check_ordered_hbt_some_implies_is_ordered
                A compare
                (HNode A (1 + max (1 + max h11 h121) (1 + max h122 h2))
@@ -2425,15 +2330,12 @@ Proof.
     (* Note that rotate right case 2 requires only a single right rotation *)
 
     (* first, rewrite h_ret correctly *)
-    Check (relate_heights).
-
     assert (H_h_ret_h11_h12: h_ret = 1 + max h11 h12).
     exact (relate_heights A h_ret h11 bt11 e1 h12 bt12 H1).
 
     rewrite -> H_h_ret_h11_h12 in H.
     
     (* next, assert that the intermediate tree is ordered *)
-    Check (rotate_right_intermediate_tree_ordered).
     destruct (rotate_right_intermediate_tree_ordered
                 A compare
                 (1 + max h11 h12)
@@ -2448,7 +2350,6 @@ Proof.
                 H H2 H0 H3) as [max2 H_intermediate_tree_is_ordered].
 
     (* now rotate the intermediate tree right and show that order is preserved *)
-    Check (rotate_right_preserves_order).
     assert (H_singly_rotated_tree_ordered:
               traverse_to_check_ordered_hbt
                 A
@@ -2468,7 +2369,6 @@ Proof.
 
     (* the final step involves using 
      * traverse_to_check_ordered_hbt_some_implies_is_ordered *)
-    Check (traverse_to_check_ordered_hbt_some_implies_is_ordered).
     exact (traverse_to_check_ordered_hbt_some_implies_is_ordered
              A compare
              (HNode A (1 + max h11 (1 + max h12 h2))
@@ -2486,8 +2386,14 @@ Proof.
     discriminate.
 Qed.
 
+(** Lemma to show that post an insertion operation on the right sub-tree of a given tree such that the resultant tree is unbalanced, and assuming:
 
+- the modified right sub-tree [hbt_ret] is sound, ordered, and not a leaf,
+- the root payload is less than the minimum payload of [hbt_ret]
+- the left sub-tree is ordered
+- if the left sub-tree were a node with a maximum and minimum value, then maximum value would be less than the root payload, 
 
+applying [rotate_left_hbt] on this unbalanced tree returns a tree which is ordered *)
 Lemma insertion_rotate_left_preserves_order:
   forall (A : Type)
          (compare : A -> A -> element_comparison)
@@ -2533,7 +2439,6 @@ Proof.
     * left rotated *)
    
    (* first, we must use the soundness of hbt_ret to rewrite the correct heights *)
-   Check (triple_sound_implies_hbts_sound).
    destruct (triple_sound_implies_hbts_sound
                A h_ret
                (HNode A h21
@@ -2545,13 +2450,11 @@ Proof.
                (HNode A h22 bt22)
                H1) as [H_left_subtree_sound _].
    
-   Check (relate_heights).
    assert (H_21_h211_h212: h21 = 1 + max h211 h212).
    exact (relate_heights A h21 h211 bt211 e21 h212 bt212 H_left_subtree_sound).
    
    rewrite -> H_21_h211_h212 in H1.
 
-   Check (relate_heights).
    assert (H_h_ret_h211_h212_h22: h_ret = 1 + max (1 + max h211 h212) h22).
    exact (relate_heights
             A h_ret
@@ -2564,7 +2467,6 @@ Proof.
    rewrite -> H_h_ret_h211_h212_h22 in H0.
 
    (* we can now perform the first right rotation on the originally returned tree *)
-    Check (rotate_right_preserves_order).   
     assert (H_first_right_rotation:
               traverse_to_check_ordered_hbt
                 A
@@ -2584,7 +2486,6 @@ Proof.
      
      (* next, we attach the right rotated tree to e and hbt1, and show that the
       * intermediate tree is ordered *)
-     Check (rotate_left_intermediate_tree_ordered).
      destruct (rotate_left_intermediate_tree_ordered
                  A compare
                  h1 bt1
@@ -2603,7 +2504,6 @@ Proof.
                  H3) as [min1 H_intermediate_tree_is_ordered].
 
      (* next, left rotate the intermediate tree *)
-     Check (rotate_left_preserves_order).
      assert (H_double_rotation_preserves_order:
                traverse_to_check_ordered_hbt
                  A
@@ -2634,7 +2534,6 @@ Proof.
 
       (* the final step involves using 
        * traverse_to_check_ordered_hbt_some_implies_is_ordered *)
-      Check (traverse_to_check_ordered_hbt_some_implies_is_ordered).     
       exact (traverse_to_check_ordered_hbt_some_implies_is_ordered
                A compare 
                (HNode A (1 + max (1 + max h1 h211) (1 + max h212 h22))
@@ -2660,14 +2559,12 @@ Proof.
    (* Note that rotate right case 2 requires only a single right rotation *)
 
    (* first, rewrite h_ret correctly *)
-   Check (relate_heights).
    assert (H_h_ret_h21_h22: h_ret = 1 + max h21 h22).
    exact (relate_heights A h_ret h21 bt21 e2 h22 bt22 H1).
    
    rewrite -> H_h_ret_h21_h22 in H0.
    
    (* next, assert that the intermediate tree is ordered *)
-    Check (rotate_left_intermediate_tree_ordered).
     destruct (rotate_left_intermediate_tree_ordered
                 A compare h1 bt1 e
                 (1 + max h21 h22)
@@ -2676,7 +2573,6 @@ Proof.
                 H H2 H0 H3) as [min1 H_intermediate_tree_is_ordered].
 
     (* now rotate the intermediate tree left and show that order is preserved *)
-    Check (rotate_left_preserves_order).
     assert (H_singly_rotated_tree_ordered:
               traverse_to_check_ordered_hbt
                 A
@@ -2697,7 +2593,6 @@ Proof.
     
     (* the final step involves using 
      * traverse_to_check_ordered_hbt_some_implies_is_ordered *)
-    Check (traverse_to_check_ordered_hbt_some_implies_is_ordered).
     exact (traverse_to_check_ordered_hbt_some_implies_is_ordered
              A compare
              (HNode A (1 + max (1 + max h1 h21) h22)
@@ -2716,55 +2611,18 @@ Proof.
     discriminate.
 Qed.
 
+(* ***** *)
 
-Lemma non_zero_height_implies_node:
-  forall (A : Type)
-         (h_ret h1 h2 : nat)
-         (bt1 : binary_tree A),
-    (h_ret = h1) \/ (h_ret = 1 + h1) -> 
-    (h_ret =n= 2 + h2) = true ->
-    is_sound_hbt A (HNode A h1 bt1) = true ->
-    exists (t1 : triple A),
-      bt1 = Node A t1.
-Proof.
-  intros.
-  apply beq_nat_true in H0.
-  destruct H as [H_ret_eq_h1 | H_ret_eq_S_h1].
+(* ********** *)
 
-  - rewrite -> H_ret_eq_h1 in H0.
-    rewrite H0 in H1.
-    case bt1 as [ | t1].
-    unfold is_sound_hbt in H1.
-    rewrite -> unfold_traverse_to_check_soundness_hbt in H1.
-    rewrite -> unfold_traverse_to_check_soundness_bt_leaf in H1.
-    case h2 as [ | h2'].
-    rewrite -> plus_0_r in H1.
-    unfold beq_nat in H1.
-    discriminate.
-    rewrite -> plus_Sn_m in H1.
-    unfold beq_nat in H1.
-    discriminate.
-    exists t1.
-    reflexivity.
+(* ********** *)
 
-  - rewrite H_ret_eq_S_h1 in H0.
-    Check (succ_eq).
-    apply succ_eq in H0.
-    rewrite H0 in H1.
-    case bt1 as [ | t1].    
-    unfold is_sound_hbt in H1.
-    rewrite -> unfold_traverse_to_check_soundness_hbt in H1.
-    rewrite -> unfold_traverse_to_check_soundness_bt_leaf in H1.
-    case h2 as [ | h2'].
-    unfold beq_nat in H1.
-    discriminate.
-    unfold beq_nat in H1.
-    discriminate.
-    exists t1.
-    reflexivity.
-Qed.    
-    
+(** * Insertion Preserves Order *)
 
+(** This lemma is the most important in this library, and shows that inserting an element into an ordered AVL tree gives results in an AVL tree which is ordered. The proof makes use of:
+
+- the crucial [insertion_in_node_min_max] lemma (defined in this library) show the relationship between a payload and the maximum/minimum values of the sub-trees
+- the lemmas concerning the preservation of orderedness post rotation operations *)
 Lemma insertion_preserves_order: 
   forall (A : Type)
          (compare : A -> A -> element_comparison)
@@ -2888,7 +2746,6 @@ Proof.
         rewrite <- H_insert_t.
 
         {
-          Check (insertion_in_node_min_max).
           destruct (insertion_in_node_min_max A compare) as [H_hbt_ret_min_max _].
           unfold is_ordered_hbt in H_ord_t_init.
           assert (H_hbt_ret_is_ordered:
@@ -2923,9 +2780,6 @@ Proof.
           exact C_traverse_ord_hbt_ret.
 
           (* the returned tree is a node *) 
-          Check (triple_ordered_implies_hbts_ordered).
-          Check (triple_ordered_implies_hbts_ordered
-                   A compare h_hbt hbt1 e hbt2 H_ord_t_init).
           destruct (triple_ordered_implies_hbts_ordered
                       A compare h_hbt hbt1 e hbt2 H_ord_t_init)
             as [H_ord_hbt1 H_ord_hbt2].
@@ -2936,7 +2790,6 @@ Proof.
 
           (* the insertion took place for a leaf *)
           rewrite -> unfold_traverse_to_check_ordered_bt_leaf in H_ord_hbt1.
-          Check (insertion_in_leaf_min_max).
           
           assert (H_traverse_leaf :
                     traverse_to_check_ordered_hbt A (HNode A h1 (Leaf A)) compare
@@ -2945,10 +2798,6 @@ Proof.
           rewrite -> unfold_traverse_to_check_ordered_bt_leaf.
           reflexivity.
 
-          Check (insertion_in_leaf_min_max).
-          Check (insertion_in_leaf_min_max
-                   A compare (HNode A h1 (Leaf A)) (HNode A h_ret bt_ret) x min_ret max_ret
-                   C_insert_hbt1 C_traverse_ord_hbt_ret H_traverse_leaf).
           destruct (insertion_in_leaf_min_max
                       A compare (HNode A h1 (Leaf A)) (HNode A h_ret bt_ret) x
                       min_ret max_ret C_insert_hbt1 C_traverse_ord_hbt_ret H_traverse_leaf)
@@ -2970,7 +2819,6 @@ Proof.
           reflexivity.
           discriminate.
           discriminate.
-          Check (H_hbt_ret_min_max).
           rewrite -> unfold_traverse_to_check_ordered_hbt in H_ord_t_init.
           rewrite -> unfold_traverse_to_check_ordered_bt_node in H_ord_t_init.
           rewrite -> unfold_traverse_to_check_ordered_t in H_ord_t_init.
@@ -2980,9 +2828,6 @@ Proof.
             as [ | | (min1, max1)] eqn : C_traverse_ord_hbt1.
           discriminate.
           induction t1 as [hbt11 e1 hbt12].
-          Check (ordered_node_has_min_max).
-          Check (ordered_node_has_min_max
-                   A compare h1 hbt11 e1 hbt12 H_hbt1_is_ordered).
           destruct (ordered_node_has_min_max
                       A compare h1 hbt11 e1 hbt12 H_hbt1_is_ordered)
             as [some_min [some_max H_contradictory]].
@@ -2995,15 +2840,6 @@ Proof.
           rewrite -> unfold_traverse_to_check_ordered_hbt.
           exact C_traverse_ord_hbt1.
 
-          Check (H_hbt_ret_min_max
-                      (HNode A h1 (Node A t1))
-                      (HNode A h_ret bt_ret)
-                      x min1 min_ret max1 max_ret
-                      H_hbt1_is_sound
-                      H_hbt1_is_balanced
-                      C_insert_hbt1
-                      C_traverse_ord_hbt_ret
-                      C_traverse_ord_hbt1).
           destruct (H_hbt_ret_min_max
                       (HNode A h1 (Node A t1))
                       (HNode A h_ret bt_ret)
@@ -3051,10 +2887,7 @@ Proof.
         }
         
       (* the insertion unbalances the tree: rotations required *)
-      * Check (H_hbt1_inductive_assumption 
-                 (HNode A h_ret bt_ret)
-                 H_hbt1_is_sound H_hbt1_is_balanced H_hbt1_is_ordered P_some_eq).
-        assert (H_hbt_ret_ordered:
+      * assert (H_hbt_ret_ordered:
                   is_ordered_hbt A (HNode A h_ret bt_ret) compare = true).
         exact (H_hbt1_inductive_assumption
                     (HNode A h_ret bt_ret)
@@ -3071,9 +2904,6 @@ Proof.
         discriminate.
 
         (* bt_ret is a triple: use lemma traverse_node_impossible_case *)
-        Check (traverse_node_impossible_case).
-        Check (traverse_node_impossible_case A compare t_ret).
-
         assert (H_bt_ret_impossible_case:
                   traverse_to_check_ordered_bt A (Node A t_ret) compare =
                   TNone (A * A) -> False).
@@ -3099,7 +2929,6 @@ Proof.
         case (h_ret =n= 2 + h2) as [ | ] eqn : C_h_ret_eq_SS_h2.
 
         (* next, assert that hbt1 is a node *)
-        Check (non_zero_height_implies_node).
         destruct (non_zero_height_implies_node
                     A h_ret h1 h2 bt1 C_hbt1_possible_heights
                     C_h_ret_eq_SS_h2 H_hbt1_is_sound) as [t1 H_bt1_as_node].
@@ -3111,9 +2940,6 @@ Proof.
 
         (* assert that traversing hbt1 to check ordered can never give a TNone 
          * constructor *)
-        Check (traverse_node_impossible_case).
-        Check (traverse_node_impossible_case A compare t1).
-
         assert (H_bt1_impossible_case:
                   traverse_to_check_ordered_bt A (Node A t1) compare =
                   TNone (A * A) -> False).
@@ -3179,12 +3005,6 @@ Proof.
         discriminate.
 
         (* we are finally in a position to apply the insertion rotation lemmas *)
-        Check (insertion_rotate_right_preserves_order).
-        Check (insertion_rotate_right_preserves_order
-                 A compare (HNode A h_ret (Node A t_ret)) (HNode A h2 bt2)
-                 min_ret max_ret e hbt'
-                 C_check_ord_hbt_ret H_hbt2_is_ordered
-                 H_hbt_ret_is_sound H_max_ret_lt_e H_e_hbt2 H_insert_t).
         exact (insertion_rotate_right_preserves_order
                  A compare (HNode A h_ret (Node A t_ret)) (HNode A h2 bt2)
                  min_ret max_ret e hbt'
@@ -3236,7 +3056,6 @@ Proof.
           assert (H_hbt2_is_ordered_duplication:
                     is_ordered_hbt A hbt2 compare = true).
           exact H_hbt2_is_ordered.
-          Check (insertion_in_node_min_max).
           destruct (insertion_in_node_min_max A compare) as [H_hbt_ret_min_max _].
           unfold is_ordered_hbt in H_ord_t_init.
 
@@ -3279,7 +3098,6 @@ Proof.
 
           (* the insertion took place for a leaf *)
           rewrite -> unfold_traverse_to_check_ordered_bt_leaf in H_hbt2_is_ordered.
-          Check (insertion_in_leaf_min_max).
           
           assert (H_traverse_leaf :
                     traverse_to_check_ordered_hbt A (HNode A h2 (Leaf A)) compare
@@ -3288,10 +3106,6 @@ Proof.
           rewrite -> unfold_traverse_to_check_ordered_bt_leaf.
           reflexivity.
 
-          Check (insertion_in_leaf_min_max).
-          Check (insertion_in_leaf_min_max
-                   A compare (HNode A h2 (Leaf A)) (HNode A h_ret bt_ret) x min_ret max_ret
-                   C_insert_hbt2 C_traverse_ord_hbt_ret H_traverse_leaf).
           destruct (insertion_in_leaf_min_max
                       A compare (HNode A h2 (Leaf A)) (HNode A h_ret bt_ret) x min_ret max_ret
                       C_insert_hbt2 C_traverse_ord_hbt_ret H_traverse_leaf)
@@ -3312,8 +3126,6 @@ Proof.
           (* impossible case: hbt2 was a leaf *)
           induction t2 as [hbt21 e2 hbt22].
           
-          Check (ordered_node_has_min_max
-                   A compare h2 hbt21 e2 hbt22 H_hbt2_is_ordered_duplication).
           destruct (ordered_node_has_min_max
                       A compare h2 hbt21 e2 hbt22 H_hbt2_is_ordered_duplication)
             as [some_min [some_max H_contradictory]].
@@ -3321,16 +3133,6 @@ Proof.
           discriminate.
 
           (* traverse_to_check_ordered_bt hbt2 has a max and min *)
-          Check (H_hbt_ret_min_max).
-          Check (H_hbt_ret_min_max
-                   (HNode A h2 (Node A t2))
-                   (HNode A h_ret bt_ret)
-                   x min2 min_ret max2 max_ret
-                   H_hbt2_is_sound
-                   H_hbt2_is_balanced
-                   C_insert_hbt2
-                   C_traverse_ord_hbt_ret
-                   C_traverse_ord_hbt2).
           destruct (H_hbt_ret_min_max
                    (HNode A h2 (Node A t2))
                    (HNode A h_ret bt_ret)
@@ -3382,7 +3184,6 @@ Proof.
           
           (* the insertion took place in a leaf *)
           rewrite -> unfold_traverse_to_check_ordered_bt_leaf in H_hbt2_is_ordered.
-          Check (insertion_in_leaf_min_max).
           
           assert (H_traverse_leaf :
                     traverse_to_check_ordered_hbt A (HNode A h2 (Leaf A)) compare
@@ -3391,10 +3192,6 @@ Proof.
           rewrite -> unfold_traverse_to_check_ordered_bt_leaf.
           reflexivity.
 
-          Check (insertion_in_leaf_min_max).
-          Check (insertion_in_leaf_min_max
-                   A compare (HNode A h2 (Leaf A)) (HNode A h_ret bt_ret) x min_ret max_ret
-                   C_insert_hbt2 C_traverse_ord_hbt_ret H_traverse_leaf).
           destruct (insertion_in_leaf_min_max
                       A compare (HNode A h2 (Leaf A)) (HNode A h_ret bt_ret) x min_ret max_ret
                       C_insert_hbt2 C_traverse_ord_hbt_ret H_traverse_leaf)
@@ -3415,8 +3212,6 @@ Proof.
           (* impossible case: hbt2 was a leaf *)
           induction t2 as [hbt21 e2 hbt22].
           
-          Check (ordered_node_has_min_max
-                   A compare h2 hbt21 e2 hbt22 H_hbt2_is_ordered_duplication).
           destruct (ordered_node_has_min_max
                       A compare h2 hbt21 e2 hbt22 H_hbt2_is_ordered_duplication)
             as [some_min [some_max H_contradictory]].
@@ -3424,15 +3219,6 @@ Proof.
           discriminate.
 
           (* traverse_to_check_ordered_bt hbt2 has a max and min *)
-          Check (H_hbt_ret_min_max
-                   (HNode A h2 (Node A t2))
-                   (HNode A h_ret bt_ret)
-                   x min2 min_ret max2 max_ret
-                   H_hbt2_is_sound
-                   H_hbt2_is_balanced
-                   C_insert_hbt2
-                   C_traverse_ord_hbt_ret
-                   C_traverse_ord_hbt2).
           destruct (H_hbt_ret_min_max
                       (HNode A h2 (Node A t2))
                       (HNode A h_ret bt_ret)
@@ -3465,10 +3251,7 @@ Proof.
         }
         
         (* the insertion unbalances the tree: rotations required *) 
-      * Check (H_hbt2_inductive_assumption
-                 (HNode A h_ret bt_ret)
-                 H_hbt2_is_sound H_hbt2_is_balanced H_hbt2_is_ordered P_some_eq).
-        assert (H_hbt_ret_ordered:
+      * assert (H_hbt_ret_ordered:
                   is_ordered_hbt A (HNode A h_ret bt_ret) compare = true).
         exact (H_hbt2_inductive_assumption
                  (HNode A h_ret bt_ret)
@@ -3488,8 +3271,6 @@ Proof.
         discriminate.
 
         (* bt_ret is a triple: use lemma traverse_node_impossible_case *)
-        Check (traverse_node_impossible_case).
-
         assert (H_bt_ret_impossible_case:
                   traverse_to_check_ordered_bt A (Node A t_ret) compare =
                   TNone (A * A) -> False).
@@ -3517,7 +3298,6 @@ Proof.
         case (h_ret =n= 2 + h1) as [ | ] eqn : C_h_ret_eq_SS_h1.
 
         (* next, assert that hbt1 is a node *)
-        Check (non_zero_height_implies_node).
         destruct (non_zero_height_implies_node
                     A h_ret h2 h1 bt2 C_hbt2_possible_heights
                     C_h_ret_eq_SS_h1 H_hbt2_is_sound) as [t2 H_bt2_as_node].
@@ -3529,8 +3309,6 @@ Proof.
 
         (* assert that traversing hbt2 to check ordered can never give a TNone 
          * constructor *)
-        Check (traverse_node_impossible_case).
-
         assert (H_bt2_impossible_case:
                   traverse_to_check_ordered_bt A (Node A t2) compare =
                   TNone (A * A) -> False).
@@ -3568,7 +3346,6 @@ Proof.
         rewrite -> H_min_ret_eq_min2.
 
         (* to solve this problem, we right reduce H_ord_t_init *)
-        Check (ordered_node_has_min_max).
         rewrite -> H_bt2_as_node in H_ord_t_init.
         destruct (ordered_node_has_min_max
                     A compare h_hbt (HNode A h1 bt1) e (HNode A h2 (Node A t2))
@@ -3587,7 +3364,6 @@ Proof.
         exact H_hbt_init_traverse_bt.
         
         (* now left reduce H_hbt_init_traverse *)
-        Check (reduce_ordered_hbt_left).
         assert (H_hbt_init_left_reduced:
                   traverse_to_check_ordered_hbt
                     A
@@ -3634,7 +3410,6 @@ Proof.
 
         (* we are finally in a position to apply 
          * insertion_rotate_right_preserves_order ! *)
-        Check (insertion_rotate_left_preserves_order).
         exact (insertion_rotate_left_preserves_order
                  A compare (HNode A h1 bt1) (HNode A h_ret (Node A t_ret))
                  min_ret max_ret e hbt'
@@ -3651,3 +3426,7 @@ Proof.
 
       * discriminate.
 Qed.
+
+(* ********** *)
+
+(* ********** End of ordered_main.v ********** *)
