@@ -676,3 +676,60 @@ let eq_assoc_comm_certified_hbt e1 e2 =
 ;;
 
 let _ = assert (test_eq_assoc_comm eq_assoc_comm_certified_hbt 1000) ;;
+
+
+(* Now that we have the three ways of checking for equality modulo associativity and 
+ * commutativity, let us write some tests to compare their performance *)
+
+(* Record type to store performance info *)
+type performance_info =
+  { t_naive : float;
+    t_org   : float;
+    t_cert  : float;
+  };;
+
+(* Type to record duration *)
+let rec duration p (x, x') exp =
+  let t_init = Sys.time () in
+  let bv = p x x' in
+  assert (bv = exp);
+  let t_fin = Sys.time ()
+  in t_fin -. t_init
+;;
+
+(* Function to compare performances of predicates and return the average time taken
+ *) 
+let compare_eq_assoc_comm_predicates n_init =
+  let rec iterate n r =
+    match n with
+    | 0 ->
+       let nf = float_of_int n_init
+       in {t_naive = (r.t_naive /. nf);
+           t_org = (r.t_org /. nf);
+           t_cert = (r.t_cert /. nf);
+          }
+    | _ -> 
+       let depth = Random.int 20
+       in let p_eq = Tests.generate_pair_equal_modulo_assoc_comm depth
+          and p_neq = Tests.generate_pair_not_equal_modulo_assoc_comm depth in
+          let t_naive' = (duration eq_assoc_comm_naive p_eq true)
+                         +. (duration eq_assoc_comm_naive  p_neq false)
+          and t_org' = (duration eq_assoc_comm_original_hbt p_eq true)
+                       +. (duration eq_assoc_comm_original_hbt p_neq false)
+          and t_cert' = (duration eq_assoc_comm_certified_hbt p_eq true)
+                        +. (duration eq_assoc_comm_certified_hbt p_neq false) in
+          let r' = { t_naive = r.t_naive +. t_naive';
+                     t_org = r.t_org +. t_org';
+                     t_cert = r.t_cert +. t_cert';
+                   }
+          in iterate (n - 1) r'
+  in iterate n_init {t_naive = 0.0; t_org = 0.0; t_cert = 0.0;}
+;;
+
+compare_eq_assoc_comm_predicates 1000;;                           
+
+let (e, e') = Tests.generate_pair_equal_modulo_assoc_comm 30;;
+
+duration eq_assoc_comm_naive (e, e') true ;; 
+duration eq_assoc_comm_original_hbt_alt (e, e') true ;;
+duration eq_assoc_comm_certified_hbt (e, e') true ;;
