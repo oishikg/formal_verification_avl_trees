@@ -1105,6 +1105,11 @@ Compute (test_insert_hbt insert_hbt).
 Set Extraction Optimize.
 Set Extraction AutoInline.
 
+Extraction occurs_hbt.
+(* Extraction insert_hbt "/home/oishik/YNC/Y4S1/Capstone_copy/Code/extracted_files/extracted_insertion.ml". *)
+
+
+
 (* ********** *)
 
 (* ********** End of hbt.v ********** *)
