@@ -746,7 +746,10 @@ Definition test_insert_hbt
 
 (** ** Implementation of Insertion Opertaion *)
 
-(** Implementation of a right rotation *)
+(** Implementation of a right rotation. Note that this implementation implements the
+double rotation directly, rather than making transparent the left and right rotations
+which were composed. As a result, the project refers to the standard right rotation
+as <<rotate_right_1>>, and the double rotation as <<rotate_right_2>>. *)
 Definition rotate_right_bt
            (A : Type)
            (bt1 : binary_tree A)
@@ -809,7 +812,11 @@ Definition rotate_right_hbt
     end
   end.
 
-(** Implementation of a left rotation *)
+
+(** Implementation of a left rotation. Note that this implementation implements the
+double rotation directly, rather than making transparent the left and left rotations
+which were composed. As a result, the project refers to the standard left rotation
+as <<rotate_left_1>>, and the double rotation as <<rotate_left_2>>. *)
 Definition rotate_left_bt
            (A : Type)
            (h1 : nat)
