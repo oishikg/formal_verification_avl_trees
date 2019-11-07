@@ -8,3 +8,5 @@ Coq_files/misc/*
 Coq_files/src/Makefile.coq
 *.aux
 Coq_files/src/CoqMakefile.conf
+*html
+*css 

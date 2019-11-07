@@ -1,3 +1,5 @@
+(* ********** paraphernalia.v ********** *)
+
 (** The Paraphernalia library contains general definitions and lemmas which are 
 important across the entire project *)
 
@@ -57,6 +59,15 @@ Proof.
     apply False_ind.
     exact C_yx.
     reflexivity.
+Qed.
+
+(** Lemma to assert trivial equalities *)
+Lemma trivial_equality:
+  forall (A : Type)
+         (v : A),
+    v = v.
+Proof.
+  intros; reflexivity.
 Qed.
 
 (** Defining an operator for equality of boolean values *) 
@@ -629,15 +640,6 @@ Proof.
   exact H.
 Qed.
 
-(** Lemma to assert trivial equalities *)
-Lemma trivial_equality:
-  forall (A : Type)
-         (v : A),
-    v = v.
-Proof.
-  intros; reflexivity.
-Qed.
-
 (* ********** *)
 
-(* ********** End of Paraphernalia ********** *)
+(* ********** End of paraphernalia.v ********** *)
