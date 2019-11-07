@@ -1,5 +1,5 @@
-Require Import Hbt.Lemmas.Ordered.ordered_sub.
-Require Export Hbt.Lemmas.Ordered.ordered_sub.
+Require Import Hbt.Lemmas.Ordered.ordered_helper.
+Require Export Hbt.Lemmas.Ordered.ordered_helper.
 
 (* The main lemma required to prove the orderedness case of the insertion specification in 
  * Hbt.Theorems.theorems: given an insertion into a subtree, show that the maximum and 

@@ -68,6 +68,218 @@ Proof.
   discriminate. 
 Qed.
 
+(* Lemma to show that traversing a node with a triple (as opposed to a leaf) to check 
+ * orderedness can never yield a TNone (which is returned only if a leaf is traversed) *)
+Lemma traverse_node_impossible_case:
+  forall (A : Type)
+         (compare : A -> A -> element_comparison)
+         (t1 : triple A),
+    traverse_to_check_ordered_bt A (Node A t1) compare = TNone (A * A) -> False. 
+Proof.
+  intros A compare t1 H.
+  rewrite -> unfold_traverse_to_check_ordered_bt_node in H.
+  induction t1 as [hbt11 e1 hbt12].
+  rewrite -> unfold_traverse_to_check_ordered_t in H.
+  case (traverse_to_check_ordered_hbt A hbt11 compare) as [ | | (min11, max11)].
+  case (traverse_to_check_ordered_hbt A hbt12 compare) as [ | | (min12, max12)].
+  discriminate.
+  discriminate.
+  discriminate.
+  case (traverse_to_check_ordered_hbt A hbt12 compare) as [ | | (min12, max12)].
+  discriminate.
+  discriminate.
+  case (compare e1 min12) as [ | | ].
+  discriminate.
+  discriminate.
+  discriminate.
+  case (traverse_to_check_ordered_hbt A hbt12 compare) as [ | | (min12, max12)].
+  case (compare max11 e1) as [ | | ].
+  discriminate.
+  discriminate.
+  discriminate.
+  case (compare max11 e1) as [ | | ].
+  discriminate.
+  discriminate.
+  discriminate.
+  case (compare max11 e1) as [ | | ].
+  case (compare e1 min12) as [ | | ].
+  discriminate.
+  discriminate.
+  discriminate.
+  discriminate.
+  discriminate.
+Qed.
+
+(* Lemma to show that if a binary tree is ordered, then it is either a leaf (in which 
+ * case traverse_to_check_ordered_hbt function returns a TNone value) or a node (in which case
+ * the traverse_to_check_ordered_hbt function returns a TSome value). *)
+Lemma is_ordered_true_implies_leaf_or_ordered_node:
+  forall (A : Type)
+         (compare : A -> A -> element_comparison)
+         (hbt : heightened_binary_tree A),
+    is_ordered_hbt A hbt compare = true ->
+    (traverse_to_check_ordered_hbt A hbt compare =
+     TNone (A * A)
+     \/
+     exists (min max : A), 
+       traverse_to_check_ordered_hbt A hbt compare =
+       TSome (A * A) (min, max)).
+Proof.  
+  intros. 
+  unfold is_ordered_hbt in H.
+  induction hbt as [h bt].
+  case bt as [ | t] eqn : C_bt.
+  rewrite -> unfold_traverse_to_check_ordered_hbt.
+  rewrite -> unfold_traverse_to_check_ordered_bt_leaf.
+  apply or_introl.
+  reflexivity.
+  rewrite -> unfold_traverse_to_check_ordered_hbt in H.
+  case (traverse_to_check_ordered_bt A (Node A t) compare)
+    as [ | |(min, max)] eqn : C_traverse_bt. 
+  discriminate.
+  
+  assert (H_false : False).
+  Check (traverse_node_impossible_case).
+  exact (traverse_node_impossible_case A compare t C_traverse_bt).
+  apply False_ind.
+  exact H_false.
+
+  apply or_intror.
+  exists min.
+  exists max.
+  exact C_traverse_bt.
+Qed.
+
+(* A very useful lemma: if traversing a binary tree to check its orderedness yields a 
+ * TSome pair, then reducing the left subtree to a leaf also yields an ordered tree 
+ * with a maximum and minimum value *)
+Lemma reduce_ordered_hbt_left:
+  forall (A : Type)
+         (compare : A -> A -> element_comparison)
+         (h : nat)
+         (hbt1 : heightened_binary_tree A)
+         (e : A)
+         (hbt2 : heightened_binary_tree A)
+         (min max : A),
+    traverse_to_check_ordered_hbt
+      A (HNode A h (Node A (Triple A hbt1 e hbt2))) compare = TSome (A * A) (min, max) ->
+    traverse_to_check_ordered_hbt
+      A (HNode A h (Node A (Triple A
+                                   (HNode A 0 (Leaf A))
+                                   e
+                                   hbt2))) compare = TSome (A * A) (e, max).
+Proof.    
+  intros.
+  rewrite -> unfold_traverse_to_check_ordered_hbt.
+  rewrite -> unfold_traverse_to_check_ordered_bt_node.
+  rewrite -> unfold_traverse_to_check_ordered_t.   
+  rewrite -> unfold_traverse_to_check_ordered_hbt.
+  rewrite -> unfold_traverse_to_check_ordered_bt_leaf.
+  rewrite -> unfold_traverse_to_check_ordered_hbt in H. 
+  rewrite -> unfold_traverse_to_check_ordered_bt_node in H.
+  rewrite -> unfold_traverse_to_check_ordered_t in H.
+  case (traverse_to_check_ordered_hbt A hbt1 compare) as [ | | (min1, max1)].
+  discriminate.
+  case (traverse_to_check_ordered_hbt A hbt2 compare) as [ | | (min2, max2)].
+  discriminate.
+  rewrite -> tsome_x_equal_tsome_y in H.
+  rewrite -> pairwise_equality in H.
+  destruct H as [_ H'].
+  rewrite <- H'.
+  reflexivity.
+  case (compare e min2) as [ | | ].
+  rewrite -> tsome_x_equal_tsome_y in H.
+  rewrite -> pairwise_equality in H.
+  destruct H as [_ H'].
+  rewrite <- H'.
+  reflexivity.
+  discriminate.
+  discriminate.
+  case (compare max1 e) as [ | | ].
+  case (traverse_to_check_ordered_hbt A hbt2 compare) as [ | | (min2, max2)]. 
+  discriminate.
+  rewrite -> tsome_x_equal_tsome_y in H.
+  rewrite -> pairwise_equality in H.
+  destruct H as [_ H'].
+  rewrite <- H'.
+  reflexivity.
+  case (compare e min2) as [ | | ].
+  rewrite -> tsome_x_equal_tsome_y in H.
+  rewrite -> pairwise_equality in H.
+  destruct H as [_ H'].
+  rewrite <- H'.
+  reflexivity.
+  discriminate.
+  discriminate.
+  discriminate.
+  discriminate.
+Qed.
+
+(* Lemma to show the same thing as for reduce_ordered_hbt_left, but with the right subtree
+ * reduced *)
+Lemma reduce_ordered_hbt_right:
+  forall (A : Type)
+         (compare : A -> A -> element_comparison)
+         (h : nat)
+         (hbt1 : heightened_binary_tree A)
+         (e : A)
+         (hbt2 : heightened_binary_tree A)
+         (min max : A),
+    traverse_to_check_ordered_hbt
+      A (HNode A h (Node A (Triple A hbt1 e hbt2))) compare = TSome (A * A) (min, max) ->
+    traverse_to_check_ordered_hbt
+      A (HNode A h (Node A (Triple A
+                                   hbt1
+                                   e
+                                   (HNode A 0 (Leaf A))))) compare = TSome (A * A) (min, e).
+Proof.
+  intros. 
+  rewrite -> unfold_traverse_to_check_ordered_hbt.
+  rewrite -> unfold_traverse_to_check_ordered_bt_node.
+  rewrite -> unfold_traverse_to_check_ordered_t.   
+  rewrite -> unfold_traverse_to_check_ordered_hbt.
+  rewrite -> unfold_traverse_to_check_ordered_bt_leaf.
+  rewrite -> unfold_traverse_to_check_ordered_hbt in H. 
+  rewrite -> unfold_traverse_to_check_ordered_bt_node in H.
+  rewrite -> unfold_traverse_to_check_ordered_t in H.
+  case (traverse_to_check_ordered_hbt A hbt1 compare) as [ | | (min1, max1)].
+  discriminate.
+  case (traverse_to_check_ordered_hbt A hbt2 compare) as [ | | (min2, max2)].
+  discriminate.
+  rewrite -> tsome_x_equal_tsome_y in H.
+  rewrite -> pairwise_equality in H.
+  destruct H as [H' _].
+  rewrite <- H'.
+  reflexivity.
+  case (compare e min2) as [ | | ].
+  rewrite -> tsome_x_equal_tsome_y in H.
+  rewrite -> pairwise_equality in H.
+  destruct H as [H' _].
+  rewrite <- H'.
+  reflexivity.  
+  discriminate.
+  discriminate.
+  case (compare max1 e) as [ | | ].
+  case (traverse_to_check_ordered_hbt A hbt2 compare) as [ | | (min2, max2)].
+  discriminate.
+  rewrite -> tsome_x_equal_tsome_y in H.
+  rewrite -> pairwise_equality in H.
+  destruct H as [H' _].
+  rewrite <- H'.
+  reflexivity.
+  case (compare e min2) as [ | | ].
+  rewrite -> tsome_x_equal_tsome_y in H.
+  rewrite -> pairwise_equality in H.
+  destruct H as [H' _].
+  rewrite <- H'.
+  reflexivity.  
+  discriminate.
+  discriminate.
+  discriminate.
+  discriminate.
+Qed.
+
+
 (* Lemma to show that if traversing a binary tree to check its orderedness yields a 
  * maximum and a minimum value, then the tree must be ordered *)
 Lemma traverse_to_check_ordered_hbt_some_implies_is_ordered:
@@ -406,216 +618,6 @@ Proof.
 Qed.      
 
 
-(* Lemma to show that traversing a node with a triple (as opposed to a leaf) to check 
- * orderedness can never yield a TNone (which is returned only if a leaf is traversed) *)
-Lemma traverse_node_impossible_case:
-  forall (A : Type)
-         (compare : A -> A -> element_comparison)
-         (t1 : triple A),
-    traverse_to_check_ordered_bt A (Node A t1) compare = TNone (A * A) -> False. 
-Proof.
-  intros A compare t1 H.
-  rewrite -> unfold_traverse_to_check_ordered_bt_node in H.
-  induction t1 as [hbt11 e1 hbt12].
-  rewrite -> unfold_traverse_to_check_ordered_t in H.
-  case (traverse_to_check_ordered_hbt A hbt11 compare) as [ | | (min11, max11)].
-  case (traverse_to_check_ordered_hbt A hbt12 compare) as [ | | (min12, max12)].
-  discriminate.
-  discriminate.
-  discriminate.
-  case (traverse_to_check_ordered_hbt A hbt12 compare) as [ | | (min12, max12)].
-  discriminate.
-  discriminate.
-  case (compare e1 min12) as [ | | ].
-  discriminate.
-  discriminate.
-  discriminate.
-  case (traverse_to_check_ordered_hbt A hbt12 compare) as [ | | (min12, max12)].
-  case (compare max11 e1) as [ | | ].
-  discriminate.
-  discriminate.
-  discriminate.
-  case (compare max11 e1) as [ | | ].
-  discriminate.
-  discriminate.
-  discriminate.
-  case (compare max11 e1) as [ | | ].
-  case (compare e1 min12) as [ | | ].
-  discriminate.
-  discriminate.
-  discriminate.
-  discriminate.
-  discriminate.
-Qed.
-
-(* Lemma to show that if a binary tree is ordered, then it is either a leaf (in which 
- * case traverse_to_check_ordered_hbt function returns a TNone value) or a node (in which case
- * the traverse_to_check_ordered_hbt function returns a TSome value). *)
-Lemma is_ordered_true_implies_leaf_or_ordered_node:
-  forall (A : Type)
-         (compare : A -> A -> element_comparison)
-         (hbt : heightened_binary_tree A),
-    is_ordered_hbt A hbt compare = true ->
-    (traverse_to_check_ordered_hbt A hbt compare =
-     TNone (A * A)
-     \/
-     exists (min max : A), 
-       traverse_to_check_ordered_hbt A hbt compare =
-       TSome (A * A) (min, max)).
-Proof.  
-  intros. 
-  unfold is_ordered_hbt in H.
-  induction hbt as [h bt].
-  case bt as [ | t] eqn : C_bt.
-  rewrite -> unfold_traverse_to_check_ordered_hbt.
-  rewrite -> unfold_traverse_to_check_ordered_bt_leaf.
-  apply or_introl.
-  reflexivity.
-  rewrite -> unfold_traverse_to_check_ordered_hbt in H.
-  case (traverse_to_check_ordered_bt A (Node A t) compare)
-    as [ | |(min, max)] eqn : C_traverse_bt. 
-  discriminate.
-  
-  assert (H_false : False).
-  Check (traverse_node_impossible_case).
-  exact (traverse_node_impossible_case A compare t C_traverse_bt).
-  apply False_ind.
-  exact H_false.
-
-  apply or_intror.
-  exists min.
-  exists max.
-  exact C_traverse_bt.
-Qed.
-
-(* A very useful lemma: if traversing a binary tree to check its orderedness yields a 
- * TSome pair, then reducing the left subtree to a leaf also yields an ordered tree 
- * with a maximum and minimum value *)
-Lemma reduce_ordered_hbt_left:
-  forall (A : Type)
-         (compare : A -> A -> element_comparison)
-         (h : nat)
-         (hbt1 : heightened_binary_tree A)
-         (e : A)
-         (hbt2 : heightened_binary_tree A)
-         (min max : A),
-    traverse_to_check_ordered_hbt
-      A (HNode A h (Node A (Triple A hbt1 e hbt2))) compare = TSome (A * A) (min, max) ->
-    traverse_to_check_ordered_hbt
-      A (HNode A h (Node A (Triple A
-                                   (HNode A 0 (Leaf A))
-                                   e
-                                   hbt2))) compare = TSome (A * A) (e, max).
-Proof.    
-  intros.
-  rewrite -> unfold_traverse_to_check_ordered_hbt.
-  rewrite -> unfold_traverse_to_check_ordered_bt_node.
-  rewrite -> unfold_traverse_to_check_ordered_t.   
-  rewrite -> unfold_traverse_to_check_ordered_hbt.
-  rewrite -> unfold_traverse_to_check_ordered_bt_leaf.
-  rewrite -> unfold_traverse_to_check_ordered_hbt in H. 
-  rewrite -> unfold_traverse_to_check_ordered_bt_node in H.
-  rewrite -> unfold_traverse_to_check_ordered_t in H.
-  case (traverse_to_check_ordered_hbt A hbt1 compare) as [ | | (min1, max1)].
-  discriminate.
-  case (traverse_to_check_ordered_hbt A hbt2 compare) as [ | | (min2, max2)].
-  discriminate.
-  rewrite -> tsome_x_equal_tsome_y in H.
-  rewrite -> pairwise_equality in H.
-  destruct H as [_ H'].
-  rewrite <- H'.
-  reflexivity.
-  case (compare e min2) as [ | | ].
-  rewrite -> tsome_x_equal_tsome_y in H.
-  rewrite -> pairwise_equality in H.
-  destruct H as [_ H'].
-  rewrite <- H'.
-  reflexivity.
-  discriminate.
-  discriminate.
-  case (compare max1 e) as [ | | ].
-  case (traverse_to_check_ordered_hbt A hbt2 compare) as [ | | (min2, max2)]. 
-  discriminate.
-  rewrite -> tsome_x_equal_tsome_y in H.
-  rewrite -> pairwise_equality in H.
-  destruct H as [_ H'].
-  rewrite <- H'.
-  reflexivity.
-  case (compare e min2) as [ | | ].
-  rewrite -> tsome_x_equal_tsome_y in H.
-  rewrite -> pairwise_equality in H.
-  destruct H as [_ H'].
-  rewrite <- H'.
-  reflexivity.
-  discriminate.
-  discriminate.
-  discriminate.
-  discriminate.
-Qed.
-
-(* Lemma to show the same thing as for reduce_ordered_hbt_left, but with the right subtree
- * reduced *)
-Lemma reduce_ordered_hbt_right:
-  forall (A : Type)
-         (compare : A -> A -> element_comparison)
-         (h : nat)
-         (hbt1 : heightened_binary_tree A)
-         (e : A)
-         (hbt2 : heightened_binary_tree A)
-         (min max : A),
-    traverse_to_check_ordered_hbt
-      A (HNode A h (Node A (Triple A hbt1 e hbt2))) compare = TSome (A * A) (min, max) ->
-    traverse_to_check_ordered_hbt
-      A (HNode A h (Node A (Triple A
-                                   hbt1
-                                   e
-                                   (HNode A 0 (Leaf A))))) compare = TSome (A * A) (min, e).
-Proof.
-  intros. 
-  rewrite -> unfold_traverse_to_check_ordered_hbt.
-  rewrite -> unfold_traverse_to_check_ordered_bt_node.
-  rewrite -> unfold_traverse_to_check_ordered_t.   
-  rewrite -> unfold_traverse_to_check_ordered_hbt.
-  rewrite -> unfold_traverse_to_check_ordered_bt_leaf.
-  rewrite -> unfold_traverse_to_check_ordered_hbt in H. 
-  rewrite -> unfold_traverse_to_check_ordered_bt_node in H.
-  rewrite -> unfold_traverse_to_check_ordered_t in H.
-  case (traverse_to_check_ordered_hbt A hbt1 compare) as [ | | (min1, max1)].
-  discriminate.
-  case (traverse_to_check_ordered_hbt A hbt2 compare) as [ | | (min2, max2)].
-  discriminate.
-  rewrite -> tsome_x_equal_tsome_y in H.
-  rewrite -> pairwise_equality in H.
-  destruct H as [H' _].
-  rewrite <- H'.
-  reflexivity.
-  case (compare e min2) as [ | | ].
-  rewrite -> tsome_x_equal_tsome_y in H.
-  rewrite -> pairwise_equality in H.
-  destruct H as [H' _].
-  rewrite <- H'.
-  reflexivity.  
-  discriminate.
-  discriminate.
-  case (compare max1 e) as [ | | ].
-  case (traverse_to_check_ordered_hbt A hbt2 compare) as [ | | (min2, max2)].
-  discriminate.
-  rewrite -> tsome_x_equal_tsome_y in H.
-  rewrite -> pairwise_equality in H.
-  destruct H as [H' _].
-  rewrite <- H'.
-  reflexivity.
-  case (compare e min2) as [ | | ].
-  rewrite -> tsome_x_equal_tsome_y in H.
-  rewrite -> pairwise_equality in H.
-  destruct H as [H' _].
-  rewrite <- H'.
-  reflexivity.  
-  discriminate.
-  discriminate.
-  discriminate.
-  discriminate.
-Qed.
 
 (* Lemma to show that if a right rotated tree is ordered, then the original subtree into which 
  * an element was inserted is also ordered *)
