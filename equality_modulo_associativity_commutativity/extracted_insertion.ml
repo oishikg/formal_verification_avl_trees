@@ -1,4 +1,4 @@
-(* ********** The original heightened binary_tree implementaion ********** *)
+(* The original heightened binary_tree implementaion *)
 
 module Original_Hbt =
   struct
@@ -152,9 +152,7 @@ module Original_Hbt =
   end
 ;;
 
-(* ********** *)
-
-(* ********** Module with certified heightened binary tree code ********** *)
+(* Module with certified heightened binary tree code *)
 module Certified_Hbt =
   struct
     
@@ -627,9 +625,6 @@ let _ = assert (test_eq_assoc_comm eq_assoc_comm_naive 1000) ;;
  * Traverse the expression and insert each variables into a self-balancing binary 
  * tree using the certified insertion function *)
 
-
-
-
 (* Predicate to check equality modulo associativity and commutativity using the 
  * original OCaml AVL tree implementation *)
 let eq_assoc_comm_original_hbt e1 e2 =
@@ -649,12 +644,14 @@ let eq_assoc_comm_original_hbt e1 e2 =
      and hbt2 = traverse_exp e2 Original_Hbt.hbt_empty
      in let ll1 = flatten_to_ll hbt1 LNil
         and ll2 = flatten_to_ll hbt2 LNil
-        in lazy_lists_equal ll1 ll2
+in lazy_lists_equal ll1 ll2
 ;;
 
 let _ = assert (test_eq_assoc_comm eq_assoc_comm_original_hbt 1000) ;;
 
-let eq_assoc_comm_certified_hbt e1 e2 =
+(* Predicate to check equality modulo associativity and commutativity using the 
+ * certified and extracted OCaml AVL tree implementation *)
+let eq_assoc_comm_certified_hbtu e1 e2 =
   let rec traverse_exp e acc = 
     match e with
     | Ide n ->
@@ -727,9 +724,3 @@ let compare_eq_assoc_comm_predicates n_init =
 ;;
 
 compare_eq_assoc_comm_predicates 1000;;                           
-
-let (e, e') = Tests.generate_pair_equal_modulo_assoc_comm 30;;
-
-duration eq_assoc_comm_naive (e, e') true ;; 
-duration eq_assoc_comm_original_hbt_alt (e, e') true ;;
-duration eq_assoc_comm_certified_hbt (e, e') true ;;
