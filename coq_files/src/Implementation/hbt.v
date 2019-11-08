@@ -557,7 +557,7 @@ Lemma unfold_occurs_t:
     | Gt =>
       occurs_hbt A compare e hbt2
     end.
-Proof.      
+Proof.
   unfold_tactic occurs_t.
 Qed.
 

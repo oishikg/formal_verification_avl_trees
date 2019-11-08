@@ -77,7 +77,7 @@ Qed.
 (** Defining the specification for an insertion function on AVL trees: given a sound,
 balanced, and ordered tree, inserting some element into this tree should give a tree 
 that is also sound, balanced, and ordered *)
-Definition specifiction_of_insert_hbt
+Definition specification_of_insert_hbt
            (A : Type)
            (compare : A -> A -> element_comparison)
            (x : A)
@@ -103,10 +103,10 @@ Theorem insert_hbt_satisfies_its_specification:
   forall (A : Type)
          (compare : A -> A -> element_comparison)
          (x : A),
-    specifiction_of_insert_hbt A compare x insert_hbt. 
+    specification_of_insert_hbt A compare x insert_hbt. 
 Proof.
   intros A compare.
-  unfold specifiction_of_insert_hbt.
+  unfold specification_of_insert_hbt.
   intros x hbt H_sound_init H_bal_init H_order_init H_compare.
   unfold insert_hbt.
   case (insert_hbt_helper A compare x hbt) as [ hbt' | ] eqn : C.
