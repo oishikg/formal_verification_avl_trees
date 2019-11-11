@@ -1,4 +1,4 @@
-(* The original heightened binary_tree implementaion *)
+(* ********** Original implementation ********** *)
 
 module Original_Hbt =
   struct
@@ -152,8 +152,12 @@ module Original_Hbt =
   end
 ;;
 
+(* ********** *)
+
+(* ********** Certified implementation using Peano numbers ********** *)
+
 (* Module with certified heightened binary tree code *)
-module Certified_Hbt =
+module Certified_Hbt_Peano =
   struct
     
     type bool =
@@ -379,9 +383,178 @@ module Certified_Hbt =
 
 (* ********** *)
 
-           
+(* ********** Certified implementation using OCaml Int ********** *)
 
-(* ********** Equality modulo associativity and commutativity ********** *)
+module Certified_Hbt_Int =
+  struct
+    type element_comparison =
+      | Lt
+      | Eq
+      | Gt
+
+    let compare_int i j =
+      if i < j then Lt else if i = j then Eq else Gt;;
+
+    type 'a heightened_binary_tree =
+      | HNode of int * 'a binary_tree
+    and 'a binary_tree =
+      | Leaf
+      | Node of 'a triple
+    and 'a triple =
+      | Triple of 'a heightened_binary_tree * 'a * 'a heightened_binary_tree
+
+    (** val hbt_empty : nat heightened_binary_tree **)
+    let hbt_empty =
+      HNode (0, Leaf)
+
+    (** val occurs_hbt :
+    ('a1 -> 'a1 -> element_comparison) -> 'a1 -> 'a1 heightened_binary_tree -> bool **)
+    let rec occurs_hbt compare e = function
+      | HNode (_, bt) -> occurs_bt compare e bt
+    (** val occurs_bt : ('a1 -> 'a1 -> element_comparison) -> 'a1 -> 'a1 binary_tree -> bool **)
+    and occurs_bt compare e = function
+      | Leaf -> false
+      | Node t -> occurs_t compare e t
+    (** val occurs_t : ('a1 -> 'a1 -> element_comparison) -> 'a1 -> 'a1 triple -> bool **)
+    and occurs_t compare e = function
+      | Triple (hbt1, e', hbt2) ->
+         (match compare e e' with
+          | Lt -> occurs_hbt compare e hbt1
+          | Eq -> true
+          | Gt -> occurs_hbt compare e hbt2)
+            
+
+    (** val rotate_right_bt :
+    'a1 binary_tree -> 'a1 -> nat -> 'a1 binary_tree -> 'a1 heightened_binary_tree option **)
+    let rotate_right_bt bt1 e h2 bt2 =
+      match bt1 with
+      | Leaf -> None
+      | Node t ->
+         let Triple (h, e1, h0) = t in
+         let HNode (h11, bt11) = h in
+         let HNode (h12, bt12) = h0 in
+         (match succ h11 = h12 with
+          | true ->
+             (match bt12 with
+              | Leaf -> None
+              | Node t0 ->
+                 let Triple (h1, e12, h3) = t0 in
+                 let HNode (h121, bt121) = h1 in
+                 let HNode (h122, bt122) = h3 in
+                 Some (HNode ((succ (max (succ (max h11 h121)) (succ (max h122 h2)))),
+                              (Node (Triple ((HNode ((succ (max h11 h121)), (Node (Triple ((HNode (h11, bt11)),
+                                                                                                e1, (HNode (h121, bt121))))))), e12, (HNode ((succ (max h122 h2)), (Node (Triple
+                                                                                                                                                                                 ((HNode (h122, bt122)), e, (HNode (h2, bt2)))))))))))))
+          | false ->
+             (match match succ h12 = h11 with
+                    | true -> true
+                    | false -> h12 = h11 with
+              | true ->
+                 Some (HNode ((succ (max h11 (succ (max h12 h2)))), (Node (Triple ((HNode
+                                                                                                (h11, bt11)), e1, (HNode ((succ (max h12 h2)), (Node (Triple ((HNode (h12,
+                                                                                                                                                                           bt12)), e, (HNode (h2, bt2))))))))))))
+              | false -> None))
+
+    (** val rotate_right_hbt :
+    'a1 heightened_binary_tree -> 'a1 -> 'a1 heightened_binary_tree -> 'a1 heightened_binary_tree
+    option **)
+    let rotate_right_hbt hbt1 e hbt2 =
+      let HNode (_, bt1) = hbt1 in let HNode (h2, bt2) = hbt2 in rotate_right_bt bt1 e h2 bt2
+
+    (** val rotate_left_bt :
+    nat -> 'a1 binary_tree -> 'a1 -> 'a1 binary_tree -> 'a1 heightened_binary_tree option **)
+    let rotate_left_bt h1 bt1 e = function
+      | Leaf -> None
+      | Node t ->
+         let Triple (h, e2, h0) = t in
+         let HNode (h21, bt21) = h in
+         let HNode (h22, bt22) = h0 in
+         (match succ h22 = h21 with
+          | true ->
+             (match bt21 with
+              | Leaf -> None
+              | Node t0 ->
+                 let Triple (h2, e21, h3) = t0 in
+                 let HNode (h211, bt211) = h2 in
+                 let HNode (h212, bt212) = h3 in
+                 Some (HNode ((succ (max (succ (max h1 h211)) (succ (max h212 h22)))),
+                              (Node (Triple ((HNode ((succ (max h1 h211)), (Node (Triple ((HNode (h1, bt1)), e,
+                                                                                               (HNode (h211, bt211))))))), e21, (HNode ((succ (max h212 h22)), (Node (Triple
+                                                                                                                                                                             ((HNode (h212, bt212)), e2, (HNode (h22, bt22)))))))))))))
+          | false ->
+             (match match succ h21 = h22 with
+                    | true -> true
+                    | false -> h21 = h22 with
+              | true ->
+                 Some (HNode ((succ (max (succ (max h1 h21)) h22)), (Node (Triple ((HNode
+                                                                                                ((succ (max h1 h21)), (Node (Triple ((HNode (h1, bt1)), e, (HNode (h21,
+                                                                                                                                                                        bt21))))))), e2, (HNode (h22, bt22)))))))
+              | false -> None))
+
+    (** val rotate_left_hbt :
+    'a1 heightened_binary_tree -> 'a1 -> 'a1 heightened_binary_tree -> 'a1 heightened_binary_tree
+    option **)
+    let rotate_left_hbt hbt1 e hbt2 =
+      let HNode (h1, bt1) = hbt1 in let HNode (_, bt2) = hbt2 in rotate_left_bt h1 bt1 e bt2
+
+    (** val project_height_hbt : 'a1 heightened_binary_tree -> nat **)
+    let project_height_hbt = function
+      | HNode (h, _) -> h
+
+    (** val insert_hbt_helper :
+    ('a1 -> 'a1 -> element_comparison) -> 'a1 -> 'a1 heightened_binary_tree -> 'a1
+    heightened_binary_tree option **)
+    let rec insert_hbt_helper compare x = function
+      | HNode (h, bt) -> insert_bt_helper compare x h bt
+    (** val insert_bt_helper :
+    ('a1 -> 'a1 -> element_comparison) -> 'a1 -> nat -> 'a1 binary_tree -> 'a1
+    heightened_binary_tree option **)
+    and insert_bt_helper compare x h_hbt = function
+      | Leaf -> Some (HNode (1, (Node (Triple ((HNode (0, Leaf)), x, (HNode (0, Leaf)))))))
+      | Node t -> insert_t_helper compare x h_hbt t
+    (** val insert_t_helper :
+    ('a1 -> 'a1 -> element_comparison) -> 'a1 -> nat -> 'a1 triple -> 'a1 heightened_binary_tree
+    option **)
+    and insert_t_helper compare x _ = function
+      | Triple (hbt1, e, hbt2) ->
+         (match compare x e with
+          | Lt ->
+             (match insert_hbt_helper compare x hbt1 with
+              | Some h ->
+                 let HNode (h1', bt1') = h in
+                 (match compare_int h1' (2 + (project_height_hbt hbt2)) with
+                  | Lt ->
+                     Some (HNode ((succ (max h1' (project_height_hbt hbt2))), (Node (Triple ((HNode
+                                                                                                     (h1', bt1')), e, hbt2)))))
+                  | Eq -> rotate_right_hbt (HNode (h1', bt1')) e hbt2
+                  | Gt -> None)
+              | None -> None)
+          | Eq -> None
+          | Gt ->
+             (match insert_hbt_helper compare x hbt2 with
+              | Some h ->
+                 let HNode (h2', bt2') = h in
+                 (match compare_int h2' (2 + (project_height_hbt hbt1)) with
+                  | Lt ->
+                     Some (HNode ((succ (max (project_height_hbt hbt1) h2')), (Node (Triple (hbt1, e,
+                                                                                                  (HNode (h2', bt2')))))))
+                  | Eq -> rotate_left_hbt hbt1 e (HNode (h2', bt2'))
+                  | Gt -> None)
+              | None -> None))
+
+    (** val insert_hbt :
+    ('a1 -> 'a1 -> element_comparison) -> 'a1 -> 'a1 heightened_binary_tree -> 'a1
+    heightened_binary_tree **)
+    let insert_hbt compare x hbt =
+      match insert_hbt_helper compare x hbt with
+      | Some hbt' -> hbt'
+      | None -> hbt
+  end
+;;
+
+(* ********** *)
+
+(* ********** Paraphernalia ********** *)
 
 (* Introducing a type that captures the abstract syntax tree of expressions in 
  * binary operations that are both associative and commutative; taken from 
@@ -535,25 +708,6 @@ module Tests =
          (f ()) && (loop f (pred n)) 
   end
   
-
-(* Checking for equality modulo associativity and commutativity between two 
- * expressions boils down to checking if the two expressions have exactly the same
- * elements. *)
-
-(* First, some paraphernalia required for the predicates *)
-    
-(* Function to map OCaml's in-built compare function to 
- * Certified_Hbt.element_comparison *)
-let compare_to_element_comparison a b =
-  match compare a b with
-  | -1 ->
-     Certified_Hbt.Lt
-  | 0 ->
-     Certified_Hbt.Eq
-  | _ ->
-     Certified_Hbt.Gt
-;;
-
 (* Function to map OCaml's in-built compare function to 
  * Original_Hbt.element_comparison *)
 let compare_to_comparison a b =
@@ -564,6 +718,30 @@ let compare_to_comparison a b =
      Original_Hbt.Eq
   | _ ->
      Original_Hbt.Gt
+;;
+    
+(* Function to map OCaml's in-built compare function to 
+ * Certified_Hbt_Peano.element_comparison *)
+let compare_to_element_comparison_peano a b =
+  match compare a b with
+  | -1 ->
+     Certified_Hbt_Peano.Lt
+  | 0 ->
+     Certified_Hbt_Peano.Eq
+  | _ ->
+     Certified_Hbt_Peano.Gt
+;;
+
+(* Function to map OCaml's in-built compare function to 
+ * Certified_Hbt_Int.element_comparison *)
+let compare_to_element_comparison_int a b =
+  match compare a b with
+  | -1 ->
+     Certified_Hbt_Int.Lt
+  | 0 ->
+     Certified_Hbt_Int.Eq
+  | _ ->
+     Certified_Hbt_Int.Gt
 ;;
 
 (* Lazy list type *)
@@ -598,6 +776,11 @@ let lazy_lists_equal (lxs_init : name lazy_list) (lys_init : name lazy_list) =
   in walk lxs_init lys_init
 ;;
 
+(* ********** *)
+
+(* ********** Equality modulo associativity and commutativity ********** *)
+
+(* Define tests for predicate using Tests module *)
 let test_eq_assoc_comm candidate n =
   let f = (fun () ->
       let depth = Random.int 20
@@ -606,23 +789,8 @@ let test_eq_assoc_comm candidate n =
          in (candidate e e_eq = true) && (candidate e1 e1_neq = false))
   in Tests.loop f n
 ;;    
-
-(* The naive predicate: 
- * Flatten both expressions into lists, and then sort the lists *)
-let eq_assoc_comm_naive e1 e2 =
-  let rec traverse_exp e acc = 
-    match e with
-    | Ide n ->
-       n :: acc
-    | BinOp (e1, e2) ->
-       traverse_exp e1 (traverse_exp e2 acc)
-  in List.sort compare (traverse_exp e1 []) = List.sort compare (traverse_exp e2 [])
-;;
-
-let _ = assert (test_eq_assoc_comm eq_assoc_comm_naive 1000) ;;
   
-(* Alternative approach: 
- * Traverse the expression and insert each variables into a self-balancing binary 
+(* Traverse the expression and insert each variables into a self-balancing binary 
  * tree using the certified insertion function *)
 
 (* Predicate to check equality modulo associativity and commutativity using the 
@@ -650,43 +818,69 @@ in lazy_lists_equal ll1 ll2
 let _ = assert (test_eq_assoc_comm eq_assoc_comm_original_hbt 1000) ;;
 
 (* Predicate to check equality modulo associativity and commutativity using the 
- * certified and extracted OCaml AVL tree implementation *)
-let eq_assoc_comm_certified_hbtu e1 e2 =
+ * certified and extracted OCaml AVL tree implementation using Peano numbers *)
+let eq_assoc_comm_certified_hbt_peano e1 e2 =
   let rec traverse_exp e acc = 
     match e with
     | Ide n ->
-       Certified_Hbt.insert_hbt compare_to_element_comparison n acc
+       Certified_Hbt_Peano.insert_hbt compare_to_element_comparison_peano n acc
     | BinOp (e1, e2) ->
        traverse_exp e1 (traverse_exp e2 acc)
   and flatten_to_ll hbt acc = 
     match hbt with
-    | Certified_Hbt.HNode (_, Certified_Hbt.Leaf) ->
+    | Certified_Hbt_Peano.HNode (_, Certified_Hbt_Peano.Leaf) ->
        acc
-    | Certified_Hbt.HNode (_, Certified_Hbt.Node
-                                (Certified_Hbt.Triple (hbt1, e, hbt2))) ->
+    | Certified_Hbt_Peano.HNode (_, Certified_Hbt_Peano.Node
+                                (Certified_Hbt_Peano.Triple (hbt1, e, hbt2))) ->
        flatten_to_ll hbt1 (LCons (e, (fun () -> flatten_to_ll hbt2 acc)))
-  in let hbt1 = traverse_exp e1 Certified_Hbt.hbt_empty
-     and hbt2 = traverse_exp e2 Certified_Hbt.hbt_empty
+  in let hbt1 = traverse_exp e1 Certified_Hbt_Peano.hbt_empty
+     and hbt2 = traverse_exp e2 Certified_Hbt_Peano.hbt_empty
      in let ll1 = flatten_to_ll hbt1 LNil
         and ll2 = flatten_to_ll hbt2 LNil
         in lazy_lists_equal ll1 ll2
 ;;
 
-let _ = assert (test_eq_assoc_comm eq_assoc_comm_certified_hbt 1000) ;;
+let _ = assert (test_eq_assoc_comm eq_assoc_comm_certified_hbt_peano 1000) ;;
 
+(* Predicate to check equality modulo associativity and commutativity using the 
+ * certified and extracted OCaml AVL tree implementation using Peano numbers *)
+let eq_assoc_comm_certified_hbt_int e1 e2 =
+  let rec traverse_exp e acc = 
+    match e with
+    | Ide n ->
+       Certified_Hbt_Int.insert_hbt compare_to_element_comparison_int n acc
+    | BinOp (e1, e2) ->
+       traverse_exp e1 (traverse_exp e2 acc)
+  and flatten_to_ll hbt acc = 
+    match hbt with
+    | Certified_Hbt_Int.HNode (_, Certified_Hbt_Int.Leaf) ->
+       acc
+    | Certified_Hbt_Int.HNode (_, Certified_Hbt_Int.Node
+                                (Certified_Hbt_Int.Triple (hbt1, e, hbt2))) ->
+       flatten_to_ll hbt1 (LCons (e, (fun () -> flatten_to_ll hbt2 acc)))
+  in let hbt1 = traverse_exp e1 Certified_Hbt_Int.hbt_empty
+     and hbt2 = traverse_exp e2 Certified_Hbt_Int.hbt_empty
+     in let ll1 = flatten_to_ll hbt1 LNil
+        and ll2 = flatten_to_ll hbt2 LNil
+        in lazy_lists_equal ll1 ll2
+;;
 
-(* Now that we have the three ways of checking for equality modulo associativity and 
- * commutativity, let us write some tests to compare their performance *)
+let _ = assert (test_eq_assoc_comm eq_assoc_comm_certified_hbt_int 1000) ;;
+
+(* ********** *)
+
+(* ********** Benchmarking the predicates ********** *)
 
 (* Record type to store performance info *)
 type performance_info =
-  { t_naive : float;
-    t_org   : float;
-    t_cert  : float;
-  };;
+  { t_org        : float;
+    t_cert_peano : float;
+    t_cert_int   : float;
+  }
+;;
 
-(* Type to record duration *)
-let rec duration p (x, x') exp =
+(* Function to record duration *)
+let duration p (x, x') exp =
   let t_init = Sys.time () in
   let bv = p x x' in
   assert (bv = exp);
@@ -694,33 +888,40 @@ let rec duration p (x, x') exp =
   in t_fin -. t_init
 ;;
 
-(* Function to compare performances of predicates and return the average time taken
- *) 
+(* Function to compare predicate performances and return the average time taken *)
 let compare_eq_assoc_comm_predicates n_init =
   let rec iterate n r =
     match n with
     | 0 ->
        let nf = float_of_int n_init
-       in {t_naive = (r.t_naive /. nf);
-           t_org = (r.t_org /. nf);
-           t_cert = (r.t_cert /. nf);
+       in { t_org = (r.t_org /. nf);
+            t_cert_peano = (r.t_cert_peano /. nf);
+            t_cert_int = (r.t_cert_int /. nf);            
           }
     | _ -> 
-       let depth = Random.int 20
+       let depth = Random.int 30
        in let p_eq = Tests.generate_pair_equal_modulo_assoc_comm depth
           and p_neq = Tests.generate_pair_not_equal_modulo_assoc_comm depth in
-          let t_naive' = (duration eq_assoc_comm_naive p_eq true)
-                         +. (duration eq_assoc_comm_naive  p_neq false)
-          and t_org' = (duration eq_assoc_comm_original_hbt p_eq true)
+          let t_org' = (duration eq_assoc_comm_original_hbt p_eq true)
                        +. (duration eq_assoc_comm_original_hbt p_neq false)
-          and t_cert' = (duration eq_assoc_comm_certified_hbt p_eq true)
-                        +. (duration eq_assoc_comm_certified_hbt p_neq false) in
-          let r' = { t_naive = r.t_naive +. t_naive';
-                     t_org = r.t_org +. t_org';
-                     t_cert = r.t_cert +. t_cert';
+          and t_cert_peano' = (duration eq_assoc_comm_certified_hbt_peano p_eq true)
+                              +. (duration eq_assoc_comm_certified_hbt_peano p_neq
+                                    false) 
+          and t_cert_int' = (duration eq_assoc_comm_certified_hbt_int p_eq true)
+                              +. (duration eq_assoc_comm_certified_hbt_int p_neq
+                                    false) in
+          let r' = { t_org = r.t_org +. t_org';
+                     t_cert_peano = r.t_cert_peano +. t_cert_peano';
+                     t_cert_int = r.t_cert_int +. t_cert_int';
                    }
           in iterate (n - 1) r'
-  in iterate n_init {t_naive = 0.0; t_org = 0.0; t_cert = 0.0;}
+  in iterate n_init {t_org = 0.0; t_cert_peano = 0.0; t_cert_int = 0.0;}
 ;;
 
-compare_eq_assoc_comm_predicates 1000;;                           
+(*
+# compare_eq_assoc_comm_predicates 1000000 ;;
+- : performance_info =
+{t_org = 0.000735804128000012; t_cert_peano = 0.00176464631200033023;
+ t_cert_int = 0.000780153733999675611}
+# 
+*)
