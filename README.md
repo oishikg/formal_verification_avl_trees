@@ -27,7 +27,7 @@ Download/clone the repository and run the following commands in the `Coq_files/s
 
 ## The Proofs and Application
 
-###`coq_files/src`:
+### `coq_files/src`:
 
 There are four folders in `coq_files/src` corresponding to four different parts of the project:
 - `/Paraphernalia`: Contains `paraphernalia.v` with the basic axioms and lemmas required to build
@@ -43,7 +43,7 @@ There are four folders in `coq_files/src` corresponding to four different parts 
     - `/Lemmas/Ordered/Helper`: This contains the file `ordered_helper.v` with 'helper' lemmas related to the orderedness of our AVL tree implementation. These lemmas are used to prove the main orderedness lemmas.
     - `/Lemmas/Ordered/Main`: This contains the file `ordered_main.v` with the main lemmas for orderedness.
 
-###`equality_modulo_associativity_commutativity`
+### `equality_modulo_associativity_commutativity`
 
 - This section contains an application of AVL trees: checking whether two expressions of binary operators (e.g. `+`, `x`, `++` , etc.) are equal modulo associativity and commutativity. 
 - We benchmark the performance of three AVL tree implementations:
@@ -54,3 +54,7 @@ There are four folders in `coq_files/src` corresponding to four different parts 
 ## Author
 
 - Oishik Ganguly 
+
+## Acknowledgements
+
+- Professor Olivier Danvy, for his guidance in this project
