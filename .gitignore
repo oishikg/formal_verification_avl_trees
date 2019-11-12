@@ -5,7 +5,7 @@ coq_files_misc/*
 *.vo
 *.glob
 *.d
-coq_files/src/Makefile.coq
+coq_files/src/Makefile*
 *.aux
 coq_files/src/CoqMakefile.conf
 *html

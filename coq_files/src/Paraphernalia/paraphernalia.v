@@ -302,12 +302,10 @@ Proof.
 
     + destruct H_conn_quantified.
 
-      * Check (relating_Eq_eq).
-        destruct (relating_Eq_eq A a b compare).
+      * destruct (relating_Eq_eq A a b compare).
         apply H1 in C_comp_ab.
         rewrite -> C_comp_ab in H.
         
-        Check (reflexivity_total_order A compare).
         assert (H_refl: leq (compare b b) = true).
         exact (reflexivity_total_order A compare b H_duplicate).
         
@@ -483,7 +481,6 @@ Proof.
         destruct (Nat.ltb_ge b a).
         apply H1 in C_b_lt_a.
 
-        Check (Nat.le_antisymm a b C_b_lt_a C_a_lt_b).
         rewrite (Nat.le_antisymm a b C_b_lt_a C_a_lt_b) in C_a_eq_b.
         rewrite -> (Nat.eqb_refl b) in C_a_eq_b.
         discriminate.
@@ -569,9 +566,7 @@ Proof.
   unfold max.
   reflexivity.
   
-  Search (max _ _ = _).
   rewrite -> (plus_comm (S a') 1).
-  Search (S _ = _).
   rewrite <- plus_n_Sm.
   rewrite -> unfold_max_Sn_Sm.
   rewrite -> plus_comm in IH_a'.
@@ -635,7 +630,6 @@ Proof.
   apply or_introl.
   reflexivity.
   apply or_intror.
-  Search (false || _ = _).
   rewrite -> (orb_false_l b2) in H.
   exact H.
 Qed.

@@ -21,7 +21,7 @@ This project aims to formally verify the correctness of an OCaml based AVL tree 
 
 Download/clone the repository and run the following commands in the `Coq_files/src` directory:
 
-- `make Makefile.Coq`: To autogenerate the required make file using the information specified in the `_CoqProject` file.
+- `coq_makefile -f _CoqProject -o Makefile`: To autogenerate the required make file using the information specified in the `_CoqProject` file.
 - `make`: To build the project. 
 
 ## Structure of `Coq_files/src`: 
