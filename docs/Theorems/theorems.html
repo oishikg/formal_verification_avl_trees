@@ -1,0 +1,166 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<link href="coqdoc.css" rel="stylesheet" type="text/css" />
+<title>theorems</title>
+</head>
+
+<body>
+
+<div id="page">
+
+<div id="header">
+</div>
+
+<div id="main">
+
+<h1 class="libtitle">Library theorems</h1>
+
+<div class="code">
+
+<br/>
+</div>
+
+<div class="doc">
+The <span class="inlinecode"><span class="id" title="var">theorems</span></span> library contains the specifications for the lookup and insert 
+functions on AVL trees, and the theorems which show that our implementation of these
+operations (see the <span class="inlinecode"><span class="id" title="var">hbt</span></span> library) meet the specifications 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="var">Hbt.Lemmas.Ordered.Main.ordered_main</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="var">dpdgraph.dpdgraph</span>.<br/>
+
+<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a name="lab1"></a><h1 class="section">Lookup</h1>
+
+<div class="paragraph"> </div>
+
+ Defining the specification for a lookup function looking for some value <tt>x</tt>: 
+<ul class="doclist">
+<li> if the tree is a leaf, then the function should always return a <span class="inlinecode"><span class="id" title="var">false</span></span> value
+
+</li>
+<li> if the tree is a node with a left sub-tree <tt>hbt1</tt>, a payload <tt>e</tt>, and a right sub-tree <tt>hbt2</tt>, then the function should compare <tt>x</tt> and <tt>e</tt>, returning true if the equality holds, checking <tt>hbt1</tt> if <tt>x</tt> is less than <tt>e</tt>, checking <tt>hbt2</tt> otherwise 
+</li>
+</ul>
+
+</div>
+<div class="code">
+<span class="id" title="keyword">Definition</span> <span class="id" title="var">specification_of_occurs_hbt</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">compare</span> : <span class="id" title="var">A</span> -&gt; <span class="id" title="var">A</span> -&gt; <span class="id" title="var">element_comparison</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">occ_hbt</span> : <span class="id" title="keyword">forall</span> (<span class="id" title="var">A'</span> : <span class="id" title="keyword">Type</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">A'</span> -&gt; <span class="id" title="var">A'</span> -&gt; <span class="id" title="var">element_comparison</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&gt; <span class="id" title="var">A'</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&gt; <span class="id" title="var">heightened_binary_tree</span> <span class="id" title="var">A'</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&gt; <span class="id" title="var">bool</span>) :=<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">hbt</span> : <span class="id" title="var">heightened_binary_tree</span> <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">x</span> : <span class="id" title="var">A</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">specification_of_compare_defining_total_order</span> <span class="id" title="var">A</span> <span class="id" title="var">compare</span> -&gt; <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">hbt</span> = (<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> 0 (<span class="id" title="var">Leaf</span> <span class="id" title="var">A</span>)) -&gt; <span class="id" title="var">occ_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">compare</span> <span class="id" title="var">x</span> <span class="id" title="var">hbt</span> = <span class="id" title="var">false</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;/\<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="keyword">forall</span> (<span class="id" title="var">hbt1</span> <span class="id" title="var">hbt2</span> : <span class="id" title="var">heightened_binary_tree</span> <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">h_hbt</span> : <span class="id" title="var">nat</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">e</span> : <span class="id" title="var">A</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">hbt</span> = (<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h_hbt</span> (<span class="id" title="var">Node</span> <span class="id" title="var">A</span> (<span class="id" title="var">Triple</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt1</span> <span class="id" title="var">e</span> <span class="id" title="var">hbt2</span>))) -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">occ_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">compare</span> <span class="id" title="var">x</span> <span class="id" title="var">hbt</span> =<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">match</span> <span class="id" title="var">compare</span> <span class="id" title="var">x</span> <span class="id" title="var">e</span> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="var">Lt</span> =&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">occ_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">compare</span> <span class="id" title="var">x</span> <span class="id" title="var">hbt1</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="var">Eq</span> =&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">true</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="var">Gt</span> =&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">occ_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">compare</span> <span class="id" title="var">x</span> <span class="id" title="var">hbt2</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">end</span>).<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Theorem to show that our implementation of lookup on AVL trees, <span class="inlinecode"><span class="id" title="var">occurs_hbt</span></span>, 
+meets the <span class="inlinecode"><span class="id" title="var">specification_of_occurs_hbt</span></span> 
+</div>
+<div class="code">
+<span class="id" title="keyword">Theorem</span> <span class="id" title="var">occurs_implementation_satisfies_its_specification</span>:<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">compare</span> : <span class="id" title="var">A</span> -&gt; <span class="id" title="var">A</span> -&gt; <span class="id" title="var">element_comparison</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">specification_of_occurs_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">compare</span> <span class="id" title="var">occurs_hbt</span>.<br/>
+
+<br/>
+
+<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a name="lab2"></a><h1 class="section">Insertion</h1>
+
+<div class="paragraph"> </div>
+
+ Defining the specification for an insertion function on AVL trees: given a sound,
+balanced, and ordered tree, inserting some element into this tree should give a tree 
+that is also sound, balanced, and ordered 
+</div>
+<div class="code">
+<span class="id" title="keyword">Definition</span> <span class="id" title="var">specification_of_insert_hbt</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">compare</span> : <span class="id" title="var">A</span> -&gt; <span class="id" title="var">A</span> -&gt; <span class="id" title="var">element_comparison</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">x</span> : <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">insert_hbt</span> : <span class="id" title="keyword">forall</span> (<span class="id" title="var">A'</span> : <span class="id" title="keyword">Type</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">A'</span> -&gt; <span class="id" title="var">A'</span> -&gt; <span class="id" title="var">element_comparison</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&gt; <span class="id" title="var">A'</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&gt; <span class="id" title="var">heightened_binary_tree</span> <span class="id" title="var">A'</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&gt; <span class="id" title="var">heightened_binary_tree</span> <span class="id" title="var">A'</span>) :=<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">hbt</span> : <span class="id" title="var">heightened_binary_tree</span> <span class="id" title="var">A</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">is_sound_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt</span> = <span class="id" title="var">true</span>) -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">is_balanced_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt</span> = <span class="id" title="var">true</span>) -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">is_ordered_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt</span> <span class="id" title="var">compare</span> = <span class="id" title="var">true</span>) -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">specification_of_compare_defining_total_order</span> <span class="id" title="var">A</span> <span class="id" title="var">compare</span>) -&gt; <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">is_sound_hbt</span> <span class="id" title="var">A</span> (<span class="id" title="var">insert_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">compare</span> <span class="id" title="var">x</span> <span class="id" title="var">hbt</span>) = <span class="id" title="var">true</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;/\<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">is_balanced_hbt</span> <span class="id" title="var">A</span> (<span class="id" title="var">insert_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">compare</span> <span class="id" title="var">x</span> <span class="id" title="var">hbt</span>) = <span class="id" title="var">true</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;/\<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">is_ordered_hbt</span> <span class="id" title="var">A</span> (<span class="id" title="var">insert_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">compare</span> <span class="id" title="var">x</span> <span class="id" title="var">hbt</span>) <span class="id" title="var">compare</span> = <span class="id" title="var">true</span>).<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Theorem to show that our implementation of insertion on AVL trees, 
+<span class="inlinecode"><span class="id" title="var">insert_hbt</span></span> meets the <span class="inlinecode"><span class="id" title="var">specifiction_of_insert_hbt</span></span> 
+</div>
+<div class="code">
+<span class="id" title="keyword">Theorem</span> <span class="id" title="var">insert_hbt_satisfies_its_specification</span>:<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">compare</span> : <span class="id" title="var">A</span> -&gt; <span class="id" title="var">A</span> -&gt; <span class="id" title="var">element_comparison</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">x</span> : <span class="id" title="var">A</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">specification_of_insert_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">compare</span> <span class="id" title="var">x</span> <span class="id" title="var">insert_hbt</span>.<br/>
+
+<br/>
+
+<br/>
+
+<br/>
+</div>
+</div>
+
+<div id="footer">
+<hr/><a href="index.html">Index</a><hr/>This page has been generated by <a href="http://coq.inria.fr/">coqdoc</a>
+</div>
+
+</div>
+
+</body>
+</html>
