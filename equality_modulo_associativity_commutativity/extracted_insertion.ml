@@ -1,4 +1,23 @@
-(* ********** Original implementation ********** *)
+(* ********** Equality Modulo Associativity and Commutativity ********** *)
+
+(* This is an application of AVL trees. The idea is follows: consider the binary
+ * operator +, and the expression (a + (b + c)). 
+ *
+ * To re-associate this expression is to change the parenthetical structure without
+ * changing the order of the terms. For instance: 
+ *
+ *         (a + (b + c)) -> ((a + b) + c)
+ *
+ * To commute this expression is to flip the arguments of the terms without breaking 
+ * the parenthetical strucure. For instance: 
+ *
+ *         (a + (b + c)) -> ((b + c) + a)
+ *
+ * The problem is as follows: we want to check if given two such expressions, one 
+ * such expression is the result of re-associating and/or commuting the other? 
+ *) 
+
+(* ********** Original AVL Implementation ********** *)
 
 module Original_Hbt =
   struct
@@ -121,7 +140,6 @@ module Original_Hbt =
 
 
     (* Implementation of insertion *)
-
     let insert compare x (hbt : 'a heightened_binary_tree) =
       let rec climb_hbt (h, bt) =
         climb_bt h bt
@@ -156,7 +174,6 @@ module Original_Hbt =
 
 (* ********** Certified implementation using Peano numbers ********** *)
 
-(* Module with certified heightened binary tree code *)
 module Certified_Hbt_Peano =
   struct
     
@@ -559,7 +576,6 @@ module Certified_Hbt_Int =
 (* Introducing a type that captures the abstract syntax tree of expressions in 
  * binary operations that are both associative and commutative; taken from 
  * Professor Danvy's YSC3203 midterm project *)
-
 type name = string ;;
 
 type exp = Ide of name | BinOp of exp * exp ;;
@@ -924,4 +940,6 @@ let compare_eq_assoc_comm_predicates n_init =
 {t_org = 0.000735804128000012; t_cert_peano = 0.00176464631200033023;
  t_cert_int = 0.000780153733999675611}
 # 
-*)
+ *)
+
+(* ********** End of extracted_insertion.ml ********** *)
