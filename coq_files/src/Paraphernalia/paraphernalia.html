@@ -1,0 +1,488 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<link href="coqdoc.css" rel="stylesheet" type="text/css" />
+<title>paraphernalia</title>
+</head>
+
+<body>
+
+<div id="page">
+
+<div id="header">
+</div>
+
+<div id="main">
+
+<h1 class="libtitle">Library paraphernalia</h1>
+
+<div class="code">
+
+<br/>
+</div>
+
+<div class="doc">
+The Paraphernalia library contains general definitions and lemmas which are 
+important across the entire project 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="var">Arith</span> <span class="id" title="var">Bool</span> <span class="id" title="var">List</span>.<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Export</span> <span class="id" title="var">Arith</span> <span class="id" title="var">Bool</span> <span class="id" title="var">List</span>.<br/>
+
+<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a name="lab1"></a><h1 class="section">Operators and Unfolding</h1>
+
+<div class="paragraph"> </div>
+
+ Tactic to prove simple unfold lemmas 
+</div>
+<div class="code">
+<span class="id" title="keyword">Ltac</span> <span class="id" title="var">unfold_tactic</span> <span class="id" title="var">name</span> := <span class="id" title="tactic">intros</span>; <span class="id" title="tactic">unfold</span> <span class="id" title="var">name</span>; <span class="id" title="tactic">reflexivity</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Operator for equality predicate <span class="inlinecode"><span class="id" title="var">beq_nat</span></span>, defined for peano natural numbers 
+</div>
+<div class="code">
+<span class="id" title="keyword">Notation</span> &quot;A =n= B" :=<br/>
+&nbsp;&nbsp;(<span class="id" title="var">beq_nat</span> <span class="id" title="var">A</span> <span class="id" title="var">B</span>) (<span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 70, <span class="id" title="tactic">right</span> <span class="id" title="keyword">associativity</span>).<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Lemma to unfold <span class="inlinecode"><span class="id" title="var">beq_nat</span></span> 
+</div>
+<div class="code">
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">unfold_beq_nat_Sn_Sm</span>:<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">n</span> <span class="id" title="var">m</span> : <span class="id" title="var">nat</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">beq_nat</span> (<span class="id" title="var">S</span> <span class="id" title="var">n</span>) (<span class="id" title="var">S</span> <span class="id" title="var">m</span>) = <span class="id" title="var">beq_nat</span> <span class="id" title="var">n</span> <span class="id" title="var">m</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Lemma to prove the symmetric property of the <span class="inlinecode">=<span class="id" title="var">n</span>=</span> operator 
+</div>
+<div class="code">
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">beq_nat_symm</span>:<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">x</span> <span class="id" title="var">y</span> : <span class="id" title="var">nat</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">x</span> =<span class="id" title="var">n</span>= <span class="id" title="var">y</span>) = (<span class="id" title="var">y</span> =<span class="id" title="var">n</span>= <span class="id" title="var">x</span>).<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Lemma to assert trivial equalities 
+</div>
+<div class="code">
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">trivial_equality</span>:<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">v</span> : <span class="id" title="var">A</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">v</span> = <span class="id" title="var">v</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Defining an operator for equality of boolean values 
+</div>
+<div class="code">
+<span class="id" title="keyword">Notation</span> &quot;A =b= B" :=<br/>
+&nbsp;&nbsp;(<span class="id" title="var">eqb</span> <span class="id" title="var">A</span> <span class="id" title="var">B</span>) (<span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 70, <span class="id" title="tactic">right</span> <span class="id" title="keyword">associativity</span>).<br/>
+
+<br/>
+
+<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a name="lab2"></a><h1 class="section">Lemmas For Peano Natural Numbers</h1>
+
+<div class="paragraph"> </div>
+
+ Lemma to show that the equality the successors of two natural numbers implies 
+the equality of the two natural number 
+</div>
+<div class="code">
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">succ_eq</span>:<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">a</span> <span class="id" title="var">b</span> : <span class="id" title="var">nat</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">S</span> <span class="id" title="var">a</span> = <span class="id" title="var">S</span> <span class="id" title="var">b</span> -&gt; <span class="id" title="var">a</span> = <span class="id" title="var">b</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Lemma to show that adding some value to equal natural numbers results in
+ equal natural number 
+</div>
+<div class="code">
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">add_to_both_sides</span>:<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">x</span> <span class="id" title="var">y</span> <span class="id" title="var">z</span> : <span class="id" title="var">nat</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">x</span> = <span class="id" title="var">y</span> -&gt; <span class="id" title="var">x</span> + <span class="id" title="var">z</span> = <span class="id" title="var">y</span> + <span class="id" title="var">z</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Lemma to unfold <span class="inlinecode"><span class="id" title="var">minus</span></span> for the successor of some natural number and 0 
+</div>
+<div class="code">
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">minus_Sn_0</span>:<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">n</span> : <span class="id" title="var">nat</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">S</span> <span class="id" title="var">n</span> - 0 = <span class="id" title="var">S</span> <span class="id" title="var">n</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Lemma to unfold <span class="inlinecode"><span class="id" title="var">minus</span></span> for the successors of two natural numbers 
+</div>
+<div class="code">
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">minus_Sn_Sm</span>:<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">n</span> <span class="id" title="var">m</span> : <span class="id" title="var">nat</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">S</span> <span class="id" title="var">n</span> - <span class="id" title="var">S</span> <span class="id" title="var">m</span> = <span class="id" title="var">n</span> - <span class="id" title="var">m</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Lemma to show that subtracting 0 from a natural number gives the same number 
+</div>
+<div class="code">
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">minus_n_0</span>:<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">n</span> : <span class="id" title="var">nat</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">n</span> - 0 = <span class="id" title="var">n</span>.<br/>
+
+<br/>
+
+<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a name="lab3"></a><h1 class="section">Defining Ordered Types</h1>
+
+<div class="paragraph"> </div>
+
+ A relation <tt>R</tt> defines a total order on a set <tt>A</tt> iff for some <tt>x, y, z</tt> in <tt>A</tt>: 
+
+<div class="paragraph"> </div>
+
+   (1) <tt>(x R y) /\ (&lt;y R x)</tt> =&gt; <tt>x = y</tt> (Anti-symmtery)
+
+<div class="paragraph"> </div>
+
+   (2) <tt>(x R y) /\ (y R z)</tt> =&gt; <tt>(x R z)</tt> (Transitivity)
+
+<div class="paragraph"> </div>
+
+   (3) <tt>(x R y) \/ (y R x)</tt> (Connexity) 
+
+<div class="paragraph"> </div>
+
+In this project, such a relation is captured through comparison functions of type
+<span class="inlinecode"><span class="id" title="var">A</span></span> <span class="inlinecode">-&gt;</span> <span class="inlinecode"><span class="id" title="var">A</span></span> <span class="inlinecode">-&gt;</span> <span class="inlinecode"><span class="id" title="var">element_comparison</span></span>. This section defines a specification for comparison
+functions to define a total ordering on the type whose elements it compares 
+<div class="paragraph"> </div>
+
+ Type alias for the predefined inductive type <span class="inlinecode"><span class="id" title="var">comparison</span></span> 
+</div>
+<div class="code">
+<span class="id" title="keyword">Inductive</span> <span class="id" title="var">element_comparison</span> :=<br/>
+| <span class="id" title="var">Lt</span> : <span class="id" title="var">element_comparison</span><br/>
+| <span class="id" title="var">Eq</span> : <span class="id" title="var">element_comparison</span><br/>
+| <span class="id" title="var">Gt</span> : <span class="id" title="var">element_comparison</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Predicate to check if a value of type <span class="inlinecode"><span class="id" title="var">element_comparison</span></span> is an <span class="inlinecode"><span class="id" title="var">Lt</span></span> or an <span class="inlinecode"><span class="id" title="var">Eq</span></span>;
+ we use this to define a total order 
+</div>
+<div class="code">
+<span class="id" title="keyword">Definition</span> <span class="id" title="var">leq</span> (<span class="id" title="var">ce</span> : <span class="id" title="var">element_comparison</span>) : <span class="id" title="var">bool</span> :=<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">match</span> <span class="id" title="var">ce</span> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;| <span class="id" title="var">Lt</span> =&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">true</span><br/>
+&nbsp;&nbsp;| <span class="id" title="var">Eq</span> =&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">true</span><br/>
+&nbsp;&nbsp;| <span class="id" title="var">Gt</span> =&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">false</span><br/>
+&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Axiom requiring comparison functions defined for some type <tt>A</tt> to map to 
+<span class="inlinecode"><span class="id" title="var">Eq</span></span> if and only if the values being compared are equal 
+</div>
+<div class="code">
+<span class="id" title="keyword">Axiom</span> <span class="id" title="var">relating_Eq_eq</span>:<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">a</span> <span class="id" title="var">b</span> : <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">compare</span> : <span class="id" title="var">A</span> -&gt; <span class="id" title="var">A</span> -&gt; <span class="id" title="var">element_comparison</span>),<br/>
+&nbsp;&nbsp;<span class="id" title="var">compare</span> <span class="id" title="var">a</span> <span class="id" title="var">b</span> = <span class="id" title="var">Eq</span> &lt;-&gt; <span class="id" title="var">a</span> = <span class="id" title="var">b</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Definition of anti-symmetric property for comparison functions 
+</div>
+<div class="code">
+<span class="id" title="keyword">Definition</span> <span class="id" title="var">anti_symmetry</span> <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">compare</span> : <span class="id" title="var">A</span> -&gt; <span class="id" title="var">A</span> -&gt; <span class="id" title="var">element_comparison</span>) :=           <br/>
+&nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">a</span> <span class="id" title="var">b</span> : <span class="id" title="var">A</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">leq</span> (<span class="id" title="var">compare</span> <span class="id" title="var">a</span> <span class="id" title="var">b</span>) = <span class="id" title="var">true</span> -&gt; <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">leq</span> (<span class="id" title="var">compare</span> <span class="id" title="var">b</span> <span class="id" title="var">a</span>) = <span class="id" title="var">true</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">compare</span> <span class="id" title="var">a</span> <span class="id" title="var">b</span> = <span class="id" title="var">Eq</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Defintion of transitive property for comparison functions 
+</div>
+<div class="code">
+<span class="id" title="keyword">Definition</span> <span class="id" title="tactic">transitivity</span> <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">compare</span> : <span class="id" title="var">A</span> -&gt; <span class="id" title="var">A</span> -&gt; <span class="id" title="var">element_comparison</span>) :=<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">a</span> <span class="id" title="var">b</span> <span class="id" title="var">c</span> : <span class="id" title="var">A</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">leq</span> (<span class="id" title="var">compare</span> <span class="id" title="var">a</span> <span class="id" title="var">b</span>) = <span class="id" title="var">true</span> -&gt; <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">leq</span> (<span class="id" title="var">compare</span> <span class="id" title="var">b</span> <span class="id" title="var">c</span>) = <span class="id" title="var">true</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">leq</span> (<span class="id" title="var">compare</span> <span class="id" title="var">a</span> <span class="id" title="var">c</span>) = <span class="id" title="var">true</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Defintion of connexity property for comparison functions 
+</div>
+<div class="code">
+<span class="id" title="keyword">Definition</span> <span class="id" title="var">connexity</span> <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">compare</span> : <span class="id" title="var">A</span> -&gt; <span class="id" title="var">A</span> -&gt; <span class="id" title="var">element_comparison</span>) :=<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">a</span> <span class="id" title="var">b</span> : <span class="id" title="var">A</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">leq</span> (<span class="id" title="var">compare</span> <span class="id" title="var">a</span> <span class="id" title="var">b</span>) = <span class="id" title="var">true</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;\/<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">leq</span> (<span class="id" title="var">compare</span> <span class="id" title="var">b</span> <span class="id" title="var">a</span>) = <span class="id" title="var">true</span>).<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Specifiction of a comparison function to define a total order on the set whose
+elements the function compares 
+</div>
+<div class="code">
+<span class="id" title="keyword">Definition</span> <span class="id" title="var">specification_of_compare_defining_total_order</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">compare</span> : <span class="id" title="var">A</span> -&gt; <span class="id" title="var">A</span> -&gt; <span class="id" title="var">element_comparison</span>) :=<br/>
+&nbsp;&nbsp;<span class="id" title="var">anti_symmetry</span> <span class="id" title="var">A</span> <span class="id" title="var">compare</span> <br/>
+&nbsp;&nbsp;/\<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">transitivity</span> <span class="id" title="var">A</span> <span class="id" title="var">compare</span> <br/>
+&nbsp;&nbsp;/\<br/>
+&nbsp;&nbsp;<span class="id" title="var">connexity</span> <span class="id" title="var">A</span> <span class="id" title="var">compare</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+For some relation <tt>R</tt> defined on some set <tt>A</tt>, the reflexive property states
+that for all <tt>x</tt> in <tt>A</tt>, it must be the case that <tt>(x R x)</tt>. This lemma shows
+that if a comparison function defines a total order on some type <tt>A</tt>, then it
+also has the property of reflexivity 
+</div>
+<div class="code">
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">reflexivity_total_order</span>:<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">compare</span> : <span class="id" title="var">A</span> -&gt; <span class="id" title="var">A</span> -&gt; <span class="id" title="var">element_comparison</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">x</span> : <span class="id" title="var">A</span>), <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">specification_of_compare_defining_total_order</span> <span class="id" title="var">A</span> <span class="id" title="var">compare</span> -&gt; <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">leq</span> (<span class="id" title="var">compare</span> <span class="id" title="var">x</span> <span class="id" title="var">x</span>) = <span class="id" title="var">true</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Lemma relating the <span class="inlinecode"><span class="id" title="var">Lt</span></span> and <span class="inlinecode"><span class="id" title="var">Gt</span></span> constructors for a comparison function which 
+defines a total order 
+</div>
+<div class="code">
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">relating_Lt_Gt_total_order</span>:<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">compare</span> : <span class="id" title="var">A</span> -&gt; <span class="id" title="var">A</span> -&gt; <span class="id" title="var">element_comparison</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">a</span> <span class="id" title="var">b</span> : <span class="id" title="var">A</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">specification_of_compare_defining_total_order</span> <span class="id" title="var">A</span> <span class="id" title="var">compare</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">compare</span> <span class="id" title="var">a</span> <span class="id" title="var">b</span> = <span class="id" title="var">Lt</span> &lt;-&gt; <span class="id" title="var">compare</span> <span class="id" title="var">b</span> <span class="id" title="var">a</span> = <span class="id" title="var">Gt</span>).<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Definition of comparison function over Coq's Peano natural numbers  
+</div>
+<div class="code">
+<span class="id" title="keyword">Definition</span> <span class="id" title="var">compare_int</span> (<span class="id" title="var">i</span> <span class="id" title="var">j</span> : <span class="id" title="var">nat</span>) : <span class="id" title="var">element_comparison</span> := <br/>
+&nbsp;&nbsp;<span class="id" title="keyword">if</span> <span class="id" title="var">i</span> &lt;? <span class="id" title="var">j</span> <span class="id" title="keyword">then</span> <span class="id" title="var">Lt</span> <span class="id" title="keyword">else</span> <span class="id" title="keyword">if</span> <span class="id" title="var">i</span> =<span class="id" title="var">n</span>= <span class="id" title="var">j</span> <span class="id" title="keyword">then</span> <span class="id" title="var">Eq</span> <span class="id" title="keyword">else</span> <span class="id" title="var">Gt</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Theorem to show that <span class="inlinecode"><span class="id" title="var">compare_int</span></span> defines a total order over <span class="inlinecode"><span class="id" title="var">nat</span></span> 
+</div>
+<div class="code">
+<span class="id" title="keyword">Theorem</span> <span class="id" title="var">compare_int_defines_a_total_order</span>:<br/>
+&nbsp;&nbsp;<span class="id" title="var">specification_of_compare_defining_total_order</span> <span class="id" title="var">nat</span> <span class="id" title="var">compare_int</span>.<br/>
+
+<br/>
+
+<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a name="lab4"></a><h1 class="section">Pairwise and Option Type Equalities</h1>
+
+<div class="paragraph"> </div>
+
+ Lemma to show that the equality of a pair of values is equivalent to the equality
+of the corresponding elements of each pair 
+</div>
+<div class="code">
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">pairwise_equality</span>:<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">x1</span> <span class="id" title="var">x2</span> <span class="id" title="var">y1</span> <span class="id" title="var">y2</span> : <span class="id" title="var">A</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">x1</span>, <span class="id" title="var">x2</span>) = (<span class="id" title="var">y1</span>, <span class="id" title="var">y2</span>) &lt;-&gt; <span class="id" title="var">x1</span> = <span class="id" title="var">y1</span> /\ <span class="id" title="var">x2</span> = <span class="id" title="var">y2</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Lemma to show that the equality of two values of the <span class="inlinecode"><span class="id" title="var">option</span></span> type is equivalent
+to the equality of the values contained by the <span class="inlinecode"><span class="id" title="var">option</span></span> type values 
+</div>
+<div class="code">
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">some_x_equal_some_y</span>:<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">x</span> <span class="id" title="var">y</span> : <span class="id" title="var">A</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">Some</span> <span class="id" title="var">x</span> = <span class="id" title="var">Some</span> <span class="id" title="var">y</span> &lt;-&gt; <span class="id" title="var">x</span> = <span class="id" title="var">y</span>.<br/>
+
+<br/>
+
+<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a name="lab5"></a><h1 class="section">Lemmas for <span class="inlinecode"><span class="id" title="var">max</span></span></h1>
+
+<div class="paragraph"> </div>
+
+ Lemma to show that for two values of type <span class="inlinecode"><span class="id" title="var">nat</span></span>, one or the other must be the
+maximum values 
+</div>
+<div class="code">
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">max_cases</span>:<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">a</span> <span class="id" title="var">b</span> : <span class="id" title="var">nat</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">max</span> <span class="id" title="var">a</span> <span class="id" title="var">b</span> = <span class="id" title="var">a</span> \/ <span class="id" title="var">max</span> <span class="id" title="var">a</span> <span class="id" title="var">b</span> = <span class="id" title="var">b</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Lemma to unfold <span class="inlinecode"><span class="id" title="var">max</span></span> the successors of two natural numbers 
+</div>
+<div class="code">
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">unfold_max_Sn_Sm</span>:<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">n</span> <span class="id" title="var">m</span> : <span class="id" title="var">nat</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">max</span> (<span class="id" title="var">S</span> <span class="id" title="var">n</span>) (<span class="id" title="var">S</span> <span class="id" title="var">m</span>) = <span class="id" title="var">S</span> (<span class="id" title="var">max</span> <span class="id" title="var">n</span> <span class="id" title="var">m</span>).<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Lemma to show that given a value of type <span class="inlinecode"><span class="id" title="var">nat</span></span> and its successor, the latter is 
+always the maximum value 
+</div>
+<div class="code">
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">H_max_S</span>:<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">a</span> : <span class="id" title="var">nat</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">max</span> (<span class="id" title="var">a</span> + 1) <span class="id" title="var">a</span> = <span class="id" title="var">a</span> + 1.<br/>
+ 
+<br/>
+
+<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a name="lab6"></a><h1 class="section">Reflections</h1>
+
+<div class="paragraph"> </div>
+
+ Lemma to relate <span class="inlinecode">=</span> and <span class="inlinecode">=<span class="id" title="var">n</span>=</span> for the same <span class="inlinecode"><span class="id" title="var">nat</span></span> values 
+</div>
+<div class="code">
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">prop_to_bool_helper</span>:<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">a</span> : <span class="id" title="var">nat</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">a</span> = <span class="id" title="var">a</span> -&gt; ((<span class="id" title="var">a</span> =<span class="id" title="var">n</span>= <span class="id" title="var">a</span>) = <span class="id" title="var">true</span>).<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Lemma to relate <span class="inlinecode">=</span> and <span class="inlinecode">=<span class="id" title="var">n</span>=</span> for different <span class="inlinecode"><span class="id" title="var">nat</span></span> values 
+</div>
+<div class="code">
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">prop_to_bool</span>:<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">a</span> <span class="id" title="var">b</span> : <span class="id" title="var">nat</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">a</span> = <span class="id" title="var">b</span> -&gt; ((<span class="id" title="var">a</span> =<span class="id" title="var">n</span>= <span class="id" title="var">b</span>) = <span class="id" title="var">true</span>).<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Lemma to relate <span class="inlinecode">||</span> and <span class="inlinecode">\/</span> 
+</div>
+<div class="code">
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">disjunction_to_prop</span>:<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">b1</span> <span class="id" title="var">b2</span> : <span class="id" title="var">bool</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">b1</span> || <span class="id" title="var">b2</span> = <span class="id" title="var">true</span>) -&gt; (<span class="id" title="var">b1</span> = <span class="id" title="var">true</span>) \/ (<span class="id" title="var">b2</span> = <span class="id" title="var">true</span>).<br/>
+
+<br/>
+
+<br/>
+</div>
+</div>
+
+<div id="footer">
+<hr/><a href="index.html">Index</a><hr/>This page has been generated by <a href="http://coq.inria.fr/">coqdoc</a>
+</div>
+
+</div>
+
+</body>
+</html>

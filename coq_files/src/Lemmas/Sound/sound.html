@@ -1,0 +1,252 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<link href="coqdoc.css" rel="stylesheet" type="text/css" />
+<title>sound</title>
+</head>
+
+<body>
+
+<div id="page">
+
+<div id="header">
+</div>
+
+<div id="main">
+
+<h1 class="libtitle">Library sound</h1>
+
+<div class="code">
+
+<br/>
+</div>
+
+<div class="doc">
+The <span class="inlinecode"><span class="id" title="var">sound</span></span> library contains lemmas concerning the soundness property of AVL 
+trees 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="var">Hbt.Implementation.hbt</span>.<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Export</span> <span class="id" title="var">Hbt.Implementation.hbt</span>.<br/>
+
+<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a name="lab1"></a><h1 class="section">General Lemmas Concerning Soundness of Heightened Binary Trees</h1>
+
+<div class="paragraph"> </div>
+
+ Lemma to show that if a heightened binary tree is sound, then its height is equal
+to <tt>1 + max h1 h2</tt>, where <tt>h1</tt> and <tt>h2</tt> are the heights of its left and right
+subtrees respectively 
+</div>
+<div class="code">
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">relate_heights</span>:<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">h_res</span> : <span class="id" title="var">nat</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">h1</span> : <span class="id" title="var">nat</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">bt1</span> : <span class="id" title="var">binary_tree</span> <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">e</span> : <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">h2</span> : <span class="id" title="var">nat</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">bt2</span> : <span class="id" title="var">binary_tree</span> <span class="id" title="var">A</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_sound_hbt</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">A</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h_res</span> (<span class="id" title="var">Node</span> <span class="id" title="var">A</span> (<span class="id" title="var">Triple</span> <span class="id" title="var">A</span> (<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h1</span> <span class="id" title="var">bt1</span>) <span class="id" title="var">e</span> (<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h2</span> <span class="id" title="var">bt2</span>)))) = <span class="id" title="var">true</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">h_res</span> = 1 + <span class="id" title="var">max</span> <span class="id" title="var">h1</span> <span class="id" title="var">h2</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Lemma to show that if a <span class="inlinecode"><span class="id" title="var">triple</span></span> is sound, the <span class="inlinecode"><span class="id" title="var">heightened_binary_tree</span></span>s it 
+contains should also be sound 
+</div>
+<div class="code">
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">triple_sound_implies_hbts_sound</span>:<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">h_hbt</span> : <span class="id" title="var">nat</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">hbt1</span> : <span class="id" title="var">heightened_binary_tree</span> <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">e</span> : <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">hbt2</span> : <span class="id" title="var">heightened_binary_tree</span> <span class="id" title="var">A</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_sound_hbt</span> <span class="id" title="var">A</span> (<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h_hbt</span> (<span class="id" title="var">Node</span> <span class="id" title="var">A</span> (<span class="id" title="var">Triple</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt1</span> <span class="id" title="var">e</span> <span class="id" title="var">hbt2</span>))) = <span class="id" title="var">true</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_sound_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt1</span> = <span class="id" title="var">true</span> /\ <span class="id" title="var">is_sound_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt2</span> = <span class="id" title="var">true</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Lemma to show that if the helper function to check soundness for 
+<span class="inlinecode"><span class="id" title="var">heightened_binary_tree</span></span>s returns <span class="inlinecode"><span class="id" title="var">Some</span></span> value, then the helper function to check
+ soundness for <span class="inlinecode"><span class="id" title="var">binary_tree</span></span>s should return the same value 
+</div>
+<div class="code">
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">traverse_to_check_soundness_hbt_bt_same</span>:<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">h</span> <span class="id" title="var">h_hbt</span> : <span class="id" title="var">nat</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">bt</span> : <span class="id" title="var">binary_tree</span> <span class="id" title="var">A</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">traverse_to_check_soundness_hbt</span> <span class="id" title="var">A</span> (<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h</span> <span class="id" title="var">bt</span>) = <span class="id" title="var">Some</span> <span class="id" title="var">h_hbt</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">traverse_to_check_soundness_bt</span> <span class="id" title="var">A</span> <span class="id" title="var">bt</span> = <span class="id" title="var">Some</span> <span class="id" title="var">h_hbt</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Lemma to show that if the helper function to check soundness for 
+<span class="inlinecode"><span class="id" title="var">binary_tree</span></span>s returns <span class="inlinecode"><span class="id" title="var">Some</span></span> value, then the helper function to check
+ soundness for <span class="inlinecode"><span class="id" title="var">triple</span></span>s should return the same value 
+</div>
+<div class="code">
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">traverse_to_check_soundness_bt_t_same</span>:<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">h_hbt</span> : <span class="id" title="var">nat</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">t</span> : <span class="id" title="var">triple</span> <span class="id" title="var">A</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">traverse_to_check_soundness_bt</span> <span class="id" title="var">A</span> (<span class="id" title="var">Node</span> <span class="id" title="var">A</span> <span class="id" title="var">t</span>) = <span class="id" title="var">Some</span> <span class="id" title="var">h_hbt</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">traverse_to_check_soundness_t</span> <span class="id" title="var">A</span> <span class="id" title="var">t</span> = <span class="id" title="var">Some</span> <span class="id" title="var">h_hbt</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Lemma to show that if a <span class="inlinecode"><span class="id" title="var">heightened_binary_tree</span></span> is sound, then it should have 
+<span class="inlinecode"><span class="id" title="var">Some</span></span> height 
+</div>
+<div class="code">
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">soundness_implies_some_height</span>:<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">h</span> : <span class="id" title="var">nat</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">bt</span> : <span class="id" title="var">binary_tree</span> <span class="id" title="var">A</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_sound_hbt</span> <span class="id" title="var">A</span> (<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h</span> <span class="id" title="var">bt</span>) = <span class="id" title="var">true</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">traverse_to_check_soundness_hbt</span> <span class="id" title="var">A</span> (<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h</span> <span class="id" title="var">bt</span>) = <span class="id" title="var">Some</span> <span class="id" title="var">h</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Lemma that lays the condition which must hold for the soundness of two sub-trees
+to imply the soundness of the tree itself. The condition is that the height stored
+in the <span class="inlinecode"><span class="id" title="var">heightened_binary_tree</span></span> concerend should be equal to <tt>1 + max h1 h2</tt>, 
+where <tt>h1</tt> is the height of the left sub-tree and <tt>h2</tt> is the height of the 
+right sub-tree 
+</div>
+<div class="code">
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">hbts_sound_implies_triple_sound_weak</span>:<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">h_hbt</span> : <span class="id" title="var">nat</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">hbt1</span> : <span class="id" title="var">heightened_binary_tree</span> <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">e</span> : <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">hbt2</span> : <span class="id" title="var">heightened_binary_tree</span> <span class="id" title="var">A</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_sound_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt1</span> = <span class="id" title="var">true</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_sound_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt2</span> = <span class="id" title="var">true</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">h_hbt</span> = 1 + <span class="id" title="var">max</span> (<span class="id" title="var">project_height_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt1</span>) (<span class="id" title="var">project_height_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt2</span>) -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_sound_hbt</span> <span class="id" title="var">A</span> (<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h_hbt</span> (<span class="id" title="var">Node</span> <span class="id" title="var">A</span> (<span class="id" title="var">Triple</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt1</span> <span class="id" title="var">e</span> <span class="id" title="var">hbt2</span>))) = <span class="id" title="var">true</span>.<br/>
+
+<br/>
+
+<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a name="lab2"></a><h1 class="section">Rotation Lemmas for Soundness</h1>
+
+<div class="paragraph"> </div>
+
+ Lemma to show that right rotating a tree preserves soundness 
+</div>
+<div class="code">
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">rotate_right_preserves_soundness</span>:<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">h_ret</span> : <span class="id" title="var">nat</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">bt_ret</span> : <span class="id" title="var">binary_tree</span> <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">e</span> : <span class="id" title="var">A</span>) <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">hbt2</span> : <span class="id" title="var">heightened_binary_tree</span> <span class="id" title="var">A</span>) <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">hbt'</span> : <span class="id" title="var">heightened_binary_tree</span> <span class="id" title="var">A</span>), <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_sound_hbt</span> <span class="id" title="var">A</span> (<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h_ret</span> <span class="id" title="var">bt_ret</span>) = <span class="id" title="var">true</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_sound_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt2</span> = <span class="id" title="var">true</span> -&gt; <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">rotate_right_hbt</span> <span class="id" title="var">A</span> (<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h_ret</span> <span class="id" title="var">bt_ret</span>) <span class="id" title="var">e</span> <span class="id" title="var">hbt2</span> = <span class="id" title="var">Some</span> <span class="id" title="var">hbt'</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_sound_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt'</span> = <span class="id" title="var">true</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Lemma to show that left rotating a tree preserves soundness 
+</div>
+<div class="code">
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">rotate_left_preserves_soundness</span>:<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">hbt1</span> : <span class="id" title="var">heightened_binary_tree</span> <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">e</span> : <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">h_ret</span> : <span class="id" title="var">nat</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">bt_ret</span> : <span class="id" title="var">binary_tree</span> <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">hbt'</span> : <span class="id" title="var">heightened_binary_tree</span> <span class="id" title="var">A</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_sound_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt1</span> = <span class="id" title="var">true</span> -&gt; <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_sound_hbt</span> <span class="id" title="var">A</span> (<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h_ret</span> <span class="id" title="var">bt_ret</span>) = <span class="id" title="var">true</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">rotate_left_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt1</span> <span class="id" title="var">e</span> (<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h_ret</span> <span class="id" title="var">bt_ret</span>) = <span class="id" title="var">Some</span> <span class="id" title="var">hbt'</span> -&gt; <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_sound_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt'</span> = <span class="id" title="var">true</span>.<br/>
+
+<br/>
+
+<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a name="lab3"></a><h1 class="section">Insertion Preserves Soundness</h1>
+
+<div class="paragraph"> </div>
+
+ This section contains the most important lemma concerning soundness in this 
+project, namely, that inserting an element into a sound <span class="inlinecode"><span class="id" title="var">heightened_binary_tree</span></span>
+using <span class="inlinecode"><span class="id" title="var">insert_hbt_helper</span></span> returns a <span class="inlinecode"><span class="id" title="var">heightened_binary_tree</span></span> which is also sound. The 
+proof proceeds by unfolding the <span class="inlinecode"><span class="id" title="var">insert_hbt_helper</span></span> function, and performing a 
+sequence of case analyses. 
+</div>
+<div class="code">
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">insertion_preserves_soundness</span>:<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">compare</span> : <span class="id" title="var">A</span> -&gt; <span class="id" title="var">A</span> -&gt; <span class="id" title="var">element_comparison</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">x</span> : <span class="id" title="var">A</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="keyword">forall</span> (<span class="id" title="var">hbt</span> : <span class="id" title="var">heightened_binary_tree</span> <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">hbt'</span> : <span class="id" title="var">heightened_binary_tree</span> <span class="id" title="var">A</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_sound_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt</span> = <span class="id" title="var">true</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">insert_hbt_helper</span> <span class="id" title="var">A</span> <span class="id" title="var">compare</span> <span class="id" title="var">x</span> <span class="id" title="var">hbt</span> = <span class="id" title="var">Some</span> <span class="id" title="var">hbt'</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_sound_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt'</span> = <span class="id" title="var">true</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;/\<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="keyword">forall</span> (<span class="id" title="var">bt</span> : <span class="id" title="var">binary_tree</span> <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">h_hbt</span> : <span class="id" title="var">nat</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">hbt'</span> : <span class="id" title="var">heightened_binary_tree</span> <span class="id" title="var">A</span>),    <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_sound_hbt</span> <span class="id" title="var">A</span> (<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h_hbt</span> <span class="id" title="var">bt</span>) = <span class="id" title="var">true</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">insert_bt_helper</span> <span class="id" title="var">A</span> <span class="id" title="var">compare</span> <span class="id" title="var">x</span> <span class="id" title="var">h_hbt</span> <span class="id" title="var">bt</span> = <span class="id" title="var">Some</span> <span class="id" title="var">hbt'</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_sound_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt'</span> = <span class="id" title="var">true</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;/\<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="keyword">forall</span> (<span class="id" title="var">t</span> : <span class="id" title="var">triple</span> <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">h_hbt</span> : <span class="id" title="var">nat</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">hbt'</span> : <span class="id" title="var">heightened_binary_tree</span> <span class="id" title="var">A</span>),    <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_sound_hbt</span> <span class="id" title="var">A</span> (<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h_hbt</span> (<span class="id" title="var">Node</span> <span class="id" title="var">A</span> <span class="id" title="var">t</span>)) = <span class="id" title="var">true</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">insert_t_helper</span> <span class="id" title="var">A</span> <span class="id" title="var">compare</span> <span class="id" title="var">x</span> <span class="id" title="var">h_hbt</span> <span class="id" title="var">t</span> = <span class="id" title="var">Some</span> <span class="id" title="var">hbt'</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_sound_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt'</span> = <span class="id" title="var">true</span>).<br/>
+
+<br/>
+
+<br/>
+</div>
+</div>
+
+<div id="footer">
+<hr/><a href="index.html">Index</a><hr/>This page has been generated by <a href="http://coq.inria.fr/">coqdoc</a>
+</div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,540 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<link href="coqdoc.css" rel="stylesheet" type="text/css" />
+<title>balanced</title>
+</head>
+
+<body>
+
+<div id="page">
+
+<div id="header">
+</div>
+
+<div id="main">
+
+<h1 class="libtitle">Library balanced</h1>
+
+<div class="code">
+
+<br/>
+</div>
+
+<div class="doc">
+The <span class="inlinecode"><span class="id" title="var">balanced</span></span> library contains lemmas concerning the balancedness property of
+AVL trees 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="var">Hbt.Lemmas.Sound.sound</span>.<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Export</span> <span class="id" title="var">Hbt.Lemmas.Sound.sound</span>.<br/>
+
+<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a name="lab1"></a><h1 class="section">General Lemmas Concerning Balancedness</h1>
+
+<div class="paragraph"> </div>
+
+ Lemma to show that given a balanced <span class="inlinecode"><span class="id" title="var">triple</span></span>, its constituent 
+<span class="inlinecode"><span class="id" title="var">heightened_binary_tree</span></span>s should also be balanced 
+</div>
+<div class="code">
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">triple_balanced_implies_hbts_balanced</span>:<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">h_hbt</span> : <span class="id" title="var">nat</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">hbt1</span> : <span class="id" title="var">heightened_binary_tree</span> <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">e</span> : <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">hbt2</span> : <span class="id" title="var">heightened_binary_tree</span> <span class="id" title="var">A</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_balanced_hbt</span> <span class="id" title="var">A</span> (<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h_hbt</span> (<span class="id" title="var">Node</span> <span class="id" title="var">A</span> (<span class="id" title="var">Triple</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt1</span> <span class="id" title="var">e</span> <span class="id" title="var">hbt2</span>))) = <span class="id" title="var">true</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_balanced_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt1</span> = <span class="id" title="var">true</span> /\ <span class="id" title="var">is_balanced_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt2</span> = <span class="id" title="var">true</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Lemma to show that if the helper function to check the balancedness of a
+<span class="inlinecode"><span class="id" title="var">heightened_binary_tree</span></span> returns <span class="inlinecode"><span class="id" title="var">Some</span></span> value, then the helper function to check
+the balancedness of the <span class="inlinecode"><span class="id" title="var">binary_tree</span></span> returns the same value 
+</div>
+<div class="code">
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">traverse_to_check_balanced_hbt_bt_same</span>:<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">h</span> <span class="id" title="var">h_hbt</span> : <span class="id" title="var">nat</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">bt</span> : <span class="id" title="var">binary_tree</span> <span class="id" title="var">A</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">traverse_to_check_balanced_hbt</span> <span class="id" title="var">A</span> (<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h</span> <span class="id" title="var">bt</span>) = <span class="id" title="var">Some</span> <span class="id" title="var">h_hbt</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">traverse_to_check_balanced_bt</span> <span class="id" title="var">A</span> <span class="id" title="var">bt</span> = <span class="id" title="var">Some</span> <span class="id" title="var">h_hbt</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Lemma to show that if the helper function to check the balancedness of a
+<span class="inlinecode"><span class="id" title="var">binary_tree</span></span> returns <span class="inlinecode"><span class="id" title="var">Some</span></span> value, then the helper function to check
+the balancedness of the <span class="inlinecode"><span class="id" title="var">triple</span></span> returns the same value 
+</div>
+<div class="code">
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">traverse_to_check_balanced_bt_t_same</span>:<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">h_hbt</span> : <span class="id" title="var">nat</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">t</span> : <span class="id" title="var">triple</span> <span class="id" title="var">A</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">traverse_to_check_balanced_bt</span> <span class="id" title="var">A</span> (<span class="id" title="var">Node</span> <span class="id" title="var">A</span> <span class="id" title="var">t</span>) = <span class="id" title="var">Some</span> <span class="id" title="var">h_hbt</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">traverse_to_check_balanced_t</span> <span class="id" title="var">A</span> <span class="id" title="var">t</span> = <span class="id" title="var">Some</span> <span class="id" title="var">h_hbt</span>.<br/>
+
+<br/>
+
+<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a name="lab2"></a><h1 class="section">Relating Balancedness to Other Properties</h1>
+
+<div class="paragraph"> </div>
+
+ Lemma to show that the heights returned by the helper functions to check for 
+soundness and balancedness are the same 
+</div>
+<div class="code">
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">relating_soundness_and_balancedness</span>:<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="keyword">forall</span> (<span class="id" title="var">hbt</span> : <span class="id" title="var">heightened_binary_tree</span> <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">h_sound</span> <span class="id" title="var">h_bal</span> : <span class="id" title="var">nat</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">traverse_to_check_soundness_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt</span> = <span class="id" title="var">Some</span> <span class="id" title="var">h_sound</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">traverse_to_check_balanced_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt</span> = <span class="id" title="var">Some</span> <span class="id" title="var">h_bal</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">h_sound</span> = <span class="id" title="var">h_bal</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;/\<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="keyword">forall</span> (<span class="id" title="var">bt</span> : <span class="id" title="var">binary_tree</span> <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">h_sound</span> <span class="id" title="var">h_bal</span> : <span class="id" title="var">nat</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">traverse_to_check_soundness_bt</span> <span class="id" title="var">A</span> <span class="id" title="var">bt</span> = <span class="id" title="var">Some</span> <span class="id" title="var">h_sound</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">traverse_to_check_balanced_bt</span> <span class="id" title="var">A</span> <span class="id" title="var">bt</span> = <span class="id" title="var">Some</span> <span class="id" title="var">h_bal</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">h_sound</span> = <span class="id" title="var">h_bal</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;/\<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="keyword">forall</span> (<span class="id" title="var">t</span> : <span class="id" title="var">triple</span> <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">h_sound</span> <span class="id" title="var">h_bal</span> : <span class="id" title="var">nat</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">traverse_to_check_soundness_t</span> <span class="id" title="var">A</span> <span class="id" title="var">t</span> = <span class="id" title="var">Some</span> <span class="id" title="var">h_sound</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">traverse_to_check_balanced_t</span> <span class="id" title="var">A</span> <span class="id" title="var">t</span> = <span class="id" title="var">Some</span> <span class="id" title="var">h_bal</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">h_sound</span> = <span class="id" title="var">h_bal</span>).<br/>
+ 
+<br/>
+</div>
+
+<div class="doc">
+Lemma to show that if an AVL tree is sound and balanced, then it must have 
+<span class="inlinecode"><span class="id" title="var">Some</span></span> height 
+</div>
+<div class="code">
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">balanced_implies_some_height</span>:<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">h</span> : <span class="id" title="var">nat</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">bt</span> : <span class="id" title="var">binary_tree</span> <span class="id" title="var">A</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_sound_hbt</span> <span class="id" title="var">A</span> (<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h</span> <span class="id" title="var">bt</span>) = <span class="id" title="var">true</span> -&gt; <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_balanced_hbt</span> <span class="id" title="var">A</span> (<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h</span> <span class="id" title="var">bt</span>) = <span class="id" title="var">true</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">traverse_to_check_balanced_hbt</span> <span class="id" title="var">A</span> (<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h</span> <span class="id" title="var">bt</span>) = <span class="id" title="var">Some</span> <span class="id" title="var">h</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Lemma to relate the projected height of a <span class="inlinecode"><span class="id" title="var">heightened_binary_tree</span></span> to that
+ returned by the helper function to check for soundness 
+</div>
+<div class="code">
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">relating_soundness_and_projection</span>:<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">hbt</span> : <span class="id" title="var">heightened_binary_tree</span> <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">h_ret</span> : <span class="id" title="var">nat</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">traverse_to_check_soundness_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt</span> = <span class="id" title="var">Some</span> <span class="id" title="var">h_ret</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">project_height_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt</span> = <span class="id" title="var">h_ret</span>.<br/>
+
+<br/>
+
+<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a name="lab3"></a><h1 class="section">Lemmas Concerning the <span class="inlinecode"><span class="id" title="var">differ_by_one</span></span> Predicate</h1>
+
+<div class="paragraph"> </div>
+
+ Lemma to show that a <span class="inlinecode"><span class="id" title="var">nat</span></span> value differs from itself by one 
+</div>
+<div class="code">
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">same_nat_differs_by_one</span>:<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">n</span> : <span class="id" title="var">nat</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">differ_by_one</span> <span class="id" title="var">n</span> <span class="id" title="var">n</span> = <span class="id" title="var">true</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Lemma to show the a <span class="inlinecode"><span class="id" title="var">nat</span></span> value and its successor differ by one 
+</div>
+<div class="code">
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">nat_and_succ_nat_differ_by_one</span>:<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">n</span> : <span class="id" title="var">nat</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">differ_by_one</span> (1 + <span class="id" title="var">n</span>) <span class="id" title="var">n</span> = <span class="id" title="var">true</span>.<br/>
+ 
+<br/>
+</div>
+
+<div class="doc">
+Lemma to show the <span class="inlinecode"><span class="id" title="var">differ_by_one</span></span> predicate is symmetric 
+</div>
+<div class="code">
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">differ_by_one_symm</span>:<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">x</span> <span class="id" title="var">y</span> : <span class="id" title="var">nat</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">differ_by_one</span> <span class="id" title="var">x</span> <span class="id" title="var">y</span> = <span class="id" title="var">differ_by_one</span> <span class="id" title="var">y</span> <span class="id" title="var">x</span>.<br/>
+ 
+<br/>
+</div>
+
+<div class="doc">
+Lemma to show that if a tree is sound and balanced, then its sub-trees should 
+differ by one in height 
+</div>
+<div class="code">
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">sound_and_balanced_imply_differ_by_one</span>:<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">h_hbt</span> : <span class="id" title="var">nat</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">h1</span> : <span class="id" title="var">nat</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">bt1</span> : <span class="id" title="var">binary_tree</span> <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">e</span> : <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">h2</span> : <span class="id" title="var">nat</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">bt2</span> : <span class="id" title="var">binary_tree</span> <span class="id" title="var">A</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_sound_hbt</span> <span class="id" title="var">A</span> (<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h_hbt</span> (<span class="id" title="var">Node</span> <span class="id" title="var">A</span> (<span class="id" title="var">Triple</span> <span class="id" title="var">A</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h1</span> <span class="id" title="var">bt1</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">e</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h2</span> <span class="id" title="var">bt2</span>)))) = <span class="id" title="var">true</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_balanced_hbt</span> <span class="id" title="var">A</span> (<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h_hbt</span> (<span class="id" title="var">Node</span> <span class="id" title="var">A</span> (<span class="id" title="var">Triple</span> <span class="id" title="var">A</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h1</span> <span class="id" title="var">bt1</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">e</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h2</span> <span class="id" title="var">bt2</span>)))) = <span class="id" title="var">true</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">differ_by_one</span> <span class="id" title="var">h1</span> <span class="id" title="var">h2</span> = <span class="id" title="var">true</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Lemma to show that a height and two more than the height cannot differ by one 
+</div>
+<div class="code">
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">differ_by_one_false</span>:<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">h</span> : <span class="id" title="var">nat</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">differ_by_one</span> (2 + <span class="id" title="var">h</span>) <span class="id" title="var">h</span> = <span class="id" title="var">false</span>.<br/>
+
+<br/>
+
+<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a name="lab4"></a><h1 class="section">Balancedness Lemmas Concerning Insertion</h1>
+
+<div class="paragraph"> </div>
+
+ This section contains the lemmas directly concerned with our implementation of
+insertion. They build up to the main lemma concerning the preservation of balance
+after insertion (dealt with in the next section 
+</div>
+<div class="code">
+
+<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a name="lab5"></a><h2 class="section">Lemmas Not Involving Rotations</h2>
+
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">right_insert_differ_by_one</span>:<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">h1</span> <span class="id" title="var">h2</span> <span class="id" title="var">h_ret</span> : <span class="id" title="var">nat</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">differ_by_one</span> <span class="id" title="var">h1</span> <span class="id" title="var">h2</span> = <span class="id" title="var">true</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">h_ret</span> = <span class="id" title="var">h2</span>) \/ (<span class="id" title="var">h_ret</span> = 1 + <span class="id" title="var">h2</span>)  -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">compare_int</span> <span class="id" title="var">h_ret</span> (2 + <span class="id" title="var">h1</span>) = <span class="id" title="var">Lt</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">differ_by_one</span> <span class="id" title="var">h1</span> <span class="id" title="var">h_ret</span> = <span class="id" title="var">true</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">left_insert_differ_by_one</span>:<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">h1</span> : <span class="id" title="var">nat</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">h2</span> : <span class="id" title="var">nat</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">h_ret</span> : <span class="id" title="var">nat</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">differ_by_one</span> <span class="id" title="var">h1</span> <span class="id" title="var">h2</span> = <span class="id" title="var">true</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">h_ret</span> = <span class="id" title="var">h1</span> \/ <span class="id" title="var">h_ret</span> = 1 + <span class="id" title="var">h1</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">compare_int</span> <span class="id" title="var">h_ret</span> (2 + <span class="id" title="var">h2</span>) = <span class="id" title="var">Lt</span> -&gt;     <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">differ_by_one</span> <span class="id" title="var">h_ret</span> <span class="id" title="var">h2</span> = <span class="id" title="var">true</span>.<br/>
+
+<br/>
+
+<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a name="lab6"></a><h2 class="section">Lemmas Concerning Rotate Right</h2>
+
+<div class="paragraph"> </div>
+
+ The following 4 lemmas, <span class="inlinecode"><span class="id" title="var">rotate_right_differ_by_one_1</span></span>, 
+<span class="inlinecode"><span class="id" title="var">rotate_right_differ_by_one_2</span></span>, <span class="inlinecode"><span class="id" title="var">rotate_right_differ_by_one_3</span></span>, and
+<span class="inlinecode"><span class="id" title="var">rotate_right_differ_by_one_4</span></span>, are helper lemmas to prove that right rotations
+preserve balance. They deal with very specific propositions that must be proved to
+prove the main balanced preservation theorem, and as such involve tedious but routine
+arithmetic rewrites 
+</div>
+<div class="code">
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">rotate_right_differ_by_one_1</span>: <br/>
+&nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">h121</span> <span class="id" title="var">h122</span> <span class="id" title="var">h11</span> <span class="id" title="var">h12</span>: <span class="id" title="var">nat</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">h12</span> = 1 + <span class="id" title="var">max</span> <span class="id" title="var">h121</span> <span class="id" title="var">h122</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">h11</span> + 1 = <span class="id" title="var">h12</span> -&gt; <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">differ_by_one</span> <span class="id" title="var">h121</span> <span class="id" title="var">h122</span> = <span class="id" title="var">true</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">differ_by_one</span> <span class="id" title="var">h11</span> (1 + <span class="id" title="var">max</span> <span class="id" title="var">h121</span> <span class="id" title="var">h122</span>) = <span class="id" title="var">true</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">differ_by_one</span> <span class="id" title="var">h11</span> <span class="id" title="var">h121</span> = <span class="id" title="var">true</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">rotate_right_differ_by_one_2</span>:<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">h121</span> <span class="id" title="var">h122</span> <span class="id" title="var">h12</span> <span class="id" title="var">h11</span> <span class="id" title="var">h_ret</span> <span class="id" title="var">h2</span>: <span class="id" title="var">nat</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">differ_by_one</span> <span class="id" title="var">h121</span> <span class="id" title="var">h122</span> = <span class="id" title="var">true</span> -&gt; <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">h12</span> = 1 + <span class="id" title="var">max</span> <span class="id" title="var">h121</span> <span class="id" title="var">h122</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">h11</span> + 1 = <span class="id" title="var">h12</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">h_ret</span> = 1 + <span class="id" title="var">max</span> <span class="id" title="var">h11</span> <span class="id" title="var">h12</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">h_ret</span> = 2 + <span class="id" title="var">h2</span> -&gt; <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">differ_by_one</span> <span class="id" title="var">h122</span> <span class="id" title="var">h2</span> = <span class="id" title="var">true</span>.<br/>
+ 
+<br/>
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">rotate_right_differ_by_one_3</span>:<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">h121</span> <span class="id" title="var">h122</span> <span class="id" title="var">h12</span> <span class="id" title="var">h11</span> <span class="id" title="var">h_ret</span> <span class="id" title="var">h2</span> : <span class="id" title="var">nat</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">differ_by_one</span> <span class="id" title="var">h121</span> <span class="id" title="var">h122</span> = <span class="id" title="var">true</span> -&gt; <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">h12</span> = 1 + <span class="id" title="var">max</span> <span class="id" title="var">h121</span> <span class="id" title="var">h122</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">h11</span> + 1 = <span class="id" title="var">h12</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">h_ret</span> = 1 + <span class="id" title="var">max</span> <span class="id" title="var">h11</span> <span class="id" title="var">h12</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">h_ret</span> = 2 + <span class="id" title="var">h2</span> -&gt; <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">differ_by_one</span> (1 + <span class="id" title="var">max</span> <span class="id" title="var">h11</span> <span class="id" title="var">h121</span>) (1 + <span class="id" title="var">max</span> <span class="id" title="var">h122</span> <span class="id" title="var">h2</span>) = <span class="id" title="var">true</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">rotate_right_differ_by_one_4</span>:<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">h12</span> <span class="id" title="var">h11</span> <span class="id" title="var">h2</span> <span class="id" title="var">h_ret</span> : <span class="id" title="var">nat</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">h12</span> + 1 =<span class="id" title="var">n</span>= <span class="id" title="var">h11</span>) || (<span class="id" title="var">h12</span> =<span class="id" title="var">n</span>= <span class="id" title="var">h11</span>) = <span class="id" title="var">true</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">h_ret</span> = 2 + <span class="id" title="var">h2</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">h_ret</span> = 1 + <span class="id" title="var">max</span> <span class="id" title="var">h11</span> <span class="id" title="var">h12</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">differ_by_one</span> <span class="id" title="var">h12</span> <span class="id" title="var">h2</span> = <span class="id" title="var">true</span> /\ <span class="id" title="var">differ_by_one</span> <span class="id" title="var">h11</span> (1 + <span class="id" title="var">max</span> <span class="id" title="var">h12</span> <span class="id" title="var">h2</span>) = <span class="id" title="var">true</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Lemma to show that right rotating a tree preserves balanced. The lemma assumes
+the soundness and balancedness of the sub-trees of the tree returned after rotation.
+
+</div>
+<div class="code">
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">rotate_right_preserves_balance</span>:<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">h_ret</span> : <span class="id" title="var">nat</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">bt_ret</span> : <span class="id" title="var">binary_tree</span> <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">e</span> : <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">hbt2</span> : <span class="id" title="var">heightened_binary_tree</span> <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">hbt'</span> : <span class="id" title="var">heightened_binary_tree</span> <span class="id" title="var">A</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_balanced_hbt</span> <span class="id" title="var">A</span> (<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h_ret</span> <span class="id" title="var">bt_ret</span>) = <span class="id" title="var">true</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_balanced_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt2</span> = <span class="id" title="var">true</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_sound_hbt</span> <span class="id" title="var">A</span> (<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h_ret</span> <span class="id" title="var">bt_ret</span>) = <span class="id" title="var">true</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_sound_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt2</span> = <span class="id" title="var">true</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">rotate_right_hbt</span> <span class="id" title="var">A</span> (<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h_ret</span> <span class="id" title="var">bt_ret</span>) <span class="id" title="var">e</span> <span class="id" title="var">hbt2</span> = <span class="id" title="var">Some</span> <span class="id" title="var">hbt'</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">compare_int</span> <span class="id" title="var">h_ret</span> (2 + <span class="id" title="var">project_height_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt2</span>)  = <span class="id" title="var">Eq</span> -&gt;  <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_balanced_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt'</span> = <span class="id" title="var">true</span>.<br/>
+
+<br/>
+
+<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a name="lab7"></a><h2 class="section">Lemmas Concerning Rotate Left</h2>
+
+<div class="paragraph"> </div>
+
+ The following 4 lemmas, <span class="inlinecode"><span class="id" title="var">rotate_left_differ_by_one_1</span></span>, 
+<span class="inlinecode"><span class="id" title="var">rotate_left_differ_by_one_2</span></span>, <span class="inlinecode"><span class="id" title="var">rotate_left_differ_by_one_3</span></span>, and
+<span class="inlinecode"><span class="id" title="var">rotate_left_differ_by_one_4</span></span>, are helper lemmas to prove that left rotations
+preserve balance. They deal with very specific propositions that must be proved to
+prove the main balanced preservation theorem, and as such involve tedious but routine
+arithmetic rewrites 
+</div>
+<div class="code">
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">rotate_left_differ_by_one_1</span>:<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">h1</span> <span class="id" title="var">h211</span> <span class="id" title="var">h212</span> : <span class="id" title="var">nat</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">h1</span> = <span class="id" title="var">max</span> <span class="id" title="var">h211</span> <span class="id" title="var">h212</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">differ_by_one</span> <span class="id" title="var">h211</span> <span class="id" title="var">h212</span> = <span class="id" title="var">true</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">differ_by_one</span> <span class="id" title="var">h1</span> <span class="id" title="var">h211</span> = <span class="id" title="var">true</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">rotate_left_differ_by_one_2</span>:<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">h211</span> <span class="id" title="var">h212</span> <span class="id" title="var">h22</span> : <span class="id" title="var">nat</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">differ_by_one</span> <span class="id" title="var">h211</span> <span class="id" title="var">h212</span> = <span class="id" title="var">true</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">h22</span> = <span class="id" title="var">max</span> <span class="id" title="var">h211</span> <span class="id" title="var">h212</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">differ_by_one</span> <span class="id" title="var">h212</span> <span class="id" title="var">h22</span> = <span class="id" title="var">true</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">rotate_left_differ_by_one_3</span>:<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">h1</span> <span class="id" title="var">h211</span> <span class="id" title="var">h212</span> <span class="id" title="var">h22</span> : <span class="id" title="var">nat</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">h1</span> = <span class="id" title="var">max</span> <span class="id" title="var">h211</span> <span class="id" title="var">h212</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">h22</span> = <span class="id" title="var">max</span> <span class="id" title="var">h211</span> <span class="id" title="var">h212</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">differ_by_one</span> <span class="id" title="var">h211</span> <span class="id" title="var">h212</span> = <span class="id" title="var">true</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">differ_by_one</span> (1 + <span class="id" title="var">max</span> <span class="id" title="var">h1</span> <span class="id" title="var">h211</span>) (1 + <span class="id" title="var">max</span> <span class="id" title="var">h212</span> <span class="id" title="var">h22</span>) = <span class="id" title="var">true</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">rotate_left_differ_by_one_4</span>:<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">h1</span> <span class="id" title="var">h21</span> <span class="id" title="var">h22</span> <span class="id" title="var">h_ret</span> : <span class="id" title="var">nat</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">h21</span> + 1 =<span class="id" title="var">n</span>= <span class="id" title="var">h22</span>) || (<span class="id" title="var">h21</span> =<span class="id" title="var">n</span>= <span class="id" title="var">h22</span>) = <span class="id" title="var">true</span> -&gt; <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">h_ret</span> = 1 + <span class="id" title="var">max</span> <span class="id" title="var">h21</span> <span class="id" title="var">h22</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">h_ret</span> = 2 + <span class="id" title="var">h1</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">differ_by_one</span> <span class="id" title="var">h1</span> <span class="id" title="var">h21</span> = <span class="id" title="var">true</span> /\ <span class="id" title="var">differ_by_one</span> (1 + <span class="id" title="var">max</span> <span class="id" title="var">h1</span> <span class="id" title="var">h21</span>) <span class="id" title="var">h22</span> = <span class="id" title="var">true</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Lemma to show that left rotating a tree preserves balanced. The lemma assumes
+the soundness and balancedness of the sub-trees of the tree returned after rotation.
+
+</div>
+<div class="code">
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">rotate_left_preserves_balance</span>:<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">hbt1</span> : <span class="id" title="var">heightened_binary_tree</span> <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">e</span> : <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">h_ret</span> : <span class="id" title="var">nat</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">bt_ret</span> : <span class="id" title="var">binary_tree</span> <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">hbt'</span> : <span class="id" title="var">heightened_binary_tree</span> <span class="id" title="var">A</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_balanced_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt1</span> = <span class="id" title="var">true</span> -&gt; <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_balanced_hbt</span> <span class="id" title="var">A</span> (<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h_ret</span> <span class="id" title="var">bt_ret</span>) = <span class="id" title="var">true</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_sound_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt1</span> = <span class="id" title="var">true</span> -&gt; <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_sound_hbt</span> <span class="id" title="var">A</span> (<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h_ret</span> <span class="id" title="var">bt_ret</span>) = <span class="id" title="var">true</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">rotate_left_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt1</span> <span class="id" title="var">e</span> (<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h_ret</span> <span class="id" title="var">bt_ret</span>) = <span class="id" title="var">Some</span> <span class="id" title="var">hbt'</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">compare_int</span> <span class="id" title="var">h_ret</span> (2 + <span class="id" title="var">project_height_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt1</span>)  = <span class="id" title="var">Eq</span> -&gt;  <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_balanced_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt'</span> = <span class="id" title="var">true</span>.<br/>
+
+<br/>
+
+<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a name="lab8"></a><h2 class="section">Main Lemmas</h2>
+
+<div class="paragraph"> </div>
+
+ Lemma to show that if a value is inserted into a sub-tree, and the resultant tree
+is balanced, then the height of the new sub-tree is either the same or one more than
+the height of the original sub-tree 
+</div>
+<div class="code">
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">relating_insertion_and_original_height</span>: <br/>
+&nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">compare</span> : <span class="id" title="var">A</span> -&gt; <span class="id" title="var">A</span> -&gt; <span class="id" title="var">element_comparison</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">x</span> : <span class="id" title="var">A</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="keyword">forall</span> (<span class="id" title="var">hbt</span> : <span class="id" title="var">heightened_binary_tree</span> <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">hbt'</span> : <span class="id" title="var">heightened_binary_tree</span> <span class="id" title="var">A</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">insert_hbt_helper</span> <span class="id" title="var">A</span> <span class="id" title="var">compare</span> <span class="id" title="var">x</span> <span class="id" title="var">hbt</span> = <span class="id" title="var">Some</span> <span class="id" title="var">hbt'</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_sound_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt</span> = <span class="id" title="var">true</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_balanced_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt</span> = <span class="id" title="var">true</span> -&gt;        <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_sound_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt'</span> = <span class="id" title="var">true</span> -&gt; <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">project_height_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt'</span> = <span class="id" title="var">project_height_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\/<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">project_height_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt'</span> = 1 + <span class="id" title="var">project_height_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt</span>))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;/\<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="keyword">forall</span> (<span class="id" title="var">bt</span> : <span class="id" title="var">binary_tree</span> <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">h_hbt</span> : <span class="id" title="var">nat</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">hbt'</span> : <span class="id" title="var">heightened_binary_tree</span> <span class="id" title="var">A</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">insert_bt_helper</span> <span class="id" title="var">A</span> <span class="id" title="var">compare</span> <span class="id" title="var">x</span> <span class="id" title="var">h_hbt</span> <span class="id" title="var">bt</span> = <span class="id" title="var">Some</span> <span class="id" title="var">hbt'</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_sound_hbt</span> <span class="id" title="var">A</span> (<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h_hbt</span> <span class="id" title="var">bt</span>) = <span class="id" title="var">true</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_balanced_hbt</span> <span class="id" title="var">A</span> (<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h_hbt</span> <span class="id" title="var">bt</span>) = <span class="id" title="var">true</span> -&gt;        <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_sound_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt'</span> = <span class="id" title="var">true</span> -&gt; <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">project_height_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt'</span> = <span class="id" title="var">h_hbt</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\/<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">project_height_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt'</span> = 1 + <span class="id" title="var">h_hbt</span>))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;/\<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="keyword">forall</span> (<span class="id" title="var">t</span> : <span class="id" title="var">triple</span> <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">h_hbt</span> : <span class="id" title="var">nat</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">hbt'</span> : <span class="id" title="var">heightened_binary_tree</span> <span class="id" title="var">A</span>),    <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">insert_t_helper</span> <span class="id" title="var">A</span> <span class="id" title="var">compare</span> <span class="id" title="var">x</span> <span class="id" title="var">h_hbt</span> <span class="id" title="var">t</span> = <span class="id" title="var">Some</span> <span class="id" title="var">hbt'</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_sound_hbt</span> <span class="id" title="var">A</span> (<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h_hbt</span> (<span class="id" title="var">Node</span> <span class="id" title="var">A</span> <span class="id" title="var">t</span>)) = <span class="id" title="var">true</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_balanced_hbt</span> <span class="id" title="var">A</span> (<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h_hbt</span> (<span class="id" title="var">Node</span> <span class="id" title="var">A</span> <span class="id" title="var">t</span>)) = <span class="id" title="var">true</span> -&gt;        <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_sound_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt'</span> = <span class="id" title="var">true</span> -&gt; <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">project_height_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt'</span> = <span class="id" title="var">h_hbt</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\/<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">project_height_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt'</span> = 1 + <span class="id" title="var">h_hbt</span>)).<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+This is the most important lemma concerning balanced in this project. It claims
+that inserting an element into a sound and balanced <span class="inlinecode"><span class="id" title="var">heightened_binary_tree</span></span> using
+<span class="inlinecode"><span class="id" title="var">insert_hbt_helper</span></span> returns a <span class="inlinecode"><span class="id" title="var">heightened_binary_tree</span></span> which is also balanced. The 
+proof proceeds by unfolding the <span class="inlinecode"><span class="id" title="var">insert_hbt_helper</span></span> function, and performing a
+sequence of case analyses. 
+</div>
+<div class="code">
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">insertion_preserves_balance</span>: <br/>
+&nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">compare</span> : <span class="id" title="var">A</span> -&gt; <span class="id" title="var">A</span> -&gt; <span class="id" title="var">element_comparison</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">x</span> : <span class="id" title="var">A</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="keyword">forall</span> (<span class="id" title="var">hbt</span> : <span class="id" title="var">heightened_binary_tree</span> <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">hbt'</span> : <span class="id" title="var">heightened_binary_tree</span> <span class="id" title="var">A</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_sound_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt</span> = <span class="id" title="var">true</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_balanced_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt</span> = <span class="id" title="var">true</span> -&gt;        <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">insert_hbt_helper</span> <span class="id" title="var">A</span> <span class="id" title="var">compare</span> <span class="id" title="var">x</span> <span class="id" title="var">hbt</span> = <span class="id" title="var">Some</span> <span class="id" title="var">hbt'</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_balanced_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt'</span> = <span class="id" title="var">true</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;/\<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="keyword">forall</span> (<span class="id" title="var">bt</span> : <span class="id" title="var">binary_tree</span> <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">h_hbt</span> : <span class="id" title="var">nat</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">hbt'</span> : <span class="id" title="var">heightened_binary_tree</span> <span class="id" title="var">A</span>),    <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_sound_hbt</span> <span class="id" title="var">A</span> (<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h_hbt</span> <span class="id" title="var">bt</span>) = <span class="id" title="var">true</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_balanced_hbt</span> <span class="id" title="var">A</span> (<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h_hbt</span> <span class="id" title="var">bt</span>) = <span class="id" title="var">true</span> -&gt;                <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">insert_bt_helper</span> <span class="id" title="var">A</span> <span class="id" title="var">compare</span> <span class="id" title="var">x</span> <span class="id" title="var">h_hbt</span> <span class="id" title="var">bt</span> = <span class="id" title="var">Some</span> <span class="id" title="var">hbt'</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_balanced_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt'</span> = <span class="id" title="var">true</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;/\<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="keyword">forall</span> (<span class="id" title="var">t</span> : <span class="id" title="var">triple</span> <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">h_hbt</span> : <span class="id" title="var">nat</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">hbt'</span> : <span class="id" title="var">heightened_binary_tree</span> <span class="id" title="var">A</span>),    <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_sound_hbt</span> <span class="id" title="var">A</span> (<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h_hbt</span> (<span class="id" title="var">Node</span> <span class="id" title="var">A</span> <span class="id" title="var">t</span>)) = <span class="id" title="var">true</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_balanced_hbt</span> <span class="id" title="var">A</span> (<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h_hbt</span> (<span class="id" title="var">Node</span> <span class="id" title="var">A</span> <span class="id" title="var">t</span>)) = <span class="id" title="var">true</span> -&gt;                        <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">insert_t_helper</span> <span class="id" title="var">A</span> <span class="id" title="var">compare</span> <span class="id" title="var">x</span> <span class="id" title="var">h_hbt</span> <span class="id" title="var">t</span> = <span class="id" title="var">Some</span> <span class="id" title="var">hbt'</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_balanced_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt'</span> = <span class="id" title="var">true</span>).<br/>
+
+<br/>
+
+<br/>
+</div>
+</div>
+
+<div id="footer">
+<hr/><a href="index.html">Index</a><hr/>This page has been generated by <a href="http://coq.inria.fr/">coqdoc</a>
+</div>
+
+</div>
+
+</body>
+</html>

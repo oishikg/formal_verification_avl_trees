@@ -1,0 +1,515 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<link href="coqdoc.css" rel="stylesheet" type="text/css" />
+<title>ordered_main</title>
+</head>
+
+<body>
+
+<div id="page">
+
+<div id="header">
+</div>
+
+<div id="main">
+
+<h1 class="libtitle">Library ordered_main</h1>
+
+<div class="code">
+
+<br/>
+</div>
+
+<div class="doc">
+The <span class="inlinecode"><span class="id" title="var">ordered_main</span></span> library contains all the main lemmas concerned with the 
+orderedness of AVL trees. These lemmas build on those define in <span class="inlinecode"><span class="id" title="var">ordered_helper</span></span> 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="var">Hbt.Lemmas.Ordered.Helper.ordered_helper</span>.<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Export</span> <span class="id" title="var">Hbt.Lemmas.Ordered.Helper.ordered_helper</span>.<br/>
+
+<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a name="lab1"></a><h1 class="section">Maximum and Minimum Elements After Insertion</h1>
+
+<div class="paragraph"> </div>
+
+ Lemma to show that post an operation on a tree to insert some element <tt>x</tt>:
+<ul class="doclist">
+<li> the maximum element is either <tt>x</tt> or the maximum element of the original tree
+
+</li>
+<li> the minimum element is either <tt>x</tt> or the minimum element of the original tree 
+</li>
+</ul>
+
+</div>
+<div class="code">
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">insertion_in_node_min_max</span>: <br/>
+&nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">compare</span> : <span class="id" title="var">A</span> -&gt; <span class="id" title="var">A</span> -&gt; <span class="id" title="var">element_comparison</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="keyword">forall</span> (<span class="id" title="var">hbt</span> : <span class="id" title="var">heightened_binary_tree</span> <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">hbt'</span> : <span class="id" title="var">heightened_binary_tree</span> <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">x</span> <span class="id" title="var">min</span> <span class="id" title="var">min'</span> <span class="id" title="var">max</span> <span class="id" title="var">max'</span> : <span class="id" title="var">A</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_sound_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt</span> = <span class="id" title="var">true</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_balanced_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt</span> = <span class="id" title="var">true</span> -&gt; <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">insert_hbt_helper</span> <span class="id" title="var">A</span> <span class="id" title="var">compare</span> <span class="id" title="var">x</span> <span class="id" title="var">hbt</span> = <span class="id" title="var">Some</span> <span class="id" title="var">hbt'</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">traverse_to_check_ordered_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt'</span> <span class="id" title="var">compare</span> = <span class="id" title="var">TSome</span> (<span class="id" title="var">A</span> * <span class="id" title="var">A</span>) (<span class="id" title="var">min'</span>, <span class="id" title="var">max'</span>) -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">traverse_to_check_ordered_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt</span> <span class="id" title="var">compare</span> = <span class="id" title="var">TSome</span> (<span class="id" title="var">A</span> * <span class="id" title="var">A</span>) (<span class="id" title="var">min</span>, <span class="id" title="var">max</span>) -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">max'</span> = <span class="id" title="var">x</span> \/ <span class="id" title="var">max'</span> = <span class="id" title="var">max</span>) /\ (<span class="id" title="var">min'</span> = <span class="id" title="var">x</span> \/ <span class="id" title="var">min'</span> = <span class="id" title="var">min</span>))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;/\<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="keyword">forall</span> (<span class="id" title="var">bt</span> : <span class="id" title="var">binary_tree</span> <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">h</span> : <span class="id" title="var">nat</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">hbt'</span> : <span class="id" title="var">heightened_binary_tree</span> <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">x</span> <span class="id" title="var">min</span> <span class="id" title="var">min'</span> <span class="id" title="var">max</span> <span class="id" title="var">max'</span> : <span class="id" title="var">A</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_sound_hbt</span> <span class="id" title="var">A</span> (<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h</span> <span class="id" title="var">bt</span>) = <span class="id" title="var">true</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_balanced_hbt</span> <span class="id" title="var">A</span> (<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h</span> <span class="id" title="var">bt</span>) = <span class="id" title="var">true</span> -&gt; <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">insert_bt_helper</span> <span class="id" title="var">A</span> <span class="id" title="var">compare</span> <span class="id" title="var">x</span> <span class="id" title="var">h</span> <span class="id" title="var">bt</span> = <span class="id" title="var">Some</span> <span class="id" title="var">hbt'</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">traverse_to_check_ordered_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt'</span> <span class="id" title="var">compare</span> = <span class="id" title="var">TSome</span> (<span class="id" title="var">A</span> * <span class="id" title="var">A</span>) (<span class="id" title="var">min'</span>, <span class="id" title="var">max'</span>) -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">traverse_to_check_ordered_bt</span> <span class="id" title="var">A</span> <span class="id" title="var">bt</span> <span class="id" title="var">compare</span> = <span class="id" title="var">TSome</span> (<span class="id" title="var">A</span> * <span class="id" title="var">A</span>) (<span class="id" title="var">min</span>, <span class="id" title="var">max</span>) -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">max'</span> = <span class="id" title="var">x</span> \/ <span class="id" title="var">max'</span> = <span class="id" title="var">max</span>) /\ (<span class="id" title="var">min'</span> = <span class="id" title="var">x</span> \/ <span class="id" title="var">min'</span> = <span class="id" title="var">min</span>))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;/\<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="keyword">forall</span> (<span class="id" title="var">t</span> : <span class="id" title="var">triple</span> <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">h</span> : <span class="id" title="var">nat</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">hbt'</span> : <span class="id" title="var">heightened_binary_tree</span> <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">x</span> <span class="id" title="var">min</span> <span class="id" title="var">min'</span> <span class="id" title="var">max</span> <span class="id" title="var">max'</span> : <span class="id" title="var">A</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_sound_hbt</span> <span class="id" title="var">A</span> (<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h</span> (<span class="id" title="var">Node</span> <span class="id" title="var">A</span> <span class="id" title="var">t</span>)) = <span class="id" title="var">true</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_balanced_hbt</span> <span class="id" title="var">A</span> (<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h</span> (<span class="id" title="var">Node</span> <span class="id" title="var">A</span> <span class="id" title="var">t</span>)) = <span class="id" title="var">true</span> -&gt; <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">insert_t_helper</span> <span class="id" title="var">A</span> <span class="id" title="var">compare</span> <span class="id" title="var">x</span> <span class="id" title="var">h</span> <span class="id" title="var">t</span> = <span class="id" title="var">Some</span> <span class="id" title="var">hbt'</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">traverse_to_check_ordered_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt'</span> <span class="id" title="var">compare</span> = <span class="id" title="var">TSome</span> (<span class="id" title="var">A</span> * <span class="id" title="var">A</span>) (<span class="id" title="var">min'</span>, <span class="id" title="var">max'</span>) -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">traverse_to_check_ordered_t</span> <span class="id" title="var">A</span> <span class="id" title="var">t</span> <span class="id" title="var">compare</span> = <span class="id" title="var">TSome</span> (<span class="id" title="var">A</span> * <span class="id" title="var">A</span>) (<span class="id" title="var">min</span>, <span class="id" title="var">max</span>) -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">max'</span> = <span class="id" title="var">x</span> \/ <span class="id" title="var">max'</span> = <span class="id" title="var">max</span>) /\ (<span class="id" title="var">min'</span> = <span class="id" title="var">x</span> \/ <span class="id" title="var">min'</span> = <span class="id" title="var">min</span>)).<br/>
+ 
+<br/>
+
+<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a name="lab2"></a><h1 class="section">Rotations Preserves Order</h1>
+
+<div class="paragraph"> </div>
+
+ When dealing with rotations in <span class="inlinecode"><span class="id" title="var">ordered_helper</span></span>, the notions of a first rotation
+and a second rotation were used to refer to the double and single rotations. While
+this corresponds to the way rotations are treated in the implementation of
+rotations in <span class="inlinecode"><span class="id" title="var">hbt</span></span>, the resulting proofs were repetitive and long. Thus, in this
+section, we instead develop our proofs with the following ideas in mind:
+
+<div class="paragraph"> </div>
+
+<ul class="doclist">
+<li> <tt>rotate_right_2</tt> and <tt>rotate_left_2</tt> correspond to the elementary rotate right and rotate left opertations
+
+</li>
+<li> The double rotation <tt>rotate_right_1</tt> results from composing an elementery rotate left operation on a sub-tree followed by an elementary rotate right operation on the entire tree
+
+</li>
+<li> The double rotation <tt>rotate_left_1</tt> results from composing an elementery rotate right operation on a sub-tree followed by an elementary rotate left operation on the entire tree. 
+
+</li>
+</ul>
+
+</div>
+<div class="code">
+
+<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a name="lab3"></a><h2 class="section">Helper Lemmas for Rotations</h2>
+
+<div class="paragraph"> </div>
+
+ Lemma to show that given two sub-trees <tt>hbt1</tt>, <tt>hbt2</tt> and a payload <tt>e</tt> such that: 
+
+<div class="paragraph"> </div>
+
+<ul class="doclist">
+<li> <tt>hbt1</tt> is ordered and has a minimum and maximum payload
+
+</li>
+<li> the maximum payload of <tt>hbt1</tt> is less than <tt>e</tt>
+<div class="paragraph"> </div>
+
+
+</li>
+<li> <tt>hbt2</tt> is ordered
+
+</li>
+<li> if <tt>hbt2</tt> has a minimum and a maximum, then <tt>e</tt> is less than this minimum, 
+
+<div class="paragraph"> </div>
+
+then the tree with <tt>e</tt> as root, <tt>hbt1</tt> as left sub-tree and <tt>hbt2</tt> as right 
+sub-tree is ordered, i.e., traversing the tree to check if it is ordered returns a 
+minimum and maximum
+
+</li>
+</ul>
+
+</div>
+<div class="code">
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">rotate_right_intermediate_tree_ordered</span>:<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">compare</span> : <span class="id" title="var">A</span> -&gt; <span class="id" title="var">A</span> -&gt; <span class="id" title="var">element_comparison</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">h1</span> : <span class="id" title="var">nat</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">bt1</span> : <span class="id" title="var">binary_tree</span> <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">e</span> : <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">h2</span> : <span class="id" title="var">nat</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">bt2</span> : <span class="id" title="var">binary_tree</span> <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">min1</span> <span class="id" title="var">max1</span> : <span class="id" title="var">A</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">traverse_to_check_ordered_hbt</span> <span class="id" title="var">A</span> (<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h1</span> <span class="id" title="var">bt1</span>) <span class="id" title="var">compare</span> =<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">TSome</span> (<span class="id" title="var">A</span> * <span class="id" title="var">A</span>) (<span class="id" title="var">min1</span>, <span class="id" title="var">max1</span>) -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">compare</span> <span class="id" title="var">max1</span> <span class="id" title="var">e</span> = <span class="id" title="var">Lt</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_ordered_hbt</span> <span class="id" title="var">A</span> (<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h2</span> <span class="id" title="var">bt2</span>) <span class="id" title="var">compare</span> = <span class="id" title="var">true</span> -&gt; <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="keyword">forall</span> <span class="id" title="var">min2</span> <span class="id" title="var">max2</span> : <span class="id" title="var">A</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">traverse_to_check_ordered_hbt</span> <span class="id" title="var">A</span> (<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h2</span> <span class="id" title="var">bt2</span>) <span class="id" title="var">compare</span> =<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">TSome</span> (<span class="id" title="var">A</span> * <span class="id" title="var">A</span>) (<span class="id" title="var">min2</span>, <span class="id" title="var">max2</span>) -&gt; <span class="id" title="var">compare</span> <span class="id" title="var">e</span> <span class="id" title="var">min2</span> = <span class="id" title="var">Lt</span>) -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">exists</span> <span class="id" title="var">max2</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">traverse_to_check_ordered_hbt</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">A</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> (1 + <span class="id" title="var">max</span> <span class="id" title="var">h1</span> <span class="id" title="var">h2</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">Node</span> <span class="id" title="var">A</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">Triple</span> <span class="id" title="var">A</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h1</span> <span class="id" title="var">bt1</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">e</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h2</span> <span class="id" title="var">bt2</span>))))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">compare</span> = <span class="id" title="var">TSome</span> (<span class="id" title="var">A</span> * <span class="id" title="var">A</span>) (<span class="id" title="var">min1</span>, <span class="id" title="var">max2</span>).<br/>
+ 
+<br/>
+</div>
+
+<div class="doc">
+Lemma to show that given two sub-trees <tt>hbt1</tt>, <tt>hbt2</tt> and a payload <tt>e</tt> such that: 
+
+<div class="paragraph"> </div>
+
+<ul class="doclist">
+<li> <tt>hbt2</tt> is ordered and has a minimum and maximum payload
+
+</li>
+<li> the minimum payload of <tt>hbt2</tt> is less than <tt>e</tt>
+<div class="paragraph"> </div>
+
+
+</li>
+<li> <tt>hbt1</tt> is ordered
+
+</li>
+<li> if <tt>hbt1</tt> has a minimum and a maximum, then this maximum is less than <tt>e</tt>, 
+
+<div class="paragraph"> </div>
+
+then the tree with <tt>e</tt> as root, <tt>hbt1</tt> as left sub-tree and <tt>hbt2</tt> as right 
+sub-tree is ordered, i.e., traversing the tree to check if it is ordered returns a 
+minimum and maximum
+
+</li>
+</ul>
+
+</div>
+<div class="code">
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">rotate_left_intermediate_tree_ordered</span>:<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">compare</span> : <span class="id" title="var">A</span> -&gt; <span class="id" title="var">A</span> -&gt; <span class="id" title="var">element_comparison</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">h1</span> : <span class="id" title="var">nat</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">bt1</span> : <span class="id" title="var">binary_tree</span> <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">e</span> : <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">h2</span> : <span class="id" title="var">nat</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">bt2</span> : <span class="id" title="var">binary_tree</span> <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">min2</span> <span class="id" title="var">max2</span> : <span class="id" title="var">A</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_ordered_hbt</span> <span class="id" title="var">A</span> (<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h1</span> <span class="id" title="var">bt1</span>) <span class="id" title="var">compare</span> = <span class="id" title="var">true</span> -&gt;     <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="keyword">forall</span> <span class="id" title="var">min1</span> <span class="id" title="var">max1</span> : <span class="id" title="var">A</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">traverse_to_check_ordered_hbt</span> <span class="id" title="var">A</span> (<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h1</span> <span class="id" title="var">bt1</span>) <span class="id" title="var">compare</span> =<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">TSome</span> (<span class="id" title="var">A</span> * <span class="id" title="var">A</span>) (<span class="id" title="var">min1</span>, <span class="id" title="var">max1</span>) -&gt; <span class="id" title="var">compare</span> <span class="id" title="var">max1</span> <span class="id" title="var">e</span> = <span class="id" title="var">Lt</span>) -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">traverse_to_check_ordered_hbt</span> <span class="id" title="var">A</span> (<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h2</span> <span class="id" title="var">bt2</span>) <span class="id" title="var">compare</span> =<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">TSome</span> (<span class="id" title="var">A</span> * <span class="id" title="var">A</span>) (<span class="id" title="var">min2</span>, <span class="id" title="var">max2</span>) -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">compare</span> <span class="id" title="var">e</span> <span class="id" title="var">min2</span> = <span class="id" title="var">Lt</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">exists</span> <span class="id" title="var">min1</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">traverse_to_check_ordered_hbt</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">A</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> (1 + <span class="id" title="var">max</span> <span class="id" title="var">h1</span> <span class="id" title="var">h2</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">Node</span> <span class="id" title="var">A</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">Triple</span> <span class="id" title="var">A</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h1</span> <span class="id" title="var">bt1</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">e</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h2</span> <span class="id" title="var">bt2</span>))))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">compare</span> = <span class="id" title="var">TSome</span> (<span class="id" title="var">A</span> * <span class="id" title="var">A</span>) (<span class="id" title="var">min1</span>, <span class="id" title="var">max2</span>).<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Lemma to show that an elementary right rotation operation preserves order 
+</div>
+<div class="code">
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">rotate_right_preserves_order</span>:<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">compare</span> : <span class="id" title="var">A</span> -&gt; <span class="id" title="var">A</span> -&gt; <span class="id" title="var">element_comparison</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">h11</span> : <span class="id" title="var">nat</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">bt11</span> : <span class="id" title="var">binary_tree</span> <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">e1</span> : <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">h12</span> : <span class="id" title="var">nat</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">bt12</span> : <span class="id" title="var">binary_tree</span> <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">e</span> : <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">h2</span> : <span class="id" title="var">nat</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">bt2</span> : <span class="id" title="var">binary_tree</span> <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">t_min</span> <span class="id" title="var">t_max</span> : <span class="id" title="var">A</span>), <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">traverse_to_check_ordered_hbt</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">A</span> (<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> (1 + <span class="id" title="var">max</span> (1 + <span class="id" title="var">max</span> <span class="id" title="var">h11</span> <span class="id" title="var">h12</span>) <span class="id" title="var">h2</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">Node</span> <span class="id" title="var">A</span> (<span class="id" title="var">Triple</span> <span class="id" title="var">A</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> (1 + <span class="id" title="var">max</span> <span class="id" title="var">h11</span> <span class="id" title="var">h12</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">Node</span> <span class="id" title="var">A</span> (<span class="id" title="var">Triple</span> <span class="id" title="var">A</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h11</span> <span class="id" title="var">bt11</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">e1</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h12</span> <span class="id" title="var">bt12</span>))))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">e</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h2</span> <span class="id" title="var">bt2</span>)))) <span class="id" title="var">compare</span> =<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">TSome</span> (<span class="id" title="var">A</span> * <span class="id" title="var">A</span>) (<span class="id" title="var">t_min</span>, <span class="id" title="var">t_max</span>) -&gt; <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">traverse_to_check_ordered_hbt</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">A</span> (<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> (1 + <span class="id" title="var">max</span> <span class="id" title="var">h11</span> (1 + <span class="id" title="var">max</span> <span class="id" title="var">h12</span> <span class="id" title="var">h2</span>))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">Node</span> <span class="id" title="var">A</span> (<span class="id" title="var">Triple</span> <span class="id" title="var">A</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h11</span> <span class="id" title="var">bt11</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">e1</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> (1 + <span class="id" title="var">max</span> <span class="id" title="var">h12</span> <span class="id" title="var">h2</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">Node</span> <span class="id" title="var">A</span> (<span class="id" title="var">Triple</span> <span class="id" title="var">A</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h12</span> <span class="id" title="var">bt12</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">e</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h2</span> <span class="id" title="var">bt2</span>)))))))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">compare</span> = <span class="id" title="var">TSome</span> (<span class="id" title="var">A</span> * <span class="id" title="var">A</span>) (<span class="id" title="var">t_min</span>, <span class="id" title="var">t_max</span>).<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Lemma to show that an elementary left rotation operation preserves order 
+</div>
+<div class="code">
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">rotate_left_preserves_order</span>:<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">compare</span> : <span class="id" title="var">A</span> -&gt; <span class="id" title="var">A</span> -&gt; <span class="id" title="var">element_comparison</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">h1</span> : <span class="id" title="var">nat</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">bt1</span> : <span class="id" title="var">binary_tree</span> <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">e</span> : <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">h21</span> : <span class="id" title="var">nat</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">bt21</span> : <span class="id" title="var">binary_tree</span> <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">e2</span> : <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">h22</span> : <span class="id" title="var">nat</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">bt22</span> : <span class="id" title="var">binary_tree</span> <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">t_min</span> <span class="id" title="var">t_max</span> : <span class="id" title="var">A</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">traverse_to_check_ordered_hbt</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">A</span> (<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> (1 + <span class="id" title="var">max</span> <span class="id" title="var">h1</span> (1 + <span class="id" title="var">max</span> <span class="id" title="var">h21</span> <span class="id" title="var">h22</span>))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">Node</span> <span class="id" title="var">A</span> (<span class="id" title="var">Triple</span> <span class="id" title="var">A</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h1</span> <span class="id" title="var">bt1</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">e</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> (1 + <span class="id" title="var">max</span> <span class="id" title="var">h21</span> <span class="id" title="var">h22</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">Node</span> <span class="id" title="var">A</span> (<span class="id" title="var">Triple</span> <span class="id" title="var">A</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h21</span> <span class="id" title="var">bt21</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">e2</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h22</span> <span class="id" title="var">bt22</span>)))))))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">compare</span> = <span class="id" title="var">TSome</span> (<span class="id" title="var">A</span> * <span class="id" title="var">A</span>) (<span class="id" title="var">t_min</span>, <span class="id" title="var">t_max</span>) -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">traverse_to_check_ordered_hbt</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">A</span> (<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> (1 + <span class="id" title="var">max</span> (1 + <span class="id" title="var">max</span> <span class="id" title="var">h1</span> <span class="id" title="var">h21</span>) <span class="id" title="var">h22</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">Node</span> <span class="id" title="var">A</span> (<span class="id" title="var">Triple</span> <span class="id" title="var">A</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> (1 + <span class="id" title="var">max</span> <span class="id" title="var">h1</span> <span class="id" title="var">h21</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">Node</span> <span class="id" title="var">A</span> (<span class="id" title="var">Triple</span> <span class="id" title="var">A</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h1</span> <span class="id" title="var">bt1</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">e</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h21</span> <span class="id" title="var">bt21</span>))))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">e2</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h22</span> <span class="id" title="var">bt22</span>)))) <span class="id" title="var">compare</span> =<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">TSome</span> (<span class="id" title="var">A</span> * <span class="id" title="var">A</span>) (<span class="id" title="var">t_min</span>, <span class="id" title="var">t_max</span>).<br/>
+
+<br/>
+
+<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a name="lab4"></a><h2 class="section">Main Lemmas for Rotations</h2>
+
+<div class="paragraph"> </div>
+
+ Lemma to show that post an insertion operation on the left sub-tree of a given tree such that the resultant tree is unbalanced, and assuming:
+
+<div class="paragraph"> </div>
+
+<ul class="doclist">
+<li> the modified left sub-tree <span class="inlinecode"><span class="id" title="var">hbt_ret</span></span> is sound, ordered, and not a leaf,
+
+</li>
+<li> the maximum payload of <span class="inlinecode"><span class="id" title="var">hbt_ret</span></span> sub-tree is less than the root payload,
+
+</li>
+<li> the right sub-tree is ordered
+
+</li>
+<li> if the right sub-tree were a node with a maximum and minimum value, then the root payload would be less than the minimum value, 
+
+</li>
+</ul>
+
+<div class="paragraph"> </div>
+
+applying <span class="inlinecode"><span class="id" title="var">rotate_right_hbt</span></span> on this unbalanced tree returns a tree which is ordered 
+</div>
+<div class="code">
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">insertion_rotate_right_preserves_order</span>:<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">compare</span> : <span class="id" title="var">A</span> -&gt; <span class="id" title="var">A</span> -&gt; <span class="id" title="var">element_comparison</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">hbt_ret</span> : <span class="id" title="var">heightened_binary_tree</span> <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">hbt2</span> : <span class="id" title="var">heightened_binary_tree</span> <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">min_ret</span> <span class="id" title="var">max_ret</span> : <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">e</span> : <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">hbt'</span> : <span class="id" title="var">heightened_binary_tree</span> <span class="id" title="var">A</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">traverse_to_check_ordered_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt_ret</span> <span class="id" title="var">compare</span> =<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">TSome</span> (<span class="id" title="var">A</span> * <span class="id" title="var">A</span>) (<span class="id" title="var">min_ret</span>, <span class="id" title="var">max_ret</span>) -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_ordered_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt2</span> <span class="id" title="var">compare</span> = <span class="id" title="var">true</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_sound_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt_ret</span> = <span class="id" title="var">true</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">compare</span> <span class="id" title="var">max_ret</span> <span class="id" title="var">e</span> = <span class="id" title="var">Lt</span> -&gt; <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="keyword">forall</span> (<span class="id" title="var">min2</span> <span class="id" title="var">max2</span> : <span class="id" title="var">A</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">traverse_to_check_ordered_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt2</span> <span class="id" title="var">compare</span> =<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">TSome</span> (<span class="id" title="var">A</span> * <span class="id" title="var">A</span>) (<span class="id" title="var">min2</span>, <span class="id" title="var">max2</span>) -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">compare</span> <span class="id" title="var">e</span> <span class="id" title="var">min2</span> = <span class="id" title="var">Lt</span>) -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">rotate_right_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt_ret</span> <span class="id" title="var">e</span> <span class="id" title="var">hbt2</span> = <span class="id" title="var">Some</span> <span class="id" title="var">hbt'</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_ordered_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt'</span> <span class="id" title="var">compare</span> = <span class="id" title="var">true</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Lemma to show that post an insertion operation on the right sub-tree of a given tree such that the resultant tree is unbalanced, and assuming:
+
+<div class="paragraph"> </div>
+
+<ul class="doclist">
+<li> the modified right sub-tree <span class="inlinecode"><span class="id" title="var">hbt_ret</span></span> is sound, ordered, and not a leaf,
+
+</li>
+<li> the root payload is less than the minimum payload of <span class="inlinecode"><span class="id" title="var">hbt_ret</span></span>
+
+</li>
+<li> the left sub-tree is ordered
+
+</li>
+<li> if the left sub-tree were a node with a maximum and minimum value, then maximum value would be less than the root payload, 
+
+</li>
+</ul>
+
+<div class="paragraph"> </div>
+
+applying <span class="inlinecode"><span class="id" title="var">rotate_left_hbt</span></span> on this unbalanced tree returns a tree which is ordered 
+</div>
+<div class="code">
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">insertion_rotate_left_preserves_order</span>:<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">compare</span> : <span class="id" title="var">A</span> -&gt; <span class="id" title="var">A</span> -&gt; <span class="id" title="var">element_comparison</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">hbt1</span> : <span class="id" title="var">heightened_binary_tree</span> <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">hbt_ret</span> : <span class="id" title="var">heightened_binary_tree</span> <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">min_ret</span> <span class="id" title="var">max_ret</span> : <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">e</span> : <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">hbt'</span> : <span class="id" title="var">heightened_binary_tree</span> <span class="id" title="var">A</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_ordered_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt1</span> <span class="id" title="var">compare</span> = <span class="id" title="var">true</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">traverse_to_check_ordered_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt_ret</span> <span class="id" title="var">compare</span> =<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">TSome</span> (<span class="id" title="var">A</span> * <span class="id" title="var">A</span>) (<span class="id" title="var">min_ret</span>, <span class="id" title="var">max_ret</span>) -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_sound_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt_ret</span> = <span class="id" title="var">true</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="keyword">forall</span> (<span class="id" title="var">min1</span> <span class="id" title="var">max1</span> : <span class="id" title="var">A</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">traverse_to_check_ordered_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt1</span> <span class="id" title="var">compare</span> =<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">TSome</span> (<span class="id" title="var">A</span> * <span class="id" title="var">A</span>) (<span class="id" title="var">min1</span>, <span class="id" title="var">max1</span>) -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">compare</span> <span class="id" title="var">max1</span> <span class="id" title="var">e</span> = <span class="id" title="var">Lt</span>) -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">compare</span> <span class="id" title="var">e</span> <span class="id" title="var">min_ret</span> = <span class="id" title="var">Lt</span> -&gt; <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">rotate_left_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt1</span> <span class="id" title="var">e</span> <span class="id" title="var">hbt_ret</span> = <span class="id" title="var">Some</span> <span class="id" title="var">hbt'</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_ordered_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt'</span> <span class="id" title="var">compare</span> = <span class="id" title="var">true</span>.<br/>
+
+<br/>
+
+<br/>
+
+<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a name="lab5"></a><h1 class="section">Insertion Preserves Order</h1>
+
+<div class="paragraph"> </div>
+
+ This lemma is the most important in this library, and shows that inserting an element into an ordered AVL tree gives results in an AVL tree which is ordered. The proof makes use of:
+
+<div class="paragraph"> </div>
+
+<ul class="doclist">
+<li> the crucial <span class="inlinecode"><span class="id" title="var">insertion_in_node_min_max</span></span> lemma (defined in this library) show the relationship between a payload and the maximum/minimum values of the sub-trees
+
+</li>
+<li> the lemmas concerning the preservation of orderedness post rotation operations 
+</li>
+</ul>
+
+</div>
+<div class="code">
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">insertion_preserves_order</span>: <br/>
+&nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">compare</span> : <span class="id" title="var">A</span> -&gt; <span class="id" title="var">A</span> -&gt; <span class="id" title="var">element_comparison</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">x</span> : <span class="id" title="var">A</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">specification_of_compare_defining_total_order</span> <span class="id" title="var">A</span> <span class="id" title="var">compare</span> -&gt; <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="keyword">forall</span> (<span class="id" title="var">hbt</span> : <span class="id" title="var">heightened_binary_tree</span> <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">hbt'</span> : <span class="id" title="var">heightened_binary_tree</span> <span class="id" title="var">A</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_sound_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt</span> = <span class="id" title="var">true</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_balanced_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt</span> = <span class="id" title="var">true</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_ordered_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt</span> <span class="id" title="var">compare</span> = <span class="id" title="var">true</span> -&gt; <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">insert_hbt_helper</span> <span class="id" title="var">A</span> <span class="id" title="var">compare</span> <span class="id" title="var">x</span> <span class="id" title="var">hbt</span> = <span class="id" title="var">Some</span> <span class="id" title="var">hbt'</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_ordered_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt'</span> <span class="id" title="var">compare</span> = <span class="id" title="var">true</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;/\<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="keyword">forall</span> (<span class="id" title="var">bt</span> : <span class="id" title="var">binary_tree</span> <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">h_hbt</span> : <span class="id" title="var">nat</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">hbt'</span> : <span class="id" title="var">heightened_binary_tree</span> <span class="id" title="var">A</span>),    <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_sound_hbt</span> <span class="id" title="var">A</span> (<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h_hbt</span> <span class="id" title="var">bt</span>) = <span class="id" title="var">true</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_balanced_hbt</span> <span class="id" title="var">A</span> (<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h_hbt</span> <span class="id" title="var">bt</span>) = <span class="id" title="var">true</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_ordered_hbt</span> <span class="id" title="var">A</span> (<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h_hbt</span> <span class="id" title="var">bt</span>) <span class="id" title="var">compare</span> = <span class="id" title="var">true</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">insert_bt_helper</span> <span class="id" title="var">A</span> <span class="id" title="var">compare</span> <span class="id" title="var">x</span> <span class="id" title="var">h_hbt</span> <span class="id" title="var">bt</span> = <span class="id" title="var">Some</span> <span class="id" title="var">hbt'</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_ordered_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt'</span> <span class="id" title="var">compare</span> = <span class="id" title="var">true</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;/\<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="keyword">forall</span> (<span class="id" title="var">t</span> : <span class="id" title="var">triple</span> <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">h_hbt</span> : <span class="id" title="var">nat</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">hbt'</span> : <span class="id" title="var">heightened_binary_tree</span> <span class="id" title="var">A</span>),    <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_sound_hbt</span> <span class="id" title="var">A</span> (<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h_hbt</span> (<span class="id" title="var">Node</span> <span class="id" title="var">A</span> <span class="id" title="var">t</span>)) = <span class="id" title="var">true</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_balanced_hbt</span> <span class="id" title="var">A</span> (<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h_hbt</span> (<span class="id" title="var">Node</span> <span class="id" title="var">A</span> <span class="id" title="var">t</span>)) = <span class="id" title="var">true</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_ordered_hbt</span> <span class="id" title="var">A</span> (<span class="id" title="var">HNode</span> <span class="id" title="var">A</span> <span class="id" title="var">h_hbt</span> (<span class="id" title="var">Node</span> <span class="id" title="var">A</span> <span class="id" title="var">t</span>)) <span class="id" title="var">compare</span> = <span class="id" title="var">true</span> -&gt;        <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">insert_t_helper</span> <span class="id" title="var">A</span> <span class="id" title="var">compare</span> <span class="id" title="var">x</span> <span class="id" title="var">h_hbt</span> <span class="id" title="var">t</span> = <span class="id" title="var">Some</span> <span class="id" title="var">hbt'</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_ordered_hbt</span> <span class="id" title="var">A</span> <span class="id" title="var">hbt'</span> <span class="id" title="var">compare</span> = <span class="id" title="var">true</span>).<br/>
+
+<br/>
+
+<br/>
+
+<br/>
+</div>
+</div>
+
+<div id="footer">
+<hr/><a href="index.html">Index</a><hr/>This page has been generated by <a href="http://coq.inria.fr/">coqdoc</a>
+</div>
+
+</div>
+
+</body>
+</html>
