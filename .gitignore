@@ -5,10 +5,10 @@ coq_files_misc/*
 *.vo
 *.glob
 *.d
-Coq_files/src/Makefile.coq
+coq_files/src/Makefile.coq
 *.aux
-Coq_files/src/CoqMakefile.conf
+coq_files/src/CoqMakefile.conf
 *html
 *css
 *zip
-*/graph/*
+coq_files/src/Theorems/graph/*
