@@ -6,6 +6,8 @@ operations (see the [hbt] library) meet the specifications *)
 
 Require Import Hbt.Lemmas.Ordered.Main.ordered_main.
 
+Require dpdgraph.dpdgraph.
+
 (* ********** *)
 
 (** * Lookup *)
@@ -133,6 +135,9 @@ Proof.
 
     exact H_order_init.
 Qed.
+
+(* To print dependnacy graph *)
+(* Print DependGraph insert_hbt_satisfies_its_specification. *)
 
 (* ********** *)
 

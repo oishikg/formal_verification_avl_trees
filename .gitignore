@@ -11,3 +11,4 @@ Coq_files/src/CoqMakefile.conf
 *html
 *css
 *zip
+*/graph/*
