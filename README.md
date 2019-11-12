@@ -1,11 +1,11 @@
-# Formally Verifying the Correctness of an OCaml AVL Tree Implementation
+# Formally Verifying the Correctness of Lookup and Insertion on AVL Trees
 
-This project aims to formally verify the correctness of an OCaml based AVL tree implementation using the `Coq` proof assistant. It contains:
+This project aims to formally verify the correctness of lookup and insertion operations on AVL Trees using the `Coq` proof assistant. It contains:
 - A`Gallina` implementation of AVL trees 
 - Specifications for the lookup and insert operations on AVL trees
 - Theorems to prove the specifications 
 - Lemmas to aid in the above theorems 
-- An application of the certified insertion function: checking for equality of expressions modulo associativity and commutativity 
+- An application of the certified insertion function: checking for equality of expressions modulo associativity and commutativity. 
 
 ## Getting started
 
@@ -50,6 +50,9 @@ There are four folders in `coq_files/src` corresponding to four different parts 
   - The original OCaml implementation contained in the`Original_Hbt` module.
   - The certified and extracted implementation contained in the `Certified_Hbt_Peano` module.
   - The certified and extracted implementation with the Peano numbers ADT replaced with the OCaml integer data type. 
+  
+## Documentation
+The documentation for this project was generated using `coqdoc`. View the documentation for the proofs [here](https://oishikg.github.io/formal_verification_avl_trees/main.html).
 
 ## Author
 
