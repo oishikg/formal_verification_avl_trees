@@ -11,3 +11,9 @@ coq_files/src/Makefile
 coq_files/src/CoqMakefile.conf
 *zip
 coq_files/src/Theorems/graph/*
+coq_files/src/Paraphernalia/
+*html
+*css
+
+# don't ignore html and css files in docs
+!*/docs
