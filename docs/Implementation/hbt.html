@@ -163,10 +163,10 @@ stores the correct heights at each node
 </div>
 
 <div class="doc">
-Unfold lemma for traverse_to_check_soundness_hbt 
+Fold unfold lemma for traverse_to_check_soundness_hbt 
 </div>
 <div class="code">
-<span class="id" title="keyword">Lemma</span> <span class="id" title="var">unfold_traverse_to_check_soundness_hbt</span>:<br/>
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">fold_unfold_traverse_to_check_soundness_hbt</span>:<br/>
 &nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">h</span> : <span class="id" title="var">nat</span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">bt</span> : <span class="id" title="var">binary_tree</span> <span class="id" title="var">A</span>),<br/>
@@ -184,10 +184,10 @@ Unfold lemma for traverse_to_check_soundness_hbt
 </div>
 
 <div class="doc">
-Unfold lemma for traverse_to_check_soundness_bt when the tree is a <span class="inlinecode"><span class="id" title="var">Leaf</span></span> 
+Fold unfold lemma for traverse_to_check_soundness_bt when the tree is a <span class="inlinecode"><span class="id" title="var">Leaf</span></span> 
 </div>
 <div class="code">
-<span class="id" title="keyword">Lemma</span> <span class="id" title="var">unfold_traverse_to_check_soundness_bt_leaf</span>:<br/>
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">fold_unfold_traverse_to_check_soundness_bt_leaf</span>:<br/>
 &nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>),<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">traverse_to_check_soundness_bt</span> <span class="id" title="var">A</span> (<span class="id" title="var">Leaf</span> <span class="id" title="var">A</span>) = <span class="id" title="var">Some</span> 0.<br/>
 
@@ -195,10 +195,10 @@ Unfold lemma for traverse_to_check_soundness_bt when the tree is a <span class="
 </div>
 
 <div class="doc">
-Unfold lemma for traverse_to_check_soundness_bt when the tree is a <span class="inlinecode"><span class="id" title="var">Node</span></span> 
+Fold unfold lemma for traverse_to_check_soundness_bt when the tree is a <span class="inlinecode"><span class="id" title="var">Node</span></span> 
 </div>
 <div class="code">
-<span class="id" title="keyword">Lemma</span> <span class="id" title="var">unfold_traverse_to_check_soundness_bt_node</span>:<br/>
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">fold_unfold_traverse_to_check_soundness_bt_node</span>:<br/>
 &nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">t</span> : <span class="id" title="var">triple</span> <span class="id" title="var">A</span>),<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">traverse_to_check_soundness_bt</span> <span class="id" title="var">A</span> (<span class="id" title="var">Node</span> <span class="id" title="var">A</span> <span class="id" title="var">t</span>) = <span class="id" title="var">traverse_to_check_soundness_t</span> <span class="id" title="var">A</span> <span class="id" title="var">t</span>.<br/>
@@ -207,10 +207,10 @@ Unfold lemma for traverse_to_check_soundness_bt when the tree is a <span class="
 </div>
 
 <div class="doc">
-Unfold lemma for traverse_to_check_soundness_t 
+Fold unfold lemma for traverse_to_check_soundness_t 
 </div>
 <div class="code">
-<span class="id" title="keyword">Lemma</span> <span class="id" title="var">unfold_traverse_to_check_soundness_t</span>:<br/>
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">fold_unfold_traverse_to_check_soundness_t</span>:<br/>
 &nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">hbt1</span> <span class="id" title="var">hbt2</span> : <span class="id" title="var">heightened_binary_tree</span> <span class="id" title="var">A</span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">e</span> : <span class="id" title="var">A</span>),<br/>
@@ -305,10 +305,10 @@ and check for balancedness
 </div>
 
 <div class="doc">
-Unfold lemma for traverse_to_check_balanced_hbt 
+Fold unfold lemma for traverse_to_check_balanced_hbt 
 </div>
 <div class="code">
-<span class="id" title="keyword">Lemma</span> <span class="id" title="var">unfold_traverse_to_check_balanced_hbt</span>:<br/>
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">fold_unfold_traverse_to_check_balanced_hbt</span>:<br/>
 &nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">h</span> : <span class="id" title="var">nat</span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">bt</span> : <span class="id" title="var">binary_tree</span> <span class="id" title="var">A</span>),<br/>
@@ -318,10 +318,10 @@ Unfold lemma for traverse_to_check_balanced_hbt
 </div>
 
 <div class="doc">
-Unfold lemma for traverse_to_check_balanced_bt, when the tree is a <span class="inlinecode"><span class="id" title="var">Leaf</span></span> 
+Fold unfold lemma for traverse_to_check_balanced_bt, when the tree is a <span class="inlinecode"><span class="id" title="var">Leaf</span></span> 
 </div>
 <div class="code">
-<span class="id" title="keyword">Lemma</span> <span class="id" title="var">unfold_traverse_to_check_balanced_bt_leaf</span>:<br/>
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">fold_unfold_traverse_to_check_balanced_bt_leaf</span>:<br/>
 &nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>),<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">traverse_to_check_balanced_bt</span> <span class="id" title="var">A</span> (<span class="id" title="var">Leaf</span> <span class="id" title="var">A</span>) = <span class="id" title="var">Some</span> 0.<br/>
 
@@ -329,10 +329,10 @@ Unfold lemma for traverse_to_check_balanced_bt, when the tree is a <span class="
 </div>
 
 <div class="doc">
-Unfold lemma for traverse_to_check_balanced_bt, when the tree is a <span class="inlinecode"><span class="id" title="var">Node</span></span> 
+Fold unfold lemma for traverse_to_check_balanced_bt, when the tree is a <span class="inlinecode"><span class="id" title="var">Node</span></span> 
 </div>
 <div class="code">
-<span class="id" title="keyword">Lemma</span> <span class="id" title="var">unfold_traverse_to_check_balanced_bt_node</span>:<br/>
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">fold_unfold_traverse_to_check_balanced_bt_node</span>:<br/>
 &nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">t</span> : <span class="id" title="var">triple</span> <span class="id" title="var">A</span>),<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">traverse_to_check_balanced_bt</span> <span class="id" title="var">A</span> (<span class="id" title="var">Node</span> <span class="id" title="var">A</span> <span class="id" title="var">t</span>) = <span class="id" title="var">traverse_to_check_balanced_t</span> <span class="id" title="var">A</span> <span class="id" title="var">t</span>.<br/>
@@ -341,10 +341,10 @@ Unfold lemma for traverse_to_check_balanced_bt, when the tree is a <span class="
 </div>
 
 <div class="doc">
-Unfold lemma for traverse_to_check_balanced_t 
+Fold unfold lemma for traverse_to_check_balanced_t 
 </div>
 <div class="code">
-<span class="id" title="keyword">Lemma</span> <span class="id" title="var">unfold_traverse_to_check_balanced_t</span>:<br/>
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">fold_unfold_traverse_to_check_balanced_t</span>:<br/>
 &nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">hbt1</span> <span class="id" title="var">hbt2</span> : <span class="id" title="var">heightened_binary_tree</span> <span class="id" title="var">A</span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">e</span> : <span class="id" title="var">A</span>),<br/>
@@ -518,10 +518,10 @@ traverses a heightened binary tree structurally, and does the following:
 </div>
 
 <div class="doc">
-Unfold lemma for traverse_to_check_ordered_hbt 
+Fold unfold lemma for traverse_to_check_ordered_hbt 
 </div>
 <div class="code">
-<span class="id" title="keyword">Lemma</span> <span class="id" title="var">unfold_traverse_to_check_ordered_hbt</span>:<br/>
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">fold_unfold_traverse_to_check_ordered_hbt</span>:<br/>
 &nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">h</span> : <span class="id" title="var">nat</span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">bt</span> : <span class="id" title="var">binary_tree</span> <span class="id" title="var">A</span>)<br/>
@@ -533,10 +533,10 @@ Unfold lemma for traverse_to_check_ordered_hbt
 </div>
 
 <div class="doc">
-Unfold lemma for traverse_to_check_ordered_bt, when the tree is a <span class="inlinecode"><span class="id" title="var">Leaf</span></span> 
+Fold unfold lemma for traverse_to_check_ordered_bt, when the tree is a <span class="inlinecode"><span class="id" title="var">Leaf</span></span> 
 </div>
 <div class="code">
-<span class="id" title="keyword">Lemma</span> <span class="id" title="var">unfold_traverse_to_check_ordered_bt_leaf</span>:<br/>
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">fold_unfold_traverse_to_check_ordered_bt_leaf</span>:<br/>
 &nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">compare</span> : <span class="id" title="var">A</span> -&gt; <span class="id" title="var">A</span> -&gt; <span class="id" title="var">element_comparison</span>),<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">traverse_to_check_ordered_bt</span> <span class="id" title="var">A</span> (<span class="id" title="var">Leaf</span> <span class="id" title="var">A</span>) <span class="id" title="var">compare</span> =<br/>
@@ -546,10 +546,10 @@ Unfold lemma for traverse_to_check_ordered_bt, when the tree is a <span class="i
 </div>
 
 <div class="doc">
-Unfold lemma for traverse_to_check_ordered_bt, when the tree is a <span class="inlinecode"><span class="id" title="var">Node</span></span> 
+Fold unfold lemma for traverse_to_check_ordered_bt, when the tree is a <span class="inlinecode"><span class="id" title="var">Node</span></span> 
 </div>
 <div class="code">
-<span class="id" title="keyword">Lemma</span> <span class="id" title="var">unfold_traverse_to_check_ordered_bt_node</span>:<br/>
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">fold_unfold_traverse_to_check_ordered_bt_node</span>:<br/>
 &nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">t</span> : <span class="id" title="var">triple</span> <span class="id" title="var">A</span>) <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">compare</span> : <span class="id" title="var">A</span> -&gt; <span class="id" title="var">A</span> -&gt; <span class="id" title="var">element_comparison</span>),<br/>
@@ -560,10 +560,10 @@ Unfold lemma for traverse_to_check_ordered_bt, when the tree is a <span class="i
 </div>
 
 <div class="doc">
-Unfold lemma for traverse_to_check_ordered_t 
+Fold unfold lemma for traverse_to_check_ordered_t 
 </div>
 <div class="code">
-<span class="id" title="keyword">Lemma</span> <span class="id" title="var">unfold_traverse_to_check_ordered_t</span>: <br/>
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">fold_unfold_traverse_to_check_ordered_t</span>: <br/>
 &nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">hbt1</span> : <span class="id" title="var">heightened_binary_tree</span> <span class="id" title="var">A</span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">e</span> : <span class="id" title="var">A</span>)<br/>
@@ -676,10 +676,10 @@ a tree
 </div>
 
 <div class="doc">
-Unfold lemma for occurs_hbt 
+Fold unfold lemma for occurs_hbt 
 </div>
 <div class="code">
-<span class="id" title="keyword">Lemma</span> <span class="id" title="var">unfold_occurs_hbt</span>:<br/>
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">fold_unfold_occurs_hbt</span>:<br/>
 &nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">compare</span> : <span class="id" title="var">A</span> -&gt; <span class="id" title="var">A</span> -&gt; <span class="id" title="var">element_comparison</span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">e</span> : <span class="id" title="var">A</span>)<br/>
@@ -691,10 +691,10 @@ Unfold lemma for occurs_hbt
 </div>
 
 <div class="doc">
-Unfold lemma for occurs_bt, when the tree is a <span class="inlinecode"><span class="id" title="var">Leaf</span></span> 
+Fold unfold lemma for occurs_bt, when the tree is a <span class="inlinecode"><span class="id" title="var">Leaf</span></span> 
 </div>
 <div class="code">
-<span class="id" title="keyword">Lemma</span> <span class="id" title="var">unfold_occurs_bt_leaf</span>: <br/>
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">fold_unfold_occurs_bt_leaf</span>: <br/>
 &nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">compare</span> : <span class="id" title="var">A</span> -&gt; <span class="id" title="var">A</span> -&gt; <span class="id" title="var">element_comparison</span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">e</span> : <span class="id" title="var">A</span>),<br/>
@@ -704,10 +704,10 @@ Unfold lemma for occurs_bt, when the tree is a <span class="inlinecode"><span cl
 </div>
 
 <div class="doc">
-Unfold lemma for occurs_bt, when the tree is a <span class="inlinecode"><span class="id" title="var">Node</span></span> 
+Fold unfold lemma for occurs_bt, when the tree is a <span class="inlinecode"><span class="id" title="var">Node</span></span> 
 </div>
 <div class="code">
-<span class="id" title="keyword">Lemma</span> <span class="id" title="var">unfold_occurs_bt_node</span>:<br/>
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">fold_unfold_occurs_bt_node</span>:<br/>
 &nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">compare</span> : <span class="id" title="var">A</span> -&gt; <span class="id" title="var">A</span> -&gt; <span class="id" title="var">element_comparison</span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">e</span> : <span class="id" title="var">A</span>)<br/>
@@ -718,10 +718,10 @@ Unfold lemma for occurs_bt, when the tree is a <span class="inlinecode"><span cl
 </div>
 
 <div class="doc">
-Unfold lemma for occurs_t 
+Fold unfold lemma for occurs_t 
 </div>
 <div class="code">
-<span class="id" title="keyword">Lemma</span> <span class="id" title="var">unfold_occurs_t</span>:<br/>
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">fold_unfold_occurs_t</span>:<br/>
 &nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">compare</span> : <span class="id" title="var">A</span> -&gt; <span class="id" title="var">A</span> -&gt; <span class="id" title="var">element_comparison</span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">e</span> <span class="id" title="var">e'</span> : <span class="id" title="var">A</span>)<br/>
@@ -1276,10 +1276,10 @@ Structurally recursive function  to insert a given value into a
 </div>
 
 <div class="doc">
-Unfold lemma for insert_hbt_helper 
+Fold unfold lemma for insert_hbt_helper 
 </div>
 <div class="code">
-<span class="id" title="keyword">Lemma</span>  <span class="id" title="var">unfold_insert_hbt_helper</span>:<br/>
+<span class="id" title="keyword">Lemma</span>  <span class="id" title="var">fold_unfold_insert_hbt_helper</span>:<br/>
 &nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">compare</span> : <span class="id" title="var">A</span> -&gt; <span class="id" title="var">A</span> -&gt; <span class="id" title="var">element_comparison</span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">x</span> : <span class="id" title="var">A</span>)<br/>
@@ -1291,10 +1291,10 @@ Unfold lemma for insert_hbt_helper
 </div>
 
 <div class="doc">
-Unfold lemma for insert_bt_helper, when the tree is a <span class="inlinecode"><span class="id" title="var">Leaf</span></span> 
+Fold unfold lemma for insert_bt_helper, when the tree is a <span class="inlinecode"><span class="id" title="var">Leaf</span></span> 
 </div>
 <div class="code">
-<span class="id" title="keyword">Lemma</span> <span class="id" title="var">unfold_insert_bt_helper_leaf</span>:<br/>
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">fold_unfold_insert_bt_helper_leaf</span>:<br/>
 &nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">compare</span> : <span class="id" title="var">A</span> -&gt; <span class="id" title="var">A</span> -&gt; <span class="id" title="var">element_comparison</span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">x</span> : <span class="id" title="var">A</span>)<br/>
@@ -1311,10 +1311,10 @@ Unfold lemma for insert_bt_helper, when the tree is a <span class="inlinecode"><
 </div>
 
 <div class="doc">
-Unfold lemma for insert_bt_helper, when the tree is a <span class="inlinecode"><span class="id" title="var">Node</span></span> 
+Fold unfold lemma for insert_bt_helper, when the tree is a <span class="inlinecode"><span class="id" title="var">Node</span></span> 
 </div>
 <div class="code">
-<span class="id" title="keyword">Lemma</span> <span class="id" title="var">unfold_insert_bt_helper_node</span>:<br/>
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">fold_unfold_insert_bt_helper_node</span>:<br/>
 &nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">compare</span> : <span class="id" title="var">A</span> -&gt; <span class="id" title="var">A</span> -&gt; <span class="id" title="var">element_comparison</span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">x</span> : <span class="id" title="var">A</span>)<br/>
@@ -1327,10 +1327,10 @@ Unfold lemma for insert_bt_helper, when the tree is a <span class="inlinecode"><
 </div>
 
 <div class="doc">
-Unfold lemma for insert_t_helper 
+Fold unfold lemma for insert_t_helper 
 </div>
 <div class="code">
-<span class="id" title="keyword">Lemma</span> <span class="id" title="var">unfold_insert_t_helper</span>:<br/>
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">fold_unfold_insert_t_helper</span>:<br/>
 &nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">compare</span> : <span class="id" title="var">A</span> -&gt; <span class="id" title="var">A</span> -&gt; <span class="id" title="var">element_comparison</span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">x</span> : <span class="id" title="var">A</span>)<br/>
