@@ -11,7 +11,7 @@ Require Export Arith Bool List.
 (** * Operators and Unfolding *)
 
 (** Tactic to prove simple unfold lemmas *)
-Ltac unfold_tactic name := intros; unfold name; reflexivity.
+Ltac fold_unfold_tactic name := intros; unfold name; fold name; reflexivity.
 
 (** Operator for equality predicate [beq_nat], defined for peano natural numbers *)
 Notation "A =n= B" :=
@@ -22,7 +22,7 @@ Lemma unfold_beq_nat_Sn_Sm:
   forall (n m : nat),
     beq_nat (S n) (S m) = beq_nat n m.
 Proof.
-  unfold_tactic beq_nat.
+  fold_unfold_tactic beq_nat.
 Qed.
 
 (** Lemma to prove the symmetric property of the [=n=] operator *)
@@ -111,7 +111,7 @@ Lemma minus_Sn_0:
   forall (n : nat),
     S n - 0 = S n.
 Proof.
-  unfold_tactic minus.
+  fold_unfold_tactic minus.
 Qed.
 
 (** Lemma to unfold [minus] for the successors of two natural numbers *)
@@ -119,7 +119,7 @@ Lemma minus_Sn_Sm:
   forall (n m : nat),
     S n - S m = n - m.
 Proof.
-  unfold_tactic minus.
+  fold_unfold_tactic minus.
 Qed.
 
 (** Lemma to show that subtracting 0 from a natural number gives the same number *)
@@ -551,7 +551,7 @@ Lemma unfold_max_Sn_Sm:
   forall (n m : nat),
     max (S n) (S m) = S (max n m).
 Proof.
-  unfold_tactic max.
+  fold_unfold_tactic max.
 Qed.
 
 (** Lemma to show that given a value of type [nat] and its successor, the latter is 

@@ -9,6 +9,9 @@ Require Import Hbt.Paraphernalia.paraphernalia.
 Require Export Hbt.Paraphernalia.paraphernalia.
 Require Extraction.
 
+(** Tactic to prove simple unfold lemmas *)
+Ltac fold_unfold_tactic name := intros; unfold name; fold name; reflexivity.
+
 (* ********** *)
 
 (** * Inductive Type for Heightened Binary Trees *)
@@ -109,7 +112,7 @@ Lemma unfold_traverse_to_check_soundness_hbt:
       else None
     end.
 Proof.
-  unfold_tactic traverse_to_check_soundness_hbt.
+  fold_unfold_tactic traverse_to_check_soundness_hbt.
 Qed.
 
 (** Unfold lemma for traverse_to_check_soundness_bt when the tree is a [Leaf] *)
@@ -117,7 +120,7 @@ Lemma unfold_traverse_to_check_soundness_bt_leaf:
   forall (A : Type),
     traverse_to_check_soundness_bt A (Leaf A) = Some 0.
 Proof.
-    unfold_tactic traverse_to_check_soundness_bt.
+    fold_unfold_tactic traverse_to_check_soundness_bt.
 Qed.
 
 (** Unfold lemma for traverse_to_check_soundness_bt when the tree is a [Node] *)
@@ -126,7 +129,7 @@ Lemma unfold_traverse_to_check_soundness_bt_node:
          (t : triple A),
     traverse_to_check_soundness_bt A (Node A t) = traverse_to_check_soundness_t A t.
 Proof.
-  unfold_tactic traverse_to_check_soundness_bt.
+  fold_unfold_tactic traverse_to_check_soundness_bt.
 Qed.
 
 (** Unfold lemma for traverse_to_check_soundness_t *)
@@ -147,7 +150,7 @@ Lemma unfold_traverse_to_check_soundness_t:
       end
     end.
 Proof.
-  unfold_tactic traverse_to_check_soundness_t.
+  fold_unfold_tactic traverse_to_check_soundness_t.
 Qed.
 
 (** Predicate to check the soundness of a [heightened_binary_tree] *)
@@ -211,7 +214,7 @@ Lemma unfold_traverse_to_check_balanced_hbt:
          (bt : binary_tree A),
     traverse_to_check_balanced_hbt A (HNode A h bt) = traverse_to_check_balanced_bt A bt.
 Proof.          
-  unfold_tactic traverse_to_check_balanced_hbt.
+  fold_unfold_tactic traverse_to_check_balanced_hbt.
 Qed.
 
 (** Unfold lemma for traverse_to_check_balanced_bt, when the tree is a [Leaf] *)
@@ -219,7 +222,7 @@ Lemma unfold_traverse_to_check_balanced_bt_leaf:
   forall (A : Type),
     traverse_to_check_balanced_bt A (Leaf A) = Some 0.
 Proof.
-    unfold_tactic traverse_to_check_balanced_bt.
+    fold_unfold_tactic traverse_to_check_balanced_bt.
 Qed.
 
 (** Unfold lemma for traverse_to_check_balanced_bt, when the tree is a [Node] *)
@@ -228,7 +231,7 @@ Lemma unfold_traverse_to_check_balanced_bt_node:
          (t : triple A),
     traverse_to_check_balanced_bt A (Node A t) = traverse_to_check_balanced_t A t.
 Proof.
-  unfold_tactic traverse_to_check_balanced_bt.
+  fold_unfold_tactic traverse_to_check_balanced_bt.
 Qed.
 
 (** Unfold lemma for traverse_to_check_balanced_t *)
@@ -251,7 +254,7 @@ Lemma unfold_traverse_to_check_balanced_t:
       end
     end.
 Proof.
-  unfold_tactic traverse_to_check_balanced_t.
+  fold_unfold_tactic traverse_to_check_balanced_t.
 Qed.
 
 (** Predicate to check the balancedness of a [heightened_binary_tree] *)
@@ -385,7 +388,7 @@ Lemma unfold_traverse_to_check_ordered_hbt:
     traverse_to_check_ordered_hbt A (HNode A h bt) compare =
     traverse_to_check_ordered_bt A bt compare. 
 Proof.
-  unfold_tactic traverse_to_check_ordered_hbt.
+  fold_unfold_tactic traverse_to_check_ordered_hbt.
 Qed.             
 
 (** Unfold lemma for traverse_to_check_ordered_bt, when the tree is a [Leaf] *)
@@ -395,7 +398,7 @@ Lemma unfold_traverse_to_check_ordered_bt_leaf:
     traverse_to_check_ordered_bt A (Leaf A) compare =
     TNone (A * A).
 Proof.
-  unfold_tactic traverse_to_check_ordered_bt.
+  fold_unfold_tactic traverse_to_check_ordered_bt.
 Qed.             
 
 (** Unfold lemma for traverse_to_check_ordered_bt, when the tree is a [Node] *)
@@ -406,7 +409,7 @@ Lemma unfold_traverse_to_check_ordered_bt_node:
     traverse_to_check_ordered_bt A (Node A t) compare =
     traverse_to_check_ordered_t A t compare.
 Proof.
-  unfold_tactic traverse_to_check_ordered_t.
+  fold_unfold_tactic traverse_to_check_ordered_t.
 Qed.             
 
 (** Unfold lemma for traverse_to_check_ordered_t *)
@@ -448,7 +451,7 @@ Lemma unfold_traverse_to_check_ordered_t:
       end
     end.
 Proof.
-  unfold_tactic traverse_to_check_ordered_t.
+  fold_unfold_tactic traverse_to_check_ordered_t.
 Qed.
 
 (** Predicate to check if a heightened_binary_tree is ordered *)
@@ -518,7 +521,7 @@ Lemma unfold_occurs_hbt:
          (bt : binary_tree A),
     occurs_hbt A compare e (HNode A h bt) = occurs_bt A compare e bt.
 Proof.
-  unfold_tactic occurs_hbt.
+  fold_unfold_tactic occurs_hbt.
 Qed.
 
 (** Unfold lemma for occurs_bt, when the tree is a [Leaf] *)
@@ -528,7 +531,7 @@ Lemma unfold_occurs_bt_leaf:
          (e : A),
     occurs_bt A compare e (Leaf A) = false.
 Proof.
-  unfold_tactic occurs_bt.
+  fold_unfold_tactic occurs_bt.
 Qed.
 
 (** Unfold lemma for occurs_bt, when the tree is a [Node] *)
@@ -539,7 +542,7 @@ Lemma unfold_occurs_bt_node:
          (t : triple A),
     occurs_bt A compare e (Node A t) = occurs_t A compare e t.
 Proof.  
-  unfold_tactic occurs_bt.
+  fold_unfold_tactic occurs_bt.
 Qed.
 
 (** Unfold lemma for occurs_t *)
@@ -558,7 +561,7 @@ Lemma unfold_occurs_t:
       occurs_hbt A compare e hbt2
     end.
 Proof.
-  unfold_tactic occurs_t.
+  fold_unfold_tactic occurs_t.
 Qed.
 
 (* ********** *)
@@ -998,7 +1001,7 @@ Lemma  unfold_insert_hbt_helper:
          (bt : binary_tree A),
     insert_hbt_helper A compare x (HNode A h bt) = insert_bt_helper A compare x h bt.
 Proof.
-  unfold_tactic insert_hbt_helper.
+  fold_unfold_tactic insert_hbt_helper.
 Qed.
 
 (** Unfold lemma for insert_bt_helper, when the tree is a [Leaf] *)
@@ -1015,7 +1018,7 @@ Lemma unfold_insert_bt_helper_leaf:
                                 x 
                                 (HNode A 0 (Leaf A))))).
 Proof.
-  unfold_tactic insert_bt_helper.
+  fold_unfold_tactic insert_bt_helper.
 Qed.
 
 (** Unfold lemma for insert_bt_helper, when the tree is a [Node] *)
@@ -1028,7 +1031,7 @@ Lemma unfold_insert_bt_helper_node:
     insert_bt_helper A compare x h_hbt (Node A t) =
     insert_t_helper A compare x h_hbt t.
 Proof.    
-  unfold_tactic insert_bt_helper.
+  fold_unfold_tactic insert_bt_helper.
 Qed.
 
 (** Unfold lemma for insert_t_helper *)
