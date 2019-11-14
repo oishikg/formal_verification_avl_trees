@@ -1,11 +1,11 @@
-# Formally Verifying the Correctness of an OCaml AVL Tree Implementation
+# Formally Verifying the Correctness of Lookup and Insertion on AVL Trees
 
-This project aims to formally verify the correctness of an OCaml based AVL tree implementation using the `Coq` proof assistant. It contains:
+This project aims to formally verify the correctness of lookup and insertion operations on AVL Trees using the `Coq` proof assistant. It contains:
 - A`Gallina` implementation of AVL trees 
 - Specifications for the lookup and insert operations on AVL trees
 - Theorems to prove the specifications 
 - Lemmas to aid in the above theorems 
-- An application of the certified insertion function: checking for equality of expressions modulo associativity and commutativity 
+- An application of the certified insertion function: checking for equality of expressions modulo associativity and commutativity. 
 
 ## Getting started
 
@@ -27,7 +27,7 @@ Download/clone the repository and run the following commands in the `Coq_files/s
 
 ## The Proofs and Application
 
-###`coq_files/src`:
+### `coq_files/src`:
 
 There are four folders in `coq_files/src` corresponding to four different parts of the project:
 - `/Paraphernalia`: Contains `paraphernalia.v` with the basic axioms and lemmas required to build
@@ -43,14 +43,21 @@ There are four folders in `coq_files/src` corresponding to four different parts 
     - `/Lemmas/Ordered/Helper`: This contains the file `ordered_helper.v` with 'helper' lemmas related to the orderedness of our AVL tree implementation. These lemmas are used to prove the main orderedness lemmas.
     - `/Lemmas/Ordered/Main`: This contains the file `ordered_main.v` with the main lemmas for orderedness.
 
-###`equality_modulo_associativity_commutativity`
+### `equality_modulo_associativity_commutativity`
 
 - This section contains an application of AVL trees: checking whether two expressions of binary operators (e.g. `+`, `x`, `++` , etc.) are equal modulo associativity and commutativity. 
 - We benchmark the performance of three AVL tree implementations:
   - The original OCaml implementation contained in the`Original_Hbt` module.
   - The certified and extracted implementation contained in the `Certified_Hbt_Peano` module.
   - The certified and extracted implementation with the Peano numbers ADT replaced with the OCaml integer data type. 
+  
+## Documentation
+The documentation for this project was generated using `coqdoc`. View the documentation for the proofs [here](https://oishikg.github.io/formal_verification_avl_trees/main.html).
 
 ## Author
 
 - Oishik Ganguly 
+
+## Acknowledgements
+
+- Professor Olivier Danvy, for his guidance in this project
