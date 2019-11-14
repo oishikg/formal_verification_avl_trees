@@ -28,9 +28,9 @@ Lemma relate_heights:
 Proof.
   intros.
   unfold is_sound_hbt in H.
-  rewrite -> unfold_traverse_to_check_soundness_hbt in H.
-  rewrite -> unfold_traverse_to_check_soundness_bt_node in H.
-  rewrite -> unfold_traverse_to_check_soundness_t in H.
+  rewrite -> fold_unfold_traverse_to_check_soundness_hbt in H.
+  rewrite -> fold_unfold_traverse_to_check_soundness_bt_node in H.
+  rewrite -> fold_unfold_traverse_to_check_soundness_t in H.
   case (traverse_to_check_soundness_hbt A (HNode A h1 bt1))
        as [h1' | ] eqn : C_h1.
   case (traverse_to_check_soundness_hbt A (HNode A h2 bt2))
@@ -39,7 +39,7 @@ Proof.
   apply beq_nat_true in C_sum.
   
   assert (H_h1'_h1: h1 = h1').
-  rewrite -> unfold_traverse_to_check_soundness_hbt in C_h1.
+  rewrite -> fold_unfold_traverse_to_check_soundness_hbt in C_h1.
   case (traverse_to_check_soundness_bt A bt1) as [h' | ] eqn : C.
   case (h' =n= h1) as [ | ] eqn :C'.
   rewrite -> some_x_equal_some_y in C_h1.
@@ -48,7 +48,7 @@ Proof.
   discriminate.
 
   assert (H_h2'_h2: h2 = h2').
-  rewrite -> unfold_traverse_to_check_soundness_hbt in C_h2.
+  rewrite -> fold_unfold_traverse_to_check_soundness_hbt in C_h2.
   case (traverse_to_check_soundness_bt A bt2) as [h' | ] eqn : C.
   case (h' =n= h2) as [ | ] eqn :C'.
   rewrite -> some_x_equal_some_y in C_h2.
@@ -81,15 +81,15 @@ Proof.
   split.
   unfold is_sound_hbt in H_t.
   rewrite ->
-          (unfold_traverse_to_check_soundness_hbt
+          (fold_unfold_traverse_to_check_soundness_hbt
              A
              h_hbt
              (Node A (Triple A hbt1 e hbt2))) in H_t.
   rewrite ->
-          (unfold_traverse_to_check_soundness_bt_node
+          (fold_unfold_traverse_to_check_soundness_bt_node
              A
              (Triple A hbt1 e hbt2)) in H_t.
-  rewrite -> (unfold_traverse_to_check_soundness_t A hbt1 hbt2 e) in H_t.
+  rewrite -> (fold_unfold_traverse_to_check_soundness_t A hbt1 hbt2 e) in H_t.
   case (traverse_to_check_soundness_hbt A hbt1) as [ret_h1 | ] eqn : C_sound_hbt1.
   unfold is_sound_hbt.
   rewrite -> C_sound_hbt1.
@@ -99,15 +99,15 @@ Proof.
 
   unfold is_sound_hbt in H_t.
   rewrite ->
-          (unfold_traverse_to_check_soundness_hbt
+          (fold_unfold_traverse_to_check_soundness_hbt
              A
              h_hbt
              (Node A (Triple A hbt1 e hbt2))) in H_t.
   rewrite ->
-          (unfold_traverse_to_check_soundness_bt_node
+          (fold_unfold_traverse_to_check_soundness_bt_node
              A
              (Triple A hbt1 e hbt2)) in H_t.
-  rewrite -> (unfold_traverse_to_check_soundness_t A hbt1 hbt2 e) in H_t.
+  rewrite -> (fold_unfold_traverse_to_check_soundness_t A hbt1 hbt2 e) in H_t.
   case (traverse_to_check_soundness_hbt A hbt1) as [ret_h1 | ] eqn : C_sound_hbt1.
   case (traverse_to_check_soundness_hbt A hbt2) as [ret_h2 | ] eqn : C_sound_hbt2.
   
@@ -131,7 +131,7 @@ Lemma traverse_to_check_soundness_hbt_bt_same:
     traverse_to_check_soundness_bt A bt = Some h_hbt.
 Proof.
   intros A h h_hbt bt H.
-  rewrite -> (unfold_traverse_to_check_soundness_hbt A h bt) in H.
+  rewrite -> (fold_unfold_traverse_to_check_soundness_hbt A h bt) in H.
   case (traverse_to_check_soundness_bt A bt) as [h_ret | ]  eqn : C_soundness.
   case (h_ret =n= h) as [ | ] eqn : C.
   apply (beq_nat_true h_ret h) in C.
@@ -154,7 +154,7 @@ Lemma traverse_to_check_soundness_bt_t_same:
     traverse_to_check_soundness_t A t = Some h_hbt.
 Proof.
   intros A h_hbt t H.
-  rewrite -> (unfold_traverse_to_check_soundness_bt_node A t) in H.
+  rewrite -> (fold_unfold_traverse_to_check_soundness_bt_node A t) in H.
   case (traverse_to_check_soundness_t A t) as [h_ret | ] eqn : C_h.
   exact H.
   discriminate.
@@ -171,12 +171,12 @@ Lemma soundness_implies_some_height:
 Proof.
   intros.
   unfold is_sound_hbt in H.
-  rewrite -> unfold_traverse_to_check_soundness_hbt in H.
+  rewrite -> fold_unfold_traverse_to_check_soundness_hbt in H.
   case (traverse_to_check_soundness_bt A bt) as [h' | ] eqn : C_traverse_bt.
   case (h' =n= h) as [ | ] eqn: C_h'h.
   assert (H0 : h' = h).
   exact (beq_nat_true h' h C_h'h).
-  rewrite -> unfold_traverse_to_check_soundness_hbt.
+  rewrite -> fold_unfold_traverse_to_check_soundness_hbt.
   rewrite -> C_traverse_bt.
   rewrite -> C_h'h.
   reflexivity.
@@ -207,9 +207,9 @@ Proof.
   induction hbt2 as [h2 bt2].
   
   unfold is_sound_hbt.
-  rewrite -> unfold_traverse_to_check_soundness_hbt.
-  rewrite -> unfold_traverse_to_check_soundness_bt_node.
-  rewrite -> unfold_traverse_to_check_soundness_t.
+  rewrite -> fold_unfold_traverse_to_check_soundness_hbt.
+  rewrite -> fold_unfold_traverse_to_check_soundness_bt_node.
+  rewrite -> fold_unfold_traverse_to_check_soundness_t.
   unfold is_sound_hbt in H_hbt1.
   unfold is_sound_hbt in H_hbt2.
   case (traverse_to_check_soundness_hbt A (HNode A h1 bt1))
@@ -221,7 +221,7 @@ Proof.
 
   assert (H_h1_h1_ret:
             h1 = h1_ret).
-  rewrite -> unfold_traverse_to_check_soundness_hbt in C_check_hbt1.
+  rewrite -> fold_unfold_traverse_to_check_soundness_hbt in C_check_hbt1.
   case (traverse_to_check_soundness_bt A bt1) as [h' | ].
   case (h' =n= h1) as [ | ] eqn : C_h'_h1.
   rewrite -> some_x_equal_some_y in C_check_hbt1.
@@ -231,7 +231,7 @@ Proof.
 
   assert (H_h2_h2_ret:
             h2 = h2_ret).
-  rewrite -> unfold_traverse_to_check_soundness_hbt in C_check_hbt2.
+  rewrite -> fold_unfold_traverse_to_check_soundness_hbt in C_check_hbt2.
   case (traverse_to_check_soundness_bt A bt2) as [h' | ].
   case (h' =n= h2) as [ | ] eqn : C_h'_h2.
   rewrite -> some_x_equal_some_y in C_check_hbt2.
@@ -325,18 +325,18 @@ Proof.
 
     (* unfold goal *)
     unfold is_sound_hbt.
-    rewrite -> unfold_traverse_to_check_soundness_hbt.
-    rewrite -> unfold_traverse_to_check_soundness_bt_node.
-    rewrite -> unfold_traverse_to_check_soundness_t.
-    rewrite -> unfold_traverse_to_check_soundness_hbt.
-    rewrite -> unfold_traverse_to_check_soundness_bt_node.
-    rewrite -> unfold_traverse_to_check_soundness_t.
-    rewrite -> (unfold_traverse_to_check_soundness_hbt
+    rewrite -> fold_unfold_traverse_to_check_soundness_hbt.
+    rewrite -> fold_unfold_traverse_to_check_soundness_bt_node.
+    rewrite -> fold_unfold_traverse_to_check_soundness_t.
+    rewrite -> fold_unfold_traverse_to_check_soundness_hbt.
+    rewrite -> fold_unfold_traverse_to_check_soundness_bt_node.
+    rewrite -> fold_unfold_traverse_to_check_soundness_t.
+    rewrite -> (fold_unfold_traverse_to_check_soundness_hbt
                   A (1 + max h122 h2)
                   (Node A (Triple A (HNode A h122 bt122) e (HNode A h2 bt2)))).
-    rewrite -> (unfold_traverse_to_check_soundness_bt_node
+    rewrite -> (fold_unfold_traverse_to_check_soundness_bt_node
                   A (Triple A (HNode A h122 bt122) e (HNode A h2 bt2))).
-    rewrite -> (unfold_traverse_to_check_soundness_t
+    rewrite -> (fold_unfold_traverse_to_check_soundness_t
                   A (HNode A h122 bt122) (HNode A h2 bt2) e).
 
     (* now rewrite the height hypotheses *)
@@ -372,13 +372,13 @@ Proof.
     exact (soundness_implies_some_height A h2 bt2 H0).
 
     unfold is_sound_hbt.
-    rewrite -> unfold_traverse_to_check_soundness_hbt.
-    rewrite -> unfold_traverse_to_check_soundness_bt_node.
-    rewrite -> unfold_traverse_to_check_soundness_t.
+    rewrite -> fold_unfold_traverse_to_check_soundness_hbt.
+    rewrite -> fold_unfold_traverse_to_check_soundness_bt_node.
+    rewrite -> fold_unfold_traverse_to_check_soundness_t.
     rewrite -> H_bt11_h11.
-    rewrite -> unfold_traverse_to_check_soundness_hbt.
-    rewrite -> unfold_traverse_to_check_soundness_bt_node.
-    rewrite -> unfold_traverse_to_check_soundness_t.
+    rewrite -> fold_unfold_traverse_to_check_soundness_hbt.
+    rewrite -> fold_unfold_traverse_to_check_soundness_bt_node.
+    rewrite -> fold_unfold_traverse_to_check_soundness_t.
     rewrite -> H_bt12_h12.
     rewrite -> H_bt2_h2.
     rewrite -> Nat.eqb_refl.
@@ -456,18 +456,18 @@ Proof.
 
     (* unfold goal *)
     unfold is_sound_hbt.
-    rewrite -> unfold_traverse_to_check_soundness_hbt.
-    rewrite -> unfold_traverse_to_check_soundness_bt_node.
-    rewrite -> unfold_traverse_to_check_soundness_t.
-    rewrite -> unfold_traverse_to_check_soundness_hbt.
-    rewrite -> unfold_traverse_to_check_soundness_bt_node.
-    rewrite -> unfold_traverse_to_check_soundness_t.
+    rewrite -> fold_unfold_traverse_to_check_soundness_hbt.
+    rewrite -> fold_unfold_traverse_to_check_soundness_bt_node.
+    rewrite -> fold_unfold_traverse_to_check_soundness_t.
+    rewrite -> fold_unfold_traverse_to_check_soundness_hbt.
+    rewrite -> fold_unfold_traverse_to_check_soundness_bt_node.
+    rewrite -> fold_unfold_traverse_to_check_soundness_t.
     rewrite -> H_bt1_h1.
     rewrite -> H_bt211_h211.
     rewrite -> Nat.eqb_refl.
-    rewrite -> unfold_traverse_to_check_soundness_hbt.
-    rewrite -> unfold_traverse_to_check_soundness_bt_node.
-    rewrite -> unfold_traverse_to_check_soundness_t.
+    rewrite -> fold_unfold_traverse_to_check_soundness_hbt.
+    rewrite -> fold_unfold_traverse_to_check_soundness_bt_node.
+    rewrite -> fold_unfold_traverse_to_check_soundness_t.
     rewrite -> H_bt212_h212.
     rewrite -> H_bt22_h22.
     rewrite -> Nat.eqb_refl.
@@ -497,12 +497,12 @@ Proof.
     exact (soundness_implies_some_height A h21 bt21 H_bt21_sound).
 
     unfold is_sound_hbt.
-    rewrite -> unfold_traverse_to_check_soundness_hbt.
-    rewrite -> unfold_traverse_to_check_soundness_bt_node.
-    rewrite -> unfold_traverse_to_check_soundness_t.
-    rewrite -> unfold_traverse_to_check_soundness_hbt.
-    rewrite -> unfold_traverse_to_check_soundness_bt_node.
-    rewrite -> unfold_traverse_to_check_soundness_t.
+    rewrite -> fold_unfold_traverse_to_check_soundness_hbt.
+    rewrite -> fold_unfold_traverse_to_check_soundness_bt_node.
+    rewrite -> fold_unfold_traverse_to_check_soundness_t.
+    rewrite -> fold_unfold_traverse_to_check_soundness_hbt.
+    rewrite -> fold_unfold_traverse_to_check_soundness_bt_node.
+    rewrite -> fold_unfold_traverse_to_check_soundness_t.
     rewrite -> H_bt1_h1.
     rewrite -> H_bt21_h21.
     rewrite -> Nat.eqb_refl.
@@ -557,17 +557,17 @@ Proof.
 
     (* Specification for bt leaf constructor holds *)
   - intros h_hbt hbt' H_sound_bt_init H_insert_bt.
-    rewrite -> (unfold_insert_bt_helper_leaf A compare x)
+    rewrite -> (fold_unfold_insert_bt_helper_leaf A compare x)
       in H_insert_bt.
     rewrite -> some_x_equal_some_y in H_insert_bt.
     rewrite <- H_insert_bt.
 
     unfold is_sound_hbt.
-    rewrite -> unfold_traverse_to_check_soundness_hbt.
-    rewrite -> unfold_traverse_to_check_soundness_bt_node.
-    rewrite -> unfold_traverse_to_check_soundness_t.
-    rewrite -> unfold_traverse_to_check_soundness_hbt.
-    rewrite -> unfold_traverse_to_check_soundness_bt_leaf.
+    rewrite -> fold_unfold_traverse_to_check_soundness_hbt.
+    rewrite -> fold_unfold_traverse_to_check_soundness_bt_node.
+    rewrite -> fold_unfold_traverse_to_check_soundness_t.
+    rewrite -> fold_unfold_traverse_to_check_soundness_hbt.
+    rewrite -> fold_unfold_traverse_to_check_soundness_bt_leaf.
     unfold beq_nat at 1.
     unfold beq_nat at 1.
     unfold max at 1.
@@ -591,7 +591,7 @@ Proof.
     destruct (triple_sound_implies_hbts_sound
                 A h_hbt hbt1 e hbt2 H_sound_t_init) as [H_hbt1_is_sound H_hbt2_is_sound].
     
-    rewrite -> (unfold_insert_t_helper A compare x h_hbt hbt1 e hbt2)
+    rewrite -> (fold_unfold_insert_t_helper A compare x h_hbt hbt1 e hbt2)
       in H_insert_t. 
     (* Element to be inserted is Lt current element considered *)
     case (compare x e) as [ | | ] eqn : C_comp.

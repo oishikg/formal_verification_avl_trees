@@ -57,16 +57,16 @@ Proof.
   (* hbt is a leaf *)
   - intro.
     rewrite -> H0.
-    rewrite -> unfold_occurs_hbt.
-    rewrite -> unfold_occurs_bt_leaf.
+    rewrite -> fold_unfold_occurs_hbt.
+    rewrite -> fold_unfold_occurs_bt_leaf.
     reflexivity.
 
   (* hbt is a node *)  
   - intros.
     rewrite -> H0.
-    rewrite -> unfold_occurs_hbt.
-    rewrite -> unfold_occurs_bt_node.
-    rewrite -> unfold_occurs_t.
+    rewrite -> fold_unfold_occurs_hbt.
+    rewrite -> fold_unfold_occurs_bt_node.
+    rewrite -> fold_unfold_occurs_t.
     reflexivity.
 Qed.
 

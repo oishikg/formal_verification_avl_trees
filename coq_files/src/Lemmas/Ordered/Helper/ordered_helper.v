@@ -26,9 +26,9 @@ Proof.
   intros.
 
   unfold is_ordered_hbt in H.
-  rewrite -> unfold_traverse_to_check_ordered_hbt in H.
-  rewrite -> unfold_traverse_to_check_ordered_bt_node in H.
-  rewrite -> unfold_traverse_to_check_ordered_t in H.
+  rewrite -> fold_unfold_traverse_to_check_ordered_hbt in H.
+  rewrite -> fold_unfold_traverse_to_check_ordered_bt_node in H.
+  rewrite -> fold_unfold_traverse_to_check_ordered_t in H.
   split.
   
   unfold is_ordered_hbt.
@@ -86,9 +86,9 @@ Lemma traverse_node_impossible_case:
     traverse_to_check_ordered_bt A (Node A t1) compare = TNone (A * A) -> False. 
 Proof.
   intros A compare t1 H.
-  rewrite -> unfold_traverse_to_check_ordered_bt_node in H.
+  rewrite -> fold_unfold_traverse_to_check_ordered_bt_node in H.
   induction t1 as [hbt11 e1 hbt12].
-  rewrite -> unfold_traverse_to_check_ordered_t in H.
+  rewrite -> fold_unfold_traverse_to_check_ordered_t in H.
   case (traverse_to_check_ordered_hbt A hbt11 compare) as [ | | (min11, max11)].
   case (traverse_to_check_ordered_hbt A hbt12 compare) as [ | | (min12, max12)].
   discriminate.
@@ -131,9 +131,9 @@ Lemma tnone_implies_leaf:
     bt = Leaf A.
 Proof.
   intros.
-  rewrite -> unfold_traverse_to_check_ordered_hbt in H.
+  rewrite -> fold_unfold_traverse_to_check_ordered_hbt in H.
   induction bt as [ | t].
-  rewrite -> unfold_traverse_to_check_ordered_bt_leaf in H.
+  rewrite -> fold_unfold_traverse_to_check_ordered_bt_leaf in H.
   reflexivity.
 
   apply False_ind.
@@ -160,11 +160,11 @@ Proof.
   unfold is_ordered_hbt in H.
   induction hbt as [h bt].
   case bt as [ | t] eqn : C_bt.
-  rewrite -> unfold_traverse_to_check_ordered_hbt.
-  rewrite -> unfold_traverse_to_check_ordered_bt_leaf.
+  rewrite -> fold_unfold_traverse_to_check_ordered_hbt.
+  rewrite -> fold_unfold_traverse_to_check_ordered_bt_leaf.
   apply or_introl.
   reflexivity.
-  rewrite -> unfold_traverse_to_check_ordered_hbt in H.
+  rewrite -> fold_unfold_traverse_to_check_ordered_hbt in H.
   case (traverse_to_check_ordered_bt A (Node A t) compare)
     as [ | |(min, max)] eqn : C_traverse_bt. 
   discriminate.
@@ -235,9 +235,9 @@ Proof.
            A compare (HNode A h2 bt2) H1).
 
   (* unfold the goal before destructing to avoid repeated unfolds *)
-  rewrite -> unfold_traverse_to_check_ordered_hbt.
-  rewrite -> unfold_traverse_to_check_ordered_bt_node.
-  rewrite -> unfold_traverse_to_check_ordered_t.
+  rewrite -> fold_unfold_traverse_to_check_ordered_hbt.
+  rewrite -> fold_unfold_traverse_to_check_ordered_bt_node.
+  rewrite -> fold_unfold_traverse_to_check_ordered_t.
   
   destruct H_hbt1_leaf_or_node as [H_hbt1_leaf | H_hbt1_node].
 
@@ -311,8 +311,8 @@ Proof.
     rewrite H0 in H1.
     case bt1 as [ | t1].
     unfold is_sound_hbt in H1.
-    rewrite -> unfold_traverse_to_check_soundness_hbt in H1.
-    rewrite -> unfold_traverse_to_check_soundness_bt_leaf in H1.
+    rewrite -> fold_unfold_traverse_to_check_soundness_hbt in H1.
+    rewrite -> fold_unfold_traverse_to_check_soundness_bt_leaf in H1.
     case h2 as [ | h2'].
     rewrite -> plus_0_r in H1.
     unfold beq_nat in H1.
@@ -329,8 +329,8 @@ Proof.
     rewrite H0 in H1.
     case bt1 as [ | t1].    
     unfold is_sound_hbt in H1.
-    rewrite -> unfold_traverse_to_check_soundness_hbt in H1.
-    rewrite -> unfold_traverse_to_check_soundness_bt_leaf in H1.
+    rewrite -> fold_unfold_traverse_to_check_soundness_hbt in H1.
+    rewrite -> fold_unfold_traverse_to_check_soundness_bt_leaf in H1.
     case h2 as [ | h2'].
     unfold beq_nat in H1.
     discriminate.
@@ -363,14 +363,14 @@ Lemma reduce_ordered_hbt_left:
                                    hbt2))) compare = TSome (A * A) (e, max).
 Proof.    
   intros.
-  rewrite -> unfold_traverse_to_check_ordered_hbt.
-  rewrite -> unfold_traverse_to_check_ordered_bt_node.
-  rewrite -> unfold_traverse_to_check_ordered_t.   
-  rewrite -> unfold_traverse_to_check_ordered_hbt.
-  rewrite -> unfold_traverse_to_check_ordered_bt_leaf.
-  rewrite -> unfold_traverse_to_check_ordered_hbt in H. 
-  rewrite -> unfold_traverse_to_check_ordered_bt_node in H.
-  rewrite -> unfold_traverse_to_check_ordered_t in H.
+  rewrite -> fold_unfold_traverse_to_check_ordered_hbt.
+  rewrite -> fold_unfold_traverse_to_check_ordered_bt_node.
+  rewrite -> fold_unfold_traverse_to_check_ordered_t.   
+  rewrite -> fold_unfold_traverse_to_check_ordered_hbt.
+  rewrite -> fold_unfold_traverse_to_check_ordered_bt_leaf.
+  rewrite -> fold_unfold_traverse_to_check_ordered_hbt in H. 
+  rewrite -> fold_unfold_traverse_to_check_ordered_bt_node in H.
+  rewrite -> fold_unfold_traverse_to_check_ordered_t in H.
   case (traverse_to_check_ordered_hbt A hbt1 compare) as [ | | (min1, max1)].
   discriminate.
   case (traverse_to_check_ordered_hbt A hbt2 compare) as [ | | (min2, max2)].
@@ -431,14 +431,14 @@ Lemma reduce_ordered_hbt_right:
                                    (HNode A 0 (Leaf A))))) compare = TSome (A * A) (min, e).
 Proof.
   intros. 
-  rewrite -> unfold_traverse_to_check_ordered_hbt.
-  rewrite -> unfold_traverse_to_check_ordered_bt_node.
-  rewrite -> unfold_traverse_to_check_ordered_t.   
-  rewrite -> unfold_traverse_to_check_ordered_hbt.
-  rewrite -> unfold_traverse_to_check_ordered_bt_leaf.
-  rewrite -> unfold_traverse_to_check_ordered_hbt in H. 
-  rewrite -> unfold_traverse_to_check_ordered_bt_node in H.
-  rewrite -> unfold_traverse_to_check_ordered_t in H.
+  rewrite -> fold_unfold_traverse_to_check_ordered_hbt.
+  rewrite -> fold_unfold_traverse_to_check_ordered_bt_node.
+  rewrite -> fold_unfold_traverse_to_check_ordered_t.   
+  rewrite -> fold_unfold_traverse_to_check_ordered_hbt.
+  rewrite -> fold_unfold_traverse_to_check_ordered_bt_leaf.
+  rewrite -> fold_unfold_traverse_to_check_ordered_hbt in H. 
+  rewrite -> fold_unfold_traverse_to_check_ordered_bt_node in H.
+  rewrite -> fold_unfold_traverse_to_check_ordered_t in H.
   case (traverse_to_check_ordered_hbt A hbt1 compare) as [ | | (min1, max1)].
   discriminate.
   case (traverse_to_check_ordered_hbt A hbt2 compare) as [ | | (min2, max2)].
@@ -488,13 +488,13 @@ Lemma traverse_to_check_ordered_hbt_some_implies_is_ordered:
 Proof. 
   intros.
   induction hbt as [h bt].
-  rewrite -> unfold_traverse_to_check_ordered_hbt in H.
+  rewrite -> fold_unfold_traverse_to_check_ordered_hbt in H.
   induction bt as [ | t].
-  rewrite -> unfold_traverse_to_check_ordered_bt_leaf in H.
+  rewrite -> fold_unfold_traverse_to_check_ordered_bt_leaf in H.
   discriminate.
   induction t as [hbt1 e hbt2].
   unfold is_ordered_hbt.
-  rewrite -> unfold_traverse_to_check_ordered_hbt.
+  rewrite -> fold_unfold_traverse_to_check_ordered_hbt.
   rewrite -> H.
   reflexivity.
 Qed.
@@ -560,23 +560,23 @@ Proof.
     intros A compare x  hbt hbt' H_ins.
     unfold not.
     induction hbt' as [h' bt'].
-    rewrite -> (unfold_traverse_to_check_ordered_hbt A h' bt' compare).
+    rewrite -> (fold_unfold_traverse_to_check_ordered_hbt A h' bt' compare).
     case bt' as [ | t'].
 
     (* bt' is a leaf *)
     - induction hbt as [h bt].
-      rewrite -> (unfold_insert_hbt_helper A compare x h bt) in H_ins.
+      rewrite -> (fold_unfold_insert_hbt_helper A compare x h bt) in H_ins.
       case bt as [ | t].
 
       (* bt is a leaf *)
-      + rewrite -> (unfold_insert_bt_helper_leaf A compare) in H_ins.
+      + rewrite -> (fold_unfold_insert_bt_helper_leaf A compare) in H_ins.
         discriminate.
 
       (* bt is a node: unfold the isnert function in H_ins *)
       + induction t as [ hbt1 e hbt2].
-        rewrite -> (unfold_insert_bt_helper_node A compare x h (Triple A hbt1 e hbt2))
+        rewrite -> (fold_unfold_insert_bt_helper_node A compare x h (Triple A hbt1 e hbt2))
           in H_ins.
-        rewrite -> (unfold_insert_t_helper A compare x h hbt1 e hbt2) in H_ins.
+        rewrite -> (fold_unfold_insert_t_helper A compare x h hbt1 e hbt2) in H_ins.
         case (compare x e) as [ | | ] eqn : C_comp_x_e.
         
         * case (insert_hbt_helper A compare x hbt1)
@@ -640,10 +640,10 @@ Proof.
 
     (* bt' is a node *)
     - intro H_check_ord.
-      rewrite -> (unfold_traverse_to_check_ordered_bt_node A t' compare)
+      rewrite -> (fold_unfold_traverse_to_check_ordered_bt_node A t' compare)
         in H_check_ord.
       induction t' as [hbt1'' e hbt2''].
-      rewrite -> (unfold_traverse_to_check_ordered_t A hbt1'' e hbt2'' compare)
+      rewrite -> (fold_unfold_traverse_to_check_ordered_t A hbt1'' e hbt2'' compare)
         in H_check_ord.
       case (traverse_to_check_ordered_hbt A hbt1'' compare) as [ | | (min1, max1)].
       discriminate.
@@ -717,12 +717,12 @@ Proof.
   induction hbt as [h bt].
   
   assert (H_form_of_bt: bt = (Leaf A)).
-  rewrite -> (unfold_traverse_to_check_ordered_hbt A h bt compare) in H_hbt.
+  rewrite -> (fold_unfold_traverse_to_check_ordered_hbt A h bt compare) in H_hbt.
   case bt as [ | t] eqn : C_bt.
   reflexivity.
-  rewrite -> (unfold_traverse_to_check_ordered_bt_node A t compare) in H_hbt.
+  rewrite -> (fold_unfold_traverse_to_check_ordered_bt_node A t compare) in H_hbt.
   case t as [hbt1 e hbt2].
-  rewrite -> (unfold_traverse_to_check_ordered_t A hbt1 e hbt2 compare) in H_hbt. 
+  rewrite -> (fold_unfold_traverse_to_check_ordered_t A hbt1 e hbt2 compare) in H_hbt. 
   case (traverse_to_check_ordered_hbt A hbt1 compare)
     as [ | | (min1, max1)] eqn : C_ord_hbt1.
   discriminate.
@@ -747,15 +747,15 @@ Proof.
   discriminate.
 
   rewrite -> H_form_of_bt in H_insert.
-  rewrite -> (unfold_insert_hbt_helper A compare x h (Leaf A)) in H_insert.
-  rewrite -> (unfold_insert_bt_helper_leaf A compare x h) in H_insert.
+  rewrite -> (fold_unfold_insert_hbt_helper A compare x h (Leaf A)) in H_insert.
+  rewrite -> (fold_unfold_insert_bt_helper_leaf A compare x h) in H_insert.
   rewrite ->  some_x_equal_some_y in H_insert.
   rewrite <- H_insert in H_hbt'.
-  rewrite -> unfold_traverse_to_check_ordered_hbt in H_hbt'.
-  rewrite -> unfold_traverse_to_check_ordered_bt_node in H_hbt'.
-  rewrite -> unfold_traverse_to_check_ordered_t in H_hbt'.
-  rewrite -> (unfold_traverse_to_check_ordered_hbt A 0 (Leaf A) compare) in H_hbt'.
-  rewrite -> (unfold_traverse_to_check_ordered_bt_leaf A compare) in H_hbt'.
+  rewrite -> fold_unfold_traverse_to_check_ordered_hbt in H_hbt'.
+  rewrite -> fold_unfold_traverse_to_check_ordered_bt_node in H_hbt'.
+  rewrite -> fold_unfold_traverse_to_check_ordered_t in H_hbt'.
+  rewrite -> (fold_unfold_traverse_to_check_ordered_hbt A 0 (Leaf A) compare) in H_hbt'.
+  rewrite -> (fold_unfold_traverse_to_check_ordered_bt_leaf A compare) in H_hbt'.
   rewrite -> (tsome_x_equal_tsome_y (A * A) (x, x) (min', max')) in H_hbt'.
   apply (pairwise_equality A x x min' max') in H_hbt'.
   destruct H_hbt' as [G1 G2].
@@ -783,13 +783,13 @@ Lemma ordered_node_has_min_max:
       TSome (A * A) (some_min, some_max).
 Proof.
   intros.
-  rewrite -> unfold_traverse_to_check_ordered_bt_node.
-  rewrite -> unfold_traverse_to_check_ordered_t.
+  rewrite -> fold_unfold_traverse_to_check_ordered_bt_node.
+  rewrite -> fold_unfold_traverse_to_check_ordered_t.
   
   unfold is_ordered_hbt in H.
-  rewrite -> unfold_traverse_to_check_ordered_hbt in H.
-  rewrite -> unfold_traverse_to_check_ordered_bt_node in H.
-  rewrite -> unfold_traverse_to_check_ordered_t in H.
+  rewrite -> fold_unfold_traverse_to_check_ordered_hbt in H.
+  rewrite -> fold_unfold_traverse_to_check_ordered_bt_node in H.
+  rewrite -> fold_unfold_traverse_to_check_ordered_t in H.
   
   case (traverse_to_check_ordered_hbt A hbt11 compare) as
       [ | | (min11, max11)] eqn : C_traverse_ord_hbt11.
@@ -908,27 +908,27 @@ Proof.
   induction hbt_right as [h_r bt_r].
   induction hbt_left as [h_l bt_l].
   
-  rewrite -> unfold_traverse_to_check_ordered_hbt in H.
-  rewrite -> unfold_traverse_to_check_ordered_bt_node in H.    
-  rewrite -> unfold_traverse_to_check_ordered_t in H.
-  rewrite -> unfold_traverse_to_check_ordered_hbt in H.    
-  rewrite -> unfold_traverse_to_check_ordered_bt_leaf in H.
-  rewrite -> unfold_traverse_to_check_ordered_hbt in H.
-  rewrite -> unfold_traverse_to_check_ordered_bt_node in H.    
-  rewrite -> unfold_traverse_to_check_ordered_t in H.
+  rewrite -> fold_unfold_traverse_to_check_ordered_hbt in H.
+  rewrite -> fold_unfold_traverse_to_check_ordered_bt_node in H.    
+  rewrite -> fold_unfold_traverse_to_check_ordered_t in H.
+  rewrite -> fold_unfold_traverse_to_check_ordered_hbt in H.    
+  rewrite -> fold_unfold_traverse_to_check_ordered_bt_leaf in H.
+  rewrite -> fold_unfold_traverse_to_check_ordered_hbt in H.
+  rewrite -> fold_unfold_traverse_to_check_ordered_bt_node in H.    
+  rewrite -> fold_unfold_traverse_to_check_ordered_t in H.
 
     (* now we do a case analysis on hbt2 *)
   case bt_r as [ | t_r].
 
     (* bt_l is a leaf *)
     + (* obtain the t_max value from H0 first *)
-      rewrite -> unfold_traverse_to_check_ordered_hbt in H0.
-      rewrite -> unfold_traverse_to_check_ordered_bt_node in H0.
-      rewrite -> unfold_traverse_to_check_ordered_t in H0.      
-      rewrite -> unfold_traverse_to_check_ordered_hbt in H0.
-      rewrite -> unfold_traverse_to_check_ordered_bt_leaf in H0.      
-      rewrite -> unfold_traverse_to_check_ordered_hbt in H0.
-      rewrite -> unfold_traverse_to_check_ordered_bt_leaf in H0.      
+      rewrite -> fold_unfold_traverse_to_check_ordered_hbt in H0.
+      rewrite -> fold_unfold_traverse_to_check_ordered_bt_node in H0.
+      rewrite -> fold_unfold_traverse_to_check_ordered_t in H0.      
+      rewrite -> fold_unfold_traverse_to_check_ordered_hbt in H0.
+      rewrite -> fold_unfold_traverse_to_check_ordered_bt_leaf in H0.      
+      rewrite -> fold_unfold_traverse_to_check_ordered_hbt in H0.
+      rewrite -> fold_unfold_traverse_to_check_ordered_bt_leaf in H0.      
       rewrite -> tsome_x_equal_tsome_y in H0.
       rewrite -> pairwise_equality in H0.
       destruct H0 as [_ H_e_t_max].
@@ -937,8 +937,8 @@ Proof.
       case (traverse_to_check_ordered_hbt A (HNode A h_l bt_l) compare)
            as [ | | (min_l, max_l)].
       discriminate.
-      rewrite -> unfold_traverse_to_check_ordered_hbt in H.
-      rewrite -> unfold_traverse_to_check_ordered_bt_leaf in H.
+      rewrite -> fold_unfold_traverse_to_check_ordered_hbt in H.
+      rewrite -> fold_unfold_traverse_to_check_ordered_bt_leaf in H.
       case (compare e e') as [ | | ].
       rewrite -> tsome_x_equal_tsome_y in H.
       rewrite -> pairwise_equality in H.
@@ -951,8 +951,8 @@ Proof.
       discriminate.
       
       case (compare max_l e') as [ | | ].
-      rewrite -> unfold_traverse_to_check_ordered_hbt in H.
-      rewrite -> unfold_traverse_to_check_ordered_bt_leaf in H.
+      rewrite -> fold_unfold_traverse_to_check_ordered_hbt in H.
+      rewrite -> fold_unfold_traverse_to_check_ordered_bt_leaf in H.
       case (compare e min_l) as [ | | ].
       rewrite -> tsome_x_equal_tsome_y in H.
       rewrite -> pairwise_equality in H.
@@ -970,12 +970,12 @@ Proof.
 
     (* bt_l is a node *)
     + (* obtain the t_max value from H0 first *)
-      rewrite -> unfold_traverse_to_check_ordered_hbt in H0.
-      rewrite -> unfold_traverse_to_check_ordered_bt_node in H0.
-      rewrite -> unfold_traverse_to_check_ordered_t in H0.      
-      rewrite -> unfold_traverse_to_check_ordered_hbt in H0.
-      rewrite -> unfold_traverse_to_check_ordered_bt_leaf in H0.
-      rewrite -> unfold_traverse_to_check_ordered_hbt in H0.      
+      rewrite -> fold_unfold_traverse_to_check_ordered_hbt in H0.
+      rewrite -> fold_unfold_traverse_to_check_ordered_bt_node in H0.
+      rewrite -> fold_unfold_traverse_to_check_ordered_t in H0.      
+      rewrite -> fold_unfold_traverse_to_check_ordered_hbt in H0.
+      rewrite -> fold_unfold_traverse_to_check_ordered_bt_leaf in H0.
+      rewrite -> fold_unfold_traverse_to_check_ordered_hbt in H0.      
       case (traverse_to_check_ordered_bt A (Node A t_r) compare)
         as [ | | (minr, maxr)] eqn : C_traverse_ord_hbt_r.
       discriminate.
@@ -995,7 +995,7 @@ Proof.
       case (traverse_to_check_ordered_hbt A (HNode A h_l bt_l) compare)
            as [ | | (min_l, max_l)].
       discriminate.
-      rewrite -> unfold_traverse_to_check_ordered_hbt in H.
+      rewrite -> fold_unfold_traverse_to_check_ordered_hbt in H.
       rewrite -> C_traverse_ord_hbt_r in H.
       rewrite -> H_comp_e_minr in H.
       case (compare e e') as [ | | ].
@@ -1010,7 +1010,7 @@ Proof.
       discriminate.
 
       case (compare max_l e') as [ | | ].
-      rewrite -> unfold_traverse_to_check_ordered_hbt in H.
+      rewrite -> fold_unfold_traverse_to_check_ordered_hbt in H.
       rewrite -> C_traverse_ord_hbt_r in H.
       rewrite -> H_comp_e_minr in H.
       case (compare e min_l) as [ | | ].
@@ -1062,7 +1062,7 @@ Proof.
 
   (* H_t_min'_min1 *)
   apply or_intror.
-  rewrite -> unfold_traverse_to_check_ordered_t in H0.
+  rewrite -> fold_unfold_traverse_to_check_ordered_t in H0.
   rewrite -> H1 in H0.
   case (compare max1 e) as [ | | ].
   case (traverse_to_check_ordered_hbt A (HNode A h2 bt2) compare)
@@ -1198,12 +1198,12 @@ Proof.
                 A (HNode A h11' bt11') compare = TSome (A * A) (min11', max11') ->
               compare max11' e1 = Lt). 
   intros min11' max11' H_traverse_ord_bt11'.
-  rewrite -> unfold_traverse_to_check_ordered_hbt in H.
-  rewrite -> unfold_traverse_to_check_ordered_bt_node in H.  
-  rewrite -> unfold_traverse_to_check_ordered_t in H.    
-  rewrite -> unfold_traverse_to_check_ordered_hbt in H.
-  rewrite -> unfold_traverse_to_check_ordered_bt_node in H.  
-  rewrite -> unfold_traverse_to_check_ordered_t in H.    
+  rewrite -> fold_unfold_traverse_to_check_ordered_hbt in H.
+  rewrite -> fold_unfold_traverse_to_check_ordered_bt_node in H.  
+  rewrite -> fold_unfold_traverse_to_check_ordered_t in H.    
+  rewrite -> fold_unfold_traverse_to_check_ordered_hbt in H.
+  rewrite -> fold_unfold_traverse_to_check_ordered_bt_node in H.  
+  rewrite -> fold_unfold_traverse_to_check_ordered_t in H.    
   rewrite -> H_traverse_ord_bt11' in H.  
   case (compare max11' e1) as [ | | ] eqn : C_comp_max11'_e1.
   reflexivity.
@@ -1216,13 +1216,13 @@ Proof.
                 A (HNode A h121' bt121') compare = TSome (A * A) (min121', max121') ->
               compare max121' e12 = Lt). 
   intros.
-  rewrite -> unfold_traverse_to_check_ordered_hbt in H.
-  rewrite -> unfold_traverse_to_check_ordered_bt_node in H.  
-  rewrite -> unfold_traverse_to_check_ordered_t in H.    
-  rewrite -> unfold_traverse_to_check_ordered_hbt in H.
-  rewrite -> unfold_traverse_to_check_ordered_bt_node in H.  
-  rewrite -> unfold_traverse_to_check_ordered_t in H.
-  rewrite -> unfold_traverse_to_check_ordered_hbt in H.
+  rewrite -> fold_unfold_traverse_to_check_ordered_hbt in H.
+  rewrite -> fold_unfold_traverse_to_check_ordered_bt_node in H.  
+  rewrite -> fold_unfold_traverse_to_check_ordered_t in H.    
+  rewrite -> fold_unfold_traverse_to_check_ordered_hbt in H.
+  rewrite -> fold_unfold_traverse_to_check_ordered_bt_node in H.  
+  rewrite -> fold_unfold_traverse_to_check_ordered_t in H.
+  rewrite -> fold_unfold_traverse_to_check_ordered_hbt in H.
   rewrite -> H0 in H.  
   case (traverse_to_check_ordered_bt A bt11' compare)
        as [ | | (min11', max11')].
@@ -1275,14 +1275,14 @@ Proof.
                   (Node A (Triple A (HNode A h122' bt122') e (HNode A h2 bt2))))
            t_min' t_max'
            H).
-  rewrite -> unfold_traverse_to_check_ordered_hbt in H_reduced_tree.
-  rewrite -> unfold_traverse_to_check_ordered_bt_node in H_reduced_tree.  
-  rewrite -> unfold_traverse_to_check_ordered_t in H_reduced_tree.    
-  rewrite -> unfold_traverse_to_check_ordered_hbt in H_reduced_tree.
-  rewrite -> unfold_traverse_to_check_ordered_bt_leaf in H_reduced_tree.
-  rewrite -> unfold_traverse_to_check_ordered_hbt in H_reduced_tree.
-  rewrite -> unfold_traverse_to_check_ordered_bt_node in H_reduced_tree.    
-  rewrite -> unfold_traverse_to_check_ordered_t in H_reduced_tree.
+  rewrite -> fold_unfold_traverse_to_check_ordered_hbt in H_reduced_tree.
+  rewrite -> fold_unfold_traverse_to_check_ordered_bt_node in H_reduced_tree.  
+  rewrite -> fold_unfold_traverse_to_check_ordered_t in H_reduced_tree.    
+  rewrite -> fold_unfold_traverse_to_check_ordered_hbt in H_reduced_tree.
+  rewrite -> fold_unfold_traverse_to_check_ordered_bt_leaf in H_reduced_tree.
+  rewrite -> fold_unfold_traverse_to_check_ordered_hbt in H_reduced_tree.
+  rewrite -> fold_unfold_traverse_to_check_ordered_bt_node in H_reduced_tree.    
+  rewrite -> fold_unfold_traverse_to_check_ordered_t in H_reduced_tree.
   rewrite -> H0 in H_reduced_tree.
   case (compare max122' e) as [ | | ].
   case (traverse_to_check_ordered_hbt A (HNode A h2 bt2) compare)
@@ -1310,9 +1310,9 @@ Proof.
               compare e1 min121' = Lt). 
   intros.
   unfold is_ordered_hbt in H_left_ord.
-  rewrite -> unfold_traverse_to_check_ordered_hbt in H_left_ord.
-  rewrite -> unfold_traverse_to_check_ordered_bt_node in H_left_ord.  
-  rewrite -> unfold_traverse_to_check_ordered_t in H_left_ord.
+  rewrite -> fold_unfold_traverse_to_check_ordered_hbt in H_left_ord.
+  rewrite -> fold_unfold_traverse_to_check_ordered_bt_node in H_left_ord.  
+  rewrite -> fold_unfold_traverse_to_check_ordered_t in H_left_ord.
   case (traverse_to_check_ordered_hbt A (HNode A h11' bt11') compare)
     as [ | | (min11', max11')].
   discriminate.
@@ -1331,21 +1331,21 @@ Proof.
   discriminate.
 
   (* With all our theorems in place, we now unfold the goal *)
-  rewrite -> unfold_traverse_to_check_ordered_hbt.
-  rewrite -> unfold_traverse_to_check_ordered_bt_node.
-  rewrite -> unfold_traverse_to_check_ordered_t.
+  rewrite -> fold_unfold_traverse_to_check_ordered_hbt.
+  rewrite -> fold_unfold_traverse_to_check_ordered_bt_node.
+  rewrite -> fold_unfold_traverse_to_check_ordered_t.
   rewrite ->
-          (unfold_traverse_to_check_ordered_hbt
+          (fold_unfold_traverse_to_check_ordered_hbt
              A h12'
              (Node A (Triple A (HNode A h121' bt121') e12 (HNode A h122' bt122')))
              compare).
   rewrite ->
-          (unfold_traverse_to_check_ordered_bt_node
+          (fold_unfold_traverse_to_check_ordered_bt_node
              A 
              (Triple A (HNode A h121' bt121') e12 (HNode A h122' bt122'))
              compare).
   rewrite ->
-          (unfold_traverse_to_check_ordered_t
+          (fold_unfold_traverse_to_check_ordered_t
              A
              (HNode A h121' bt121')
              e12
@@ -1372,14 +1372,14 @@ Proof.
            (HNode A (1 + max h122' h2)
                   (Node A (Triple A (HNode A h122' bt122') e (HNode A h2 bt2))))
            t_min' t_max' H).
-  rewrite -> unfold_traverse_to_check_ordered_hbt in H_for_t_min'.
-  rewrite -> unfold_traverse_to_check_ordered_bt_node in H_for_t_min'.
-  rewrite -> unfold_traverse_to_check_ordered_t in H_for_t_min'.
-  rewrite -> unfold_traverse_to_check_ordered_hbt in H_for_t_min'.
-  rewrite -> unfold_traverse_to_check_ordered_bt_node in H_for_t_min'.
-  rewrite -> unfold_traverse_to_check_ordered_t in H_for_t_min'.
-  rewrite -> (unfold_traverse_to_check_ordered_hbt A 0 (Leaf A) compare)  in H_for_t_min'.
-  rewrite -> unfold_traverse_to_check_ordered_bt_leaf in H_for_t_min'.
+  rewrite -> fold_unfold_traverse_to_check_ordered_hbt in H_for_t_min'.
+  rewrite -> fold_unfold_traverse_to_check_ordered_bt_node in H_for_t_min'.
+  rewrite -> fold_unfold_traverse_to_check_ordered_t in H_for_t_min'.
+  rewrite -> fold_unfold_traverse_to_check_ordered_hbt in H_for_t_min'.
+  rewrite -> fold_unfold_traverse_to_check_ordered_bt_node in H_for_t_min'.
+  rewrite -> fold_unfold_traverse_to_check_ordered_t in H_for_t_min'.
+  rewrite -> (fold_unfold_traverse_to_check_ordered_hbt A 0 (Leaf A) compare)  in H_for_t_min'.
+  rewrite -> fold_unfold_traverse_to_check_ordered_bt_leaf in H_for_t_min'.
 
   (* Finally, we may tackle the 8 possible cases *) 
   case (is_ordered_true_implies_leaf_or_ordered_node
@@ -1627,8 +1627,8 @@ Proof.
   intros A compare x h1 bt1 h1' h11' h12' h121' h122' bt11' bt121' bt122' e1 e12 H.
   induction bt1 as [ | t1].
 
-  rewrite -> unfold_insert_hbt_helper in H.
-  rewrite -> unfold_insert_bt_helper_leaf in H.
+  rewrite -> fold_unfold_insert_hbt_helper in H.
+  rewrite -> fold_unfold_insert_bt_helper_leaf in H.
   rewrite -> some_x_equal_some_y in H.
   discriminate.
   unfold not.
@@ -1688,8 +1688,8 @@ Proof.
                 A
                 (HNode A h2 (Node A ((Triple A hbt1 e (HNode A h2 bt2))))) compare = 
               TSome (A * A) (t_min, t_max)).
-    rewrite -> unfold_traverse_to_check_ordered_hbt.
-    rewrite -> unfold_traverse_to_check_ordered_bt_node.  
+    rewrite -> fold_unfold_traverse_to_check_ordered_hbt.
+    rewrite -> fold_unfold_traverse_to_check_ordered_bt_node.  
     exact H0.
 
 
@@ -1712,8 +1712,8 @@ Proof.
                                             (Node A (Triple A (HNode A h11' bt11') e1 (HNode A h121' bt121')))) e12
                                      (HNode A (1 + max h122' h2)
                                             (Node A (Triple A (HNode A h122' bt122') e (HNode A h2 bt2))))))) compare = TSome (A * A) (t_min', t_max')).
-    rewrite -> unfold_traverse_to_check_ordered_hbt.
-    rewrite -> unfold_traverse_to_check_ordered_bt_node.  
+    rewrite -> fold_unfold_traverse_to_check_ordered_hbt.
+    rewrite -> fold_unfold_traverse_to_check_ordered_bt_node.  
     exact H.
 
     (* next, use reduce_ordered_hbt_left *)
@@ -1832,12 +1832,12 @@ Proof.
                   (Node A (Triple A (HNode A h12' bt12') e (HNode A h2 bt2))))
            t_min' t_max' H).
   
-  rewrite -> unfold_traverse_to_check_ordered_hbt in H_reduced_tree.
-  rewrite -> unfold_traverse_to_check_ordered_bt_node in H_reduced_tree.
-  rewrite -> unfold_traverse_to_check_ordered_t in H_reduced_tree.
+  rewrite -> fold_unfold_traverse_to_check_ordered_hbt in H_reduced_tree.
+  rewrite -> fold_unfold_traverse_to_check_ordered_bt_node in H_reduced_tree.
+  rewrite -> fold_unfold_traverse_to_check_ordered_t in H_reduced_tree.
   rewrite -> H0 in H_reduced_tree.
-  rewrite -> unfold_traverse_to_check_ordered_hbt in H_reduced_tree.
-  rewrite -> unfold_traverse_to_check_ordered_bt_leaf in H_reduced_tree.
+  rewrite -> fold_unfold_traverse_to_check_ordered_hbt in H_reduced_tree.
+  rewrite -> fold_unfold_traverse_to_check_ordered_bt_leaf in H_reduced_tree.
   case (compare max11' e1) as [ | | ] eqn : C_comp_max11'_e1.
   reflexivity.
   discriminate.
@@ -1867,14 +1867,14 @@ Proof.
            (HNode A (1 + max h12' h2)
                   (Node A (Triple A (HNode A h12' bt12') e (HNode A h2 bt2))))
            t_min' t_max' H).
-  rewrite -> unfold_traverse_to_check_ordered_hbt in H_reduced_tree.
-  rewrite -> unfold_traverse_to_check_ordered_bt_node in H_reduced_tree.
-  rewrite -> unfold_traverse_to_check_ordered_t in H_reduced_tree.
-  rewrite -> unfold_traverse_to_check_ordered_hbt in H_reduced_tree.
-  rewrite -> unfold_traverse_to_check_ordered_bt_leaf in H_reduced_tree.
-  rewrite -> unfold_traverse_to_check_ordered_hbt in H_reduced_tree.
-  rewrite -> unfold_traverse_to_check_ordered_bt_node in H_reduced_tree.
-  rewrite -> unfold_traverse_to_check_ordered_t in H_reduced_tree.
+  rewrite -> fold_unfold_traverse_to_check_ordered_hbt in H_reduced_tree.
+  rewrite -> fold_unfold_traverse_to_check_ordered_bt_node in H_reduced_tree.
+  rewrite -> fold_unfold_traverse_to_check_ordered_t in H_reduced_tree.
+  rewrite -> fold_unfold_traverse_to_check_ordered_hbt in H_reduced_tree.
+  rewrite -> fold_unfold_traverse_to_check_ordered_bt_leaf in H_reduced_tree.
+  rewrite -> fold_unfold_traverse_to_check_ordered_hbt in H_reduced_tree.
+  rewrite -> fold_unfold_traverse_to_check_ordered_bt_node in H_reduced_tree.
+  rewrite -> fold_unfold_traverse_to_check_ordered_t in H_reduced_tree.
   rewrite -> H0 in H_reduced_tree.
   case (compare max12' e) as [ | | ].
   case (traverse_to_check_ordered_hbt A (HNode A h2 bt2) compare) as
@@ -1909,11 +1909,11 @@ Proof.
                   (Node A (Triple A (HNode A h12' bt12') e (HNode A h2 bt2))))
            t_min' t_max' H).
   
-  rewrite -> unfold_traverse_to_check_ordered_hbt in H_reduced_tree.
-  rewrite -> unfold_traverse_to_check_ordered_bt_node in H_reduced_tree.
-  rewrite -> unfold_traverse_to_check_ordered_t in H_reduced_tree.
-  rewrite -> (unfold_traverse_to_check_ordered_hbt A 0 (Leaf A) compare) in H_reduced_tree.
-  rewrite -> unfold_traverse_to_check_ordered_bt_leaf in H_reduced_tree.
+  rewrite -> fold_unfold_traverse_to_check_ordered_hbt in H_reduced_tree.
+  rewrite -> fold_unfold_traverse_to_check_ordered_bt_node in H_reduced_tree.
+  rewrite -> fold_unfold_traverse_to_check_ordered_t in H_reduced_tree.
+  rewrite -> (fold_unfold_traverse_to_check_ordered_hbt A 0 (Leaf A) compare) in H_reduced_tree.
+  rewrite -> fold_unfold_traverse_to_check_ordered_bt_leaf in H_reduced_tree.
 
   (* finally, work through all possible cases for bt11' and bt12' *)
   case (is_ordered_true_implies_leaf_or_ordered_node
@@ -1924,9 +1924,9 @@ Proof.
             A compare (HNode A h12' bt12') H_ord_bt12') as [H_bt12'_leaf | H_bt12'_node]. 
 
     (* bt12' = leaf *)
-    + rewrite -> unfold_traverse_to_check_ordered_hbt.
-      rewrite -> unfold_traverse_to_check_ordered_bt_node.
-      rewrite -> unfold_traverse_to_check_ordered_t.      
+    + rewrite -> fold_unfold_traverse_to_check_ordered_hbt.
+      rewrite -> fold_unfold_traverse_to_check_ordered_bt_node.
+      rewrite -> fold_unfold_traverse_to_check_ordered_t.      
       rewrite -> H_bt11'_leaf.
       rewrite -> H_bt12'_leaf.
       rewrite -> H_bt11'_leaf in H_reduced_tree.
@@ -1939,9 +1939,9 @@ Proof.
       
     (* bt12' = node *)
     + destruct H_bt12'_node as [min12' [max12' H_bt12'_node]].
-      rewrite -> unfold_traverse_to_check_ordered_hbt.
-      rewrite -> unfold_traverse_to_check_ordered_bt_node.
-      rewrite -> unfold_traverse_to_check_ordered_t.
+      rewrite -> fold_unfold_traverse_to_check_ordered_hbt.
+      rewrite -> fold_unfold_traverse_to_check_ordered_bt_node.
+      rewrite -> fold_unfold_traverse_to_check_ordered_t.
       rewrite -> H_bt11'_leaf.
       rewrite -> H_bt12'_node.
       rewrite -> (H_comp_e1_min12' min12' max12' H_bt12'_node).
@@ -1959,9 +1959,9 @@ Proof.
 
     (* bt12' = leaf *)
     + destruct H_bt11'_node as [min11' [max11' H_bt11'_node]].
-      rewrite -> unfold_traverse_to_check_ordered_hbt.
-      rewrite -> unfold_traverse_to_check_ordered_bt_node.
-      rewrite -> unfold_traverse_to_check_ordered_t.
+      rewrite -> fold_unfold_traverse_to_check_ordered_hbt.
+      rewrite -> fold_unfold_traverse_to_check_ordered_bt_node.
+      rewrite -> fold_unfold_traverse_to_check_ordered_t.
       rewrite -> H_bt11'_node.
       rewrite -> H_bt12'_leaf. 
       rewrite -> H_bt11'_node in H_reduced_tree.
@@ -1977,9 +1977,9 @@ Proof.
     (* bt12' = node *)
     + destruct H_bt11'_node as [min11' [max11' H_bt11'_node]].
       destruct H_bt12'_node as [min12' [max12' H_bt12'_node]].
-      rewrite -> unfold_traverse_to_check_ordered_hbt.
-      rewrite -> unfold_traverse_to_check_ordered_bt_node.
-      rewrite -> unfold_traverse_to_check_ordered_t.
+      rewrite -> fold_unfold_traverse_to_check_ordered_hbt.
+      rewrite -> fold_unfold_traverse_to_check_ordered_bt_node.
+      rewrite -> fold_unfold_traverse_to_check_ordered_t.
       rewrite -> H_bt11'_node.
       rewrite -> H_bt12'_node. 
       rewrite -> H_bt11'_node in H_reduced_tree.
@@ -2023,8 +2023,8 @@ Proof.
 
   induction bt1 as [ | t1].
 
-  rewrite -> unfold_insert_hbt_helper in H.
-  rewrite -> unfold_insert_bt_helper_leaf in H.
+  rewrite -> fold_unfold_insert_hbt_helper in H.
+  rewrite -> fold_unfold_insert_bt_helper_leaf in H.
   rewrite -> some_x_equal_some_y in H.
 
   apply  beq_nat_true in H0.
@@ -2109,8 +2109,8 @@ Proof.
   (* now use induction *)
   case bt1 as [ | t1].
 
-  rewrite -> unfold_insert_hbt_helper in H1.
-  rewrite -> unfold_insert_bt_helper_leaf in H1.
+  rewrite -> fold_unfold_insert_hbt_helper in H1.
+  rewrite -> fold_unfold_insert_bt_helper_leaf in H1.
   rewrite -> some_x_equal_some_y in H1.
   discriminate.
 
@@ -2167,8 +2167,8 @@ Proof.
                      (Node A (Triple A hbt1 e (HNode A h2 bt2)))) compare =
             TSome (A * A) (t_min, t_max)).
   unfold is_ordered_hbt.
-  rewrite -> unfold_traverse_to_check_ordered_hbt.
-  rewrite -> unfold_traverse_to_check_ordered_bt_node.
+  rewrite -> fold_unfold_traverse_to_check_ordered_hbt.
+  rewrite -> fold_unfold_traverse_to_check_ordered_bt_node.
   exact H0.
 
   (* then left reduce it *)
@@ -2249,8 +2249,8 @@ Proof.
             A (HNode A (1 + max h1 (project_height_hbt A hbt2))
                                 (Node A (Triple A (HNode A h1 bt1) e hbt2)))
             compare = TSome (A * A) (t_min, t_max)).
-  rewrite -> unfold_traverse_to_check_ordered_hbt.
-  rewrite -> unfold_traverse_to_check_ordered_bt_node.
+  rewrite -> fold_unfold_traverse_to_check_ordered_hbt.
+  rewrite -> fold_unfold_traverse_to_check_ordered_bt_node.
   exact H.
   
   assert (H_t_left_reduced:
@@ -2264,11 +2264,11 @@ Proof.
            (HNode A h1 bt1) e hbt2 t_min t_max H').
 
   (* unfold the left reduced tree *)
-  rewrite -> unfold_traverse_to_check_ordered_hbt in H_t_left_reduced.
-  rewrite -> unfold_traverse_to_check_ordered_bt_node in H_t_left_reduced.
-  rewrite -> unfold_traverse_to_check_ordered_t in H_t_left_reduced.  
-  rewrite -> unfold_traverse_to_check_ordered_hbt in H_t_left_reduced.
-  rewrite -> unfold_traverse_to_check_ordered_bt_leaf in H_t_left_reduced.
+  rewrite -> fold_unfold_traverse_to_check_ordered_hbt in H_t_left_reduced.
+  rewrite -> fold_unfold_traverse_to_check_ordered_bt_node in H_t_left_reduced.
+  rewrite -> fold_unfold_traverse_to_check_ordered_t in H_t_left_reduced.  
+  rewrite -> fold_unfold_traverse_to_check_ordered_hbt in H_t_left_reduced.
+  rewrite -> fold_unfold_traverse_to_check_ordered_bt_leaf in H_t_left_reduced.
   rewrite -> H0 in H_t_left_reduced.
   case (compare e min2) as [ | | ].
   rewrite -> tsome_x_equal_tsome_y in H_t_left_reduced.
@@ -2321,21 +2321,21 @@ Proof.
   intros.
 
   (* unfold the original tree first *)
-  rewrite -> unfold_traverse_to_check_ordered_hbt in H0.
-  rewrite -> unfold_traverse_to_check_ordered_bt_node in H0.
-  rewrite -> unfold_traverse_to_check_ordered_t in H0.  
-  rewrite -> unfold_traverse_to_check_ordered_hbt in H0.
-  rewrite -> unfold_traverse_to_check_ordered_bt_leaf in H0.
+  rewrite -> fold_unfold_traverse_to_check_ordered_hbt in H0.
+  rewrite -> fold_unfold_traverse_to_check_ordered_bt_node in H0.
+  rewrite -> fold_unfold_traverse_to_check_ordered_t in H0.  
+  rewrite -> fold_unfold_traverse_to_check_ordered_hbt in H0.
+  rewrite -> fold_unfold_traverse_to_check_ordered_bt_leaf in H0.
   
   (* unfold the reduced rotated tree *)
-  rewrite -> unfold_traverse_to_check_ordered_hbt in H.
-  rewrite -> unfold_traverse_to_check_ordered_bt_node in H.
-  rewrite -> unfold_traverse_to_check_ordered_t in H.  
-  rewrite -> unfold_traverse_to_check_ordered_hbt in H.
-  rewrite -> unfold_traverse_to_check_ordered_bt_node in H.
-  rewrite -> unfold_traverse_to_check_ordered_t in H.  
-  rewrite -> unfold_traverse_to_check_ordered_hbt in H.
-  rewrite -> unfold_traverse_to_check_ordered_bt_leaf in H.
+  rewrite -> fold_unfold_traverse_to_check_ordered_hbt in H.
+  rewrite -> fold_unfold_traverse_to_check_ordered_bt_node in H.
+  rewrite -> fold_unfold_traverse_to_check_ordered_t in H.  
+  rewrite -> fold_unfold_traverse_to_check_ordered_hbt in H.
+  rewrite -> fold_unfold_traverse_to_check_ordered_bt_node in H.
+  rewrite -> fold_unfold_traverse_to_check_ordered_t in H.  
+  rewrite -> fold_unfold_traverse_to_check_ordered_hbt in H.
+  rewrite -> fold_unfold_traverse_to_check_ordered_bt_leaf in H.
   case (traverse_to_check_ordered_hbt A hbt_left compare)
     as [ | | (minl, maxl)].
 
@@ -2595,14 +2595,14 @@ Proof.
            t_min' t_max' H).
   
   (* unfold H_right_reduced until inequality is proved *)
-  rewrite -> unfold_traverse_to_check_ordered_hbt in H_rotate_right_reduced.
-  rewrite -> unfold_traverse_to_check_ordered_bt_node in H_rotate_right_reduced.
-  rewrite -> unfold_traverse_to_check_ordered_t in H_rotate_right_reduced.
-  rewrite -> (unfold_traverse_to_check_ordered_hbt A 0 (Leaf A)) in H_rotate_right_reduced.
-  rewrite -> unfold_traverse_to_check_ordered_bt_leaf in H_rotate_right_reduced.
-  rewrite -> unfold_traverse_to_check_ordered_hbt in H_rotate_right_reduced.
-  rewrite -> unfold_traverse_to_check_ordered_bt_node in H_rotate_right_reduced.
-  rewrite -> unfold_traverse_to_check_ordered_t in H_rotate_right_reduced.  
+  rewrite -> fold_unfold_traverse_to_check_ordered_hbt in H_rotate_right_reduced.
+  rewrite -> fold_unfold_traverse_to_check_ordered_bt_node in H_rotate_right_reduced.
+  rewrite -> fold_unfold_traverse_to_check_ordered_t in H_rotate_right_reduced.
+  rewrite -> (fold_unfold_traverse_to_check_ordered_hbt A 0 (Leaf A)) in H_rotate_right_reduced.
+  rewrite -> fold_unfold_traverse_to_check_ordered_bt_leaf in H_rotate_right_reduced.
+  rewrite -> fold_unfold_traverse_to_check_ordered_hbt in H_rotate_right_reduced.
+  rewrite -> fold_unfold_traverse_to_check_ordered_bt_node in H_rotate_right_reduced.
+  rewrite -> fold_unfold_traverse_to_check_ordered_t in H_rotate_right_reduced.  
   case (traverse_to_check_ordered_hbt A (HNode A h1 bt1) compare)
        as [ | | (min1, max1)]. 
 
@@ -2641,14 +2641,14 @@ Proof.
   intros.
 
   (* unfold and prove *)
-  rewrite -> unfold_traverse_to_check_ordered_hbt in H_rotate_left_reduced.
-  rewrite -> unfold_traverse_to_check_ordered_bt_node in H_rotate_left_reduced.
-  rewrite -> unfold_traverse_to_check_ordered_t in H_rotate_left_reduced.
-  rewrite -> (unfold_traverse_to_check_ordered_hbt A 0 (Leaf A)) in H_rotate_left_reduced.
-  rewrite -> unfold_traverse_to_check_ordered_bt_leaf in H_rotate_left_reduced.
-  rewrite -> unfold_traverse_to_check_ordered_hbt in H_rotate_left_reduced.
-  rewrite -> unfold_traverse_to_check_ordered_bt_node in H_rotate_left_reduced.
-  rewrite -> unfold_traverse_to_check_ordered_t in H_rotate_left_reduced.  
+  rewrite -> fold_unfold_traverse_to_check_ordered_hbt in H_rotate_left_reduced.
+  rewrite -> fold_unfold_traverse_to_check_ordered_bt_node in H_rotate_left_reduced.
+  rewrite -> fold_unfold_traverse_to_check_ordered_t in H_rotate_left_reduced.
+  rewrite -> (fold_unfold_traverse_to_check_ordered_hbt A 0 (Leaf A)) in H_rotate_left_reduced.
+  rewrite -> fold_unfold_traverse_to_check_ordered_bt_leaf in H_rotate_left_reduced.
+  rewrite -> fold_unfold_traverse_to_check_ordered_hbt in H_rotate_left_reduced.
+  rewrite -> fold_unfold_traverse_to_check_ordered_bt_node in H_rotate_left_reduced.
+  rewrite -> fold_unfold_traverse_to_check_ordered_t in H_rotate_left_reduced.  
   rewrite -> H0 in H_rotate_left_reduced.
   case (compare max212' e2) as [ | | ].
   case (traverse_to_check_ordered_hbt A (HNode A h22' bt22') compare) as
@@ -2686,9 +2686,9 @@ Proof.
   
   (* we can simply use H_right_ord *)
   unfold is_ordered_hbt in H_right_ord.
-  rewrite -> unfold_traverse_to_check_ordered_hbt in H_right_ord.
-  rewrite -> unfold_traverse_to_check_ordered_bt_node in H_right_ord.
-  rewrite -> unfold_traverse_to_check_ordered_t in H_right_ord.  
+  rewrite -> fold_unfold_traverse_to_check_ordered_hbt in H_right_ord.
+  rewrite -> fold_unfold_traverse_to_check_ordered_bt_node in H_right_ord.
+  rewrite -> fold_unfold_traverse_to_check_ordered_t in H_right_ord.  
   rewrite -> H0 in H_right_ord.
   case (compare max212' e2) as [ | | ].
   case (traverse_to_check_ordered_hbt A (HNode A h22' bt22') compare)
@@ -2709,9 +2709,9 @@ Proof.
 
   (* again, we can use H_right_ord *)
   unfold is_ordered_hbt in H_right_ord.
-  rewrite -> unfold_traverse_to_check_ordered_hbt in H_right_ord.
-  rewrite -> unfold_traverse_to_check_ordered_bt_node in H_right_ord.
-  rewrite -> unfold_traverse_to_check_ordered_t in H_right_ord.  
+  rewrite -> fold_unfold_traverse_to_check_ordered_hbt in H_right_ord.
+  rewrite -> fold_unfold_traverse_to_check_ordered_bt_node in H_right_ord.
+  rewrite -> fold_unfold_traverse_to_check_ordered_t in H_right_ord.  
   case (traverse_to_check_ordered_hbt A (HNode A h212' bt212') compare)
        as [ | | (min212', max212')].
 
@@ -2737,22 +2737,22 @@ Proof.
   discriminate.
 
   (* left reduce the rotated tree and unfold *)
-  rewrite -> unfold_traverse_to_check_ordered_hbt in H_rotate_left_reduced.
-  rewrite -> unfold_traverse_to_check_ordered_bt_node in H_rotate_left_reduced.
-  rewrite -> unfold_traverse_to_check_ordered_t in H_rotate_left_reduced.
-  rewrite -> (unfold_traverse_to_check_ordered_hbt A 0 (Leaf A)) in H_rotate_left_reduced.
-  rewrite -> unfold_traverse_to_check_ordered_bt_leaf in H_rotate_left_reduced.
-  rewrite -> unfold_traverse_to_check_ordered_hbt in H_rotate_left_reduced.
-  rewrite -> unfold_traverse_to_check_ordered_bt_node in H_rotate_left_reduced.
-  rewrite -> unfold_traverse_to_check_ordered_t in H_rotate_left_reduced.
+  rewrite -> fold_unfold_traverse_to_check_ordered_hbt in H_rotate_left_reduced.
+  rewrite -> fold_unfold_traverse_to_check_ordered_bt_node in H_rotate_left_reduced.
+  rewrite -> fold_unfold_traverse_to_check_ordered_t in H_rotate_left_reduced.
+  rewrite -> (fold_unfold_traverse_to_check_ordered_hbt A 0 (Leaf A)) in H_rotate_left_reduced.
+  rewrite -> fold_unfold_traverse_to_check_ordered_bt_leaf in H_rotate_left_reduced.
+  rewrite -> fold_unfold_traverse_to_check_ordered_hbt in H_rotate_left_reduced.
+  rewrite -> fold_unfold_traverse_to_check_ordered_bt_node in H_rotate_left_reduced.
+  rewrite -> fold_unfold_traverse_to_check_ordered_t in H_rotate_left_reduced.
 
   (* With all our theorems in place, we now unfold the goal *)
-  rewrite -> unfold_traverse_to_check_ordered_hbt.
-  rewrite -> unfold_traverse_to_check_ordered_bt_node.
-  rewrite -> unfold_traverse_to_check_ordered_t.
-  rewrite -> unfold_traverse_to_check_ordered_hbt.
-  rewrite -> unfold_traverse_to_check_ordered_bt_node.
-  rewrite -> unfold_traverse_to_check_ordered_t.
+  rewrite -> fold_unfold_traverse_to_check_ordered_hbt.
+  rewrite -> fold_unfold_traverse_to_check_ordered_bt_node.
+  rewrite -> fold_unfold_traverse_to_check_ordered_t.
+  rewrite -> fold_unfold_traverse_to_check_ordered_hbt.
+  rewrite -> fold_unfold_traverse_to_check_ordered_bt_node.
+  rewrite -> fold_unfold_traverse_to_check_ordered_t.
   
   (* with the reduced tree unfolded, work on the 8 cases *)
   case (is_ordered_true_implies_leaf_or_ordered_node
@@ -2994,8 +2994,8 @@ Proof.
   intros.
   case bt2 as [ | t2].
 
-  rewrite -> unfold_insert_hbt_helper in H.
-  rewrite -> unfold_insert_bt_helper_leaf in H.  
+  rewrite -> fold_unfold_insert_hbt_helper in H.
+  rewrite -> fold_unfold_insert_bt_helper_leaf in H.  
   rewrite -> some_x_equal_some_y in H.
   discriminate.
 
@@ -3196,11 +3196,11 @@ Proof.
            t_min' t_max' H).
 
   (* unfold the tree in preparation *)
-  rewrite -> unfold_traverse_to_check_ordered_hbt in H_rotate_left_reduced.
-  rewrite -> unfold_traverse_to_check_ordered_bt_node in H_rotate_left_reduced.
-  rewrite -> unfold_traverse_to_check_ordered_t in H_rotate_left_reduced.
-  rewrite -> unfold_traverse_to_check_ordered_hbt in H_rotate_left_reduced.
-  rewrite -> unfold_traverse_to_check_ordered_bt_leaf in H_rotate_left_reduced.
+  rewrite -> fold_unfold_traverse_to_check_ordered_hbt in H_rotate_left_reduced.
+  rewrite -> fold_unfold_traverse_to_check_ordered_bt_node in H_rotate_left_reduced.
+  rewrite -> fold_unfold_traverse_to_check_ordered_t in H_rotate_left_reduced.
+  rewrite -> fold_unfold_traverse_to_check_ordered_hbt in H_rotate_left_reduced.
+  rewrite -> fold_unfold_traverse_to_check_ordered_bt_leaf in H_rotate_left_reduced.
 
   (* assert inequalites *)
 
@@ -3230,16 +3230,16 @@ Proof.
            e2
            (HNode A h22' bt22') t_min' t_max' H).
   (* unfold the reduced tree *)
-  rewrite -> unfold_traverse_to_check_ordered_hbt in H_rotate_right_reduced.
-  rewrite -> unfold_traverse_to_check_ordered_bt_node in H_rotate_right_reduced.
-  rewrite -> unfold_traverse_to_check_ordered_t in H_rotate_right_reduced.
-  rewrite -> unfold_traverse_to_check_ordered_hbt in H_rotate_right_reduced.
-  rewrite -> unfold_traverse_to_check_ordered_bt_node in H_rotate_right_reduced.
-  rewrite -> unfold_traverse_to_check_ordered_t in H_rotate_right_reduced.
+  rewrite -> fold_unfold_traverse_to_check_ordered_hbt in H_rotate_right_reduced.
+  rewrite -> fold_unfold_traverse_to_check_ordered_bt_node in H_rotate_right_reduced.
+  rewrite -> fold_unfold_traverse_to_check_ordered_t in H_rotate_right_reduced.
+  rewrite -> fold_unfold_traverse_to_check_ordered_hbt in H_rotate_right_reduced.
+  rewrite -> fold_unfold_traverse_to_check_ordered_bt_node in H_rotate_right_reduced.
+  rewrite -> fold_unfold_traverse_to_check_ordered_t in H_rotate_right_reduced.
   rewrite ->
-          (unfold_traverse_to_check_ordered_hbt
+          (fold_unfold_traverse_to_check_ordered_hbt
             A 0 (Leaf A) compare) in H_rotate_right_reduced.
-  rewrite -> unfold_traverse_to_check_ordered_bt_leaf in H_rotate_right_reduced.
+  rewrite -> fold_unfold_traverse_to_check_ordered_bt_leaf in H_rotate_right_reduced.
 
 
   rewrite -> H0 in H_rotate_right_reduced.
@@ -3294,9 +3294,9 @@ Proof.
   discriminate.
 
   (* finally, unfold the tree in the goal, and perform the required case analyses *)
-  rewrite -> unfold_traverse_to_check_ordered_hbt.
-  rewrite -> unfold_traverse_to_check_ordered_bt_node.
-  rewrite -> unfold_traverse_to_check_ordered_t.
+  rewrite -> fold_unfold_traverse_to_check_ordered_hbt.
+  rewrite -> fold_unfold_traverse_to_check_ordered_bt_node.
+  rewrite -> fold_unfold_traverse_to_check_ordered_t.
 
   case (is_ordered_true_implies_leaf_or_ordered_node
             A compare (HNode A h21' bt21') H_bt21'_ord)
@@ -3341,12 +3341,12 @@ Proof.
 
   (* bt21' node *)
   + (* in this case, we need to use the entire rotated tree *) 
-    rewrite -> unfold_traverse_to_check_ordered_hbt in H.
-    rewrite -> unfold_traverse_to_check_ordered_bt_node in H.
-    rewrite -> unfold_traverse_to_check_ordered_t in H.
-    rewrite -> unfold_traverse_to_check_ordered_hbt in H.
-    rewrite -> unfold_traverse_to_check_ordered_bt_node in H.
-    rewrite -> unfold_traverse_to_check_ordered_t in H.
+    rewrite -> fold_unfold_traverse_to_check_ordered_hbt in H.
+    rewrite -> fold_unfold_traverse_to_check_ordered_bt_node in H.
+    rewrite -> fold_unfold_traverse_to_check_ordered_t in H.
+    rewrite -> fold_unfold_traverse_to_check_ordered_hbt in H.
+    rewrite -> fold_unfold_traverse_to_check_ordered_bt_node in H.
+    rewrite -> fold_unfold_traverse_to_check_ordered_t in H.
     
     case (is_ordered_true_implies_leaf_or_ordered_node
             A compare (HNode A h22' bt22') H_bt22'_ord)
@@ -3472,8 +3472,8 @@ Proof.
   case bt2 as [ | t2].
 
   (* leaf *)
-  rewrite -> unfold_insert_hbt_helper in H.
-  rewrite -> unfold_insert_bt_helper_leaf in H.
+  rewrite -> fold_unfold_insert_hbt_helper in H.
+  rewrite -> fold_unfold_insert_bt_helper_leaf in H.
   rewrite -> some_x_equal_some_y in H.
   apply beq_nat_true in H0.
   rewrite <- H0 in H.
@@ -3553,8 +3553,8 @@ Proof.
   (* now use induction *)
   case bt2 as [ | t1].
 
-  rewrite -> unfold_insert_hbt_helper in H1.
-  rewrite -> unfold_insert_bt_helper_leaf in H1.
+  rewrite -> fold_unfold_insert_hbt_helper in H1.
+  rewrite -> fold_unfold_insert_bt_helper_leaf in H1.
   rewrite -> some_x_equal_some_y in H1.
   discriminate.
 

@@ -10,7 +10,7 @@ Require Export Arith Bool List.
 
 (** * Operators and Unfolding *)
 
-(** Tactic to prove simple unfold lemmas *)
+(** Tactic to prove fold unfold lemmas *)
 Ltac fold_unfold_tactic name := intros; unfold name; fold name; reflexivity.
 
 (** Operator for equality predicate [beq_nat], defined for peano natural numbers *)
@@ -18,7 +18,7 @@ Notation "A =n= B" :=
   (beq_nat A B) (at level 70, right associativity).
 
 (** Lemma to unfold [beq_nat] *)
-Lemma unfold_beq_nat_Sn_Sm:
+Lemma fold_unfold_beq_nat_Sn_Sm:
   forall (n m : nat),
     beq_nat (S n) (S m) = beq_nat n m.
 Proof.
@@ -547,7 +547,7 @@ Proof.
 Qed.    
 
 (** Lemma to unfold [max] the successors of two natural numbers *)
-Lemma unfold_max_Sn_Sm:
+Lemma fold_unfold_max_Sn_Sm:
   forall (n m : nat),
     max (S n) (S m) = S (max n m).
 Proof.
@@ -568,7 +568,7 @@ Proof.
   
   rewrite -> (plus_comm (S a') 1).
   rewrite <- plus_n_Sm.
-  rewrite -> unfold_max_Sn_Sm.
+  rewrite -> fold_unfold_max_Sn_Sm.
   rewrite -> plus_comm in IH_a'.
   rewrite -> IH_a'.
   reflexivity.
@@ -590,7 +590,7 @@ Proof.
   unfold beq_nat.
   reflexivity.
   
-  rewrite -> unfold_beq_nat_Sn_Sm. 
+  rewrite -> fold_unfold_beq_nat_Sn_Sm. 
   apply IH_a.
   exact (succ_eq a' a' H).
 Qed.  
@@ -610,7 +610,7 @@ Proof.
   case b as [ | b'].
   discriminate.
   rewrite -> H.
-  rewrite -> unfold_beq_nat_Sn_Sm.
+  rewrite -> fold_unfold_beq_nat_Sn_Sm.
   
   assert (H_trivial: b' = b').
   reflexivity.

@@ -97,8 +97,8 @@ with traverse_to_check_soundness_t
          end
        end.
 
-(** Unfold lemma for traverse_to_check_soundness_hbt *)
-Lemma unfold_traverse_to_check_soundness_hbt:
+(** Fold unfold lemma for traverse_to_check_soundness_hbt *)
+Lemma fold_unfold_traverse_to_check_soundness_hbt:
   forall (A : Type)
          (h : nat)
          (bt : binary_tree A),
@@ -115,16 +115,16 @@ Proof.
   fold_unfold_tactic traverse_to_check_soundness_hbt.
 Qed.
 
-(** Unfold lemma for traverse_to_check_soundness_bt when the tree is a [Leaf] *)
-Lemma unfold_traverse_to_check_soundness_bt_leaf:
+(** Fold unfold lemma for traverse_to_check_soundness_bt when the tree is a [Leaf] *)
+Lemma fold_unfold_traverse_to_check_soundness_bt_leaf:
   forall (A : Type),
     traverse_to_check_soundness_bt A (Leaf A) = Some 0.
 Proof.
     fold_unfold_tactic traverse_to_check_soundness_bt.
 Qed.
 
-(** Unfold lemma for traverse_to_check_soundness_bt when the tree is a [Node] *)
-Lemma unfold_traverse_to_check_soundness_bt_node:
+(** Fold unfold lemma for traverse_to_check_soundness_bt when the tree is a [Node] *)
+Lemma fold_unfold_traverse_to_check_soundness_bt_node:
   forall (A : Type)
          (t : triple A),
     traverse_to_check_soundness_bt A (Node A t) = traverse_to_check_soundness_t A t.
@@ -132,8 +132,8 @@ Proof.
   fold_unfold_tactic traverse_to_check_soundness_bt.
 Qed.
 
-(** Unfold lemma for traverse_to_check_soundness_t *)
-Lemma unfold_traverse_to_check_soundness_t:
+(** Fold unfold lemma for traverse_to_check_soundness_t *)
+Lemma fold_unfold_traverse_to_check_soundness_t:
   forall (A : Type)
          (hbt1 hbt2 : heightened_binary_tree A)
          (e : A),
@@ -207,8 +207,8 @@ with traverse_to_check_balanced_t
          end
        end.
 
-(** Unfold lemma for traverse_to_check_balanced_hbt *)
-Lemma unfold_traverse_to_check_balanced_hbt:
+(** Fold unfold lemma for traverse_to_check_balanced_hbt *)
+Lemma fold_unfold_traverse_to_check_balanced_hbt:
   forall (A : Type)
          (h : nat)
          (bt : binary_tree A),
@@ -217,16 +217,16 @@ Proof.
   fold_unfold_tactic traverse_to_check_balanced_hbt.
 Qed.
 
-(** Unfold lemma for traverse_to_check_balanced_bt, when the tree is a [Leaf] *)
-Lemma unfold_traverse_to_check_balanced_bt_leaf:
+(** Fold unfold lemma for traverse_to_check_balanced_bt, when the tree is a [Leaf] *)
+Lemma fold_unfold_traverse_to_check_balanced_bt_leaf:
   forall (A : Type),
     traverse_to_check_balanced_bt A (Leaf A) = Some 0.
 Proof.
     fold_unfold_tactic traverse_to_check_balanced_bt.
 Qed.
 
-(** Unfold lemma for traverse_to_check_balanced_bt, when the tree is a [Node] *)
-Lemma unfold_traverse_to_check_balanced_bt_node:
+(** Fold unfold lemma for traverse_to_check_balanced_bt, when the tree is a [Node] *)
+Lemma fold_unfold_traverse_to_check_balanced_bt_node:
   forall (A : Type)
          (t : triple A),
     traverse_to_check_balanced_bt A (Node A t) = traverse_to_check_balanced_t A t.
@@ -234,8 +234,8 @@ Proof.
   fold_unfold_tactic traverse_to_check_balanced_bt.
 Qed.
 
-(** Unfold lemma for traverse_to_check_balanced_t *)
-Lemma unfold_traverse_to_check_balanced_t:
+(** Fold unfold lemma for traverse_to_check_balanced_t *)
+Lemma fold_unfold_traverse_to_check_balanced_t:
   forall (A : Type)
          (hbt1 hbt2 : heightened_binary_tree A)
          (e : A),
@@ -379,8 +379,8 @@ with traverse_to_check_ordered_t
          end
        end.
 
-(** Unfold lemma for traverse_to_check_ordered_hbt *)
-Lemma unfold_traverse_to_check_ordered_hbt:
+(** Fold unfold lemma for traverse_to_check_ordered_hbt *)
+Lemma fold_unfold_traverse_to_check_ordered_hbt:
   forall (A : Type)
          (h : nat)
          (bt : binary_tree A)
@@ -391,8 +391,8 @@ Proof.
   fold_unfold_tactic traverse_to_check_ordered_hbt.
 Qed.             
 
-(** Unfold lemma for traverse_to_check_ordered_bt, when the tree is a [Leaf] *)
-Lemma unfold_traverse_to_check_ordered_bt_leaf:
+(** Fold unfold lemma for traverse_to_check_ordered_bt, when the tree is a [Leaf] *)
+Lemma fold_unfold_traverse_to_check_ordered_bt_leaf:
   forall (A : Type)
          (compare : A -> A -> element_comparison),
     traverse_to_check_ordered_bt A (Leaf A) compare =
@@ -401,8 +401,8 @@ Proof.
   fold_unfold_tactic traverse_to_check_ordered_bt.
 Qed.             
 
-(** Unfold lemma for traverse_to_check_ordered_bt, when the tree is a [Node] *)
-Lemma unfold_traverse_to_check_ordered_bt_node:
+(** Fold unfold lemma for traverse_to_check_ordered_bt, when the tree is a [Node] *)
+Lemma fold_unfold_traverse_to_check_ordered_bt_node:
   forall (A : Type)
          (t : triple A) 
          (compare : A -> A -> element_comparison),
@@ -412,8 +412,8 @@ Proof.
   fold_unfold_tactic traverse_to_check_ordered_t.
 Qed.             
 
-(** Unfold lemma for traverse_to_check_ordered_t *)
-Lemma unfold_traverse_to_check_ordered_t: 
+(** Fold unfold lemma for traverse_to_check_ordered_t *)
+Lemma fold_unfold_traverse_to_check_ordered_t: 
   forall (A : Type)
          (hbt1 : heightened_binary_tree A)
          (e : A)
@@ -512,8 +512,8 @@ with occurs_t
        end.
 
 
-(** Unfold lemma for occurs_hbt *)
-Lemma unfold_occurs_hbt:
+(** Fold unfold lemma for occurs_hbt *)
+Lemma fold_unfold_occurs_hbt:
   forall (A : Type)
          (compare : A -> A -> element_comparison)
          (e : A)
@@ -524,8 +524,8 @@ Proof.
   fold_unfold_tactic occurs_hbt.
 Qed.
 
-(** Unfold lemma for occurs_bt, when the tree is a [Leaf] *)
-Lemma unfold_occurs_bt_leaf: 
+(** Fold unfold lemma for occurs_bt, when the tree is a [Leaf] *)
+Lemma fold_unfold_occurs_bt_leaf: 
   forall (A : Type)
          (compare : A -> A -> element_comparison)
          (e : A),
@@ -534,8 +534,8 @@ Proof.
   fold_unfold_tactic occurs_bt.
 Qed.
 
-(** Unfold lemma for occurs_bt, when the tree is a [Node] *)
-Lemma unfold_occurs_bt_node:
+(** Fold unfold lemma for occurs_bt, when the tree is a [Node] *)
+Lemma fold_unfold_occurs_bt_node:
   forall (A : Type)
          (compare : A -> A -> element_comparison)
          (e : A)
@@ -545,8 +545,8 @@ Proof.
   fold_unfold_tactic occurs_bt.
 Qed.
 
-(** Unfold lemma for occurs_t *)
-Lemma unfold_occurs_t:
+(** Fold unfold lemma for occurs_t *)
+Lemma fold_unfold_occurs_t:
   forall (A : Type)
          (compare : A -> A -> element_comparison)
          (e e' : A)
@@ -992,8 +992,8 @@ with insert_t_helper
        end.
 
 
-(** Unfold lemma for insert_hbt_helper *)
-Lemma  unfold_insert_hbt_helper:
+(** Fold unfold lemma for insert_hbt_helper *)
+Lemma  fold_unfold_insert_hbt_helper:
   forall (A : Type)
          (compare : A -> A -> element_comparison)
          (x : A)
@@ -1004,8 +1004,8 @@ Proof.
   fold_unfold_tactic insert_hbt_helper.
 Qed.
 
-(** Unfold lemma for insert_bt_helper, when the tree is a [Leaf] *)
-Lemma unfold_insert_bt_helper_leaf:
+(** Fold unfold lemma for insert_bt_helper, when the tree is a [Leaf] *)
+Lemma fold_unfold_insert_bt_helper_leaf:
   forall (A : Type)
          (compare : A -> A -> element_comparison)
          (x : A)
@@ -1021,8 +1021,8 @@ Proof.
   fold_unfold_tactic insert_bt_helper.
 Qed.
 
-(** Unfold lemma for insert_bt_helper, when the tree is a [Node] *)
-Lemma unfold_insert_bt_helper_node:
+(** Fold unfold lemma for insert_bt_helper, when the tree is a [Node] *)
+Lemma fold_unfold_insert_bt_helper_node:
   forall (A : Type)
          (compare : A -> A -> element_comparison)
          (x : A)
@@ -1034,8 +1034,8 @@ Proof.
   fold_unfold_tactic insert_bt_helper.
 Qed.
 
-(** Unfold lemma for insert_t_helper *)
-Lemma unfold_insert_t_helper:
+(** Fold unfold lemma for insert_t_helper *)
+Lemma fold_unfold_insert_t_helper:
   forall (A : Type)
          (compare : A -> A -> element_comparison)
          (x : A)

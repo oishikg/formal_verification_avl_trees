@@ -43,10 +43,10 @@ important across the entire project
 
 <div class="paragraph"> </div>
 
- Tactic to prove simple unfold lemmas 
+ Tactic to prove fold unfold lemmas 
 </div>
 <div class="code">
-<span class="id" title="keyword">Ltac</span> <span class="id" title="var">unfold_tactic</span> <span class="id" title="var">name</span> := <span class="id" title="tactic">intros</span>; <span class="id" title="tactic">unfold</span> <span class="id" title="var">name</span>; <span class="id" title="tactic">reflexivity</span>.<br/>
+<span class="id" title="keyword">Ltac</span> <span class="id" title="var">fold_unfold_tactic</span> <span class="id" title="var">name</span> := <span class="id" title="tactic">intros</span>; <span class="id" title="tactic">unfold</span> <span class="id" title="var">name</span>; <span class="id" title="tactic">fold</span> <span class="id" title="var">name</span>; <span class="id" title="tactic">reflexivity</span>.<br/>
 
 <br/>
 </div>
@@ -65,7 +65,7 @@ Operator for equality predicate <span class="inlinecode"><span class="id" title=
 Lemma to unfold <span class="inlinecode"><span class="id" title="var">beq_nat</span></span> 
 </div>
 <div class="code">
-<span class="id" title="keyword">Lemma</span> <span class="id" title="var">unfold_beq_nat_Sn_Sm</span>:<br/>
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">fold_unfold_beq_nat_Sn_Sm</span>:<br/>
 &nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">n</span> <span class="id" title="var">m</span> : <span class="id" title="var">nat</span>),<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">beq_nat</span> (<span class="id" title="var">S</span> <span class="id" title="var">n</span>) (<span class="id" title="var">S</span> <span class="id" title="var">m</span>) = <span class="id" title="var">beq_nat</span> <span class="id" title="var">n</span> <span class="id" title="var">m</span>.<br/>
 
@@ -415,7 +415,7 @@ maximum values
 Lemma to unfold <span class="inlinecode"><span class="id" title="var">max</span></span> the successors of two natural numbers 
 </div>
 <div class="code">
-<span class="id" title="keyword">Lemma</span> <span class="id" title="var">unfold_max_Sn_Sm</span>:<br/>
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">fold_unfold_max_Sn_Sm</span>:<br/>
 &nbsp;&nbsp;<span class="id" title="keyword">forall</span> (<span class="id" title="var">n</span> <span class="id" title="var">m</span> : <span class="id" title="var">nat</span>),<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">max</span> (<span class="id" title="var">S</span> <span class="id" title="var">n</span>) (<span class="id" title="var">S</span> <span class="id" title="var">m</span>) = <span class="id" title="var">S</span> (<span class="id" title="var">max</span> <span class="id" title="var">n</span> <span class="id" title="var">m</span>).<br/>
 

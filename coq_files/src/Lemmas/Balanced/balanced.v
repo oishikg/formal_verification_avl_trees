@@ -23,9 +23,9 @@ Lemma triple_balanced_implies_hbts_balanced:
 Proof.
   intros. 
   unfold is_balanced_hbt in H.
-  rewrite -> unfold_traverse_to_check_balanced_hbt in H.
-  rewrite -> unfold_traverse_to_check_balanced_bt_node in H.
-  rewrite -> unfold_traverse_to_check_balanced_t in H.  
+  rewrite -> fold_unfold_traverse_to_check_balanced_hbt in H.
+  rewrite -> fold_unfold_traverse_to_check_balanced_bt_node in H.
+  rewrite -> fold_unfold_traverse_to_check_balanced_t in H.  
 
   case (traverse_to_check_balanced_hbt A hbt1) as [h1 | ] eqn : C_check_hbt1. 
   case (traverse_to_check_balanced_hbt A hbt2) as [h2 | ] eqn : C_check_hbt2. 
@@ -58,7 +58,7 @@ Lemma traverse_to_check_balanced_hbt_bt_same:
     traverse_to_check_balanced_bt A bt = Some h_hbt.
 Proof.
   intros A h h_hbt bt H.
-  rewrite -> (unfold_traverse_to_check_balanced_hbt A h bt) in H.  
+  rewrite -> (fold_unfold_traverse_to_check_balanced_hbt A h bt) in H.  
   case (traverse_to_check_balanced_bt A bt) as [bt_ret | ] eqn : C_check_bal.
   exact H.
   discriminate.
@@ -75,7 +75,7 @@ Lemma traverse_to_check_balanced_bt_t_same:
     traverse_to_check_balanced_t A t = Some h_hbt.
 Proof.
   intros A h_hbt t H.
-  rewrite -> (unfold_traverse_to_check_balanced_bt_node A t) in H.
+  rewrite -> (fold_unfold_traverse_to_check_balanced_bt_node A t) in H.
   case (traverse_to_check_balanced_t A t) as [h_ret | ] eqn : C_h.
   exact H.
   discriminate.
@@ -119,8 +119,8 @@ Proof.
                                                             H_balanced_hbt)).
 
   - intros h_sound h_bal H_sound_leaf H_balanced_leaf.
-    rewrite -> (unfold_traverse_to_check_soundness_bt_leaf A) in H_sound_leaf.
-    rewrite -> (unfold_traverse_to_check_balanced_bt_leaf A) in H_balanced_leaf.    
+    rewrite -> (fold_unfold_traverse_to_check_soundness_bt_leaf A) in H_sound_leaf.
+    rewrite -> (fold_unfold_traverse_to_check_balanced_bt_leaf A) in H_balanced_leaf.    
     rewrite -> (some_x_equal_some_y nat 0 h_sound) in H_sound_leaf.
     rewrite -> (some_x_equal_some_y nat 0 h_bal) in H_balanced_leaf.    
     rewrite <- H_sound_leaf.
@@ -134,8 +134,8 @@ Proof.
 
   - intros hbt1 H_inductive_hbt1 e hbt2 H_inductive_hbt2
            h_sound h_bal H_sound_t H_balanced_t.
-    rewrite -> (unfold_traverse_to_check_soundness_t A hbt1 hbt2 e) in H_sound_t.
-    rewrite -> (unfold_traverse_to_check_balanced_t A hbt1 hbt2 e) in H_balanced_t. 
+    rewrite -> (fold_unfold_traverse_to_check_soundness_t A hbt1 hbt2 e) in H_sound_t.
+    rewrite -> (fold_unfold_traverse_to_check_balanced_t A hbt1 hbt2 e) in H_balanced_t. 
     case (traverse_to_check_soundness_hbt A hbt1)
       as [h_sound_sub_1 | ] eqn : C_sound_hbt1.
     case (traverse_to_check_soundness_hbt A hbt2)
@@ -236,7 +236,7 @@ Proof.
   intros A hbt h H_traverse_sound.
   induction hbt as [h_given bt_given].
   unfold project_height_hbt.
-  rewrite -> (unfold_traverse_to_check_soundness_hbt A h_given bt_given)
+  rewrite -> (fold_unfold_traverse_to_check_soundness_hbt A h_given bt_given)
     in H_traverse_sound.
   case (traverse_to_check_soundness_bt A bt_given) as [h_ret | ] eqn : C_check_bt.
   case (h_ret =n= h_given) as [ | ] eqn : C_equal_nats_implies_true_prop.
@@ -269,8 +269,8 @@ Proof.
   reflexivity.
 
   rewrite -> plus_Sn_m.
-  rewrite -> unfold_beq_nat_Sn_Sm.
-  rewrite -> unfold_beq_nat_Sn_Sm.
+  rewrite -> fold_unfold_beq_nat_Sn_Sm.
+  rewrite -> fold_unfold_beq_nat_Sn_Sm.
   exact IH_n'.
 Qed.
 
@@ -286,16 +286,16 @@ Proof.
   induction n as [ | n' IH_n'].
   
   Focus 2.
-  rewrite -> unfold_beq_nat_Sn_Sm.
-  rewrite -> unfold_beq_nat_Sn_Sm.    
-  rewrite -> unfold_beq_nat_Sn_Sm in IH_n'.
-  rewrite -> unfold_beq_nat_Sn_Sm.
+  rewrite -> fold_unfold_beq_nat_Sn_Sm.
+  rewrite -> fold_unfold_beq_nat_Sn_Sm.    
+  rewrite -> fold_unfold_beq_nat_Sn_Sm in IH_n'.
+  rewrite -> fold_unfold_beq_nat_Sn_Sm.
   rewrite -> plus_Sn_m.
-  rewrite -> unfold_beq_nat_Sn_Sm.  
+  rewrite -> fold_unfold_beq_nat_Sn_Sm.  
   exact IH_n'.
 
   rewrite -> plus_0_r.
-  rewrite -> unfold_beq_nat_Sn_Sm.  
+  rewrite -> fold_unfold_beq_nat_Sn_Sm.  
   unfold beq_nat at 1.
   rewrite -> orb_true_l.
   reflexivity.
@@ -336,9 +336,9 @@ Proof.
   intros.
   unfold is_sound_hbt in H.
   unfold is_balanced_hbt in H0.
-  rewrite -> unfold_traverse_to_check_soundness_hbt in H.
-  rewrite -> unfold_traverse_to_check_soundness_bt_node in H.
-  rewrite -> unfold_traverse_to_check_soundness_t in H.
+  rewrite -> fold_unfold_traverse_to_check_soundness_hbt in H.
+  rewrite -> fold_unfold_traverse_to_check_soundness_bt_node in H.
+  rewrite -> fold_unfold_traverse_to_check_soundness_t in H.
   case (traverse_to_check_soundness_hbt A (HNode A h1 bt1))
     as [h1_sound | ] eqn : C_check_sound_bt1.
   case (traverse_to_check_soundness_hbt A (HNode A h2 bt2))
@@ -352,9 +352,9 @@ Proof.
   exact (relating_soundness_and_projection A (HNode A h2 bt2) h2_sound
                                            C_check_sound_bt2).
 
-  rewrite -> unfold_traverse_to_check_balanced_hbt in H0.
-  rewrite -> unfold_traverse_to_check_balanced_bt_node in H0.
-  rewrite -> unfold_traverse_to_check_balanced_t in H0.
+  rewrite -> fold_unfold_traverse_to_check_balanced_hbt in H0.
+  rewrite -> fold_unfold_traverse_to_check_balanced_bt_node in H0.
+  rewrite -> fold_unfold_traverse_to_check_balanced_t in H0.
   case (traverse_to_check_balanced_hbt A (HNode A h1 bt1))
     as [h1_bal | ] eqn : C_check_balanced_bt1.
   case (traverse_to_check_balanced_hbt A (HNode A h2 bt2))
@@ -894,12 +894,12 @@ Proof.
 
     (* unfold the goal *)
     unfold is_balanced_hbt.
-    rewrite -> unfold_traverse_to_check_balanced_hbt.
-    rewrite -> unfold_traverse_to_check_balanced_bt_node.
-    rewrite -> unfold_traverse_to_check_balanced_t.
-    rewrite -> unfold_traverse_to_check_balanced_hbt.
-    rewrite -> unfold_traverse_to_check_balanced_bt_node.
-    rewrite -> unfold_traverse_to_check_balanced_t.
+    rewrite -> fold_unfold_traverse_to_check_balanced_hbt.
+    rewrite -> fold_unfold_traverse_to_check_balanced_bt_node.
+    rewrite -> fold_unfold_traverse_to_check_balanced_t.
+    rewrite -> fold_unfold_traverse_to_check_balanced_hbt.
+    rewrite -> fold_unfold_traverse_to_check_balanced_bt_node.
+    rewrite -> fold_unfold_traverse_to_check_balanced_t.
     rewrite -> H_bt11_h11.
     rewrite -> H_bt121_h121.
 
@@ -912,13 +912,13 @@ Proof.
                 (Triple A (HNode A h11 bt11) e1
                    (HNode A h12
                       (Node A (Triple A (HNode A h121 bt121) e12 (HNode A h122 bt122)))))))) as [h_ret_bal | ] eqn : C_traverse_bt_ret.
-    rewrite -> unfold_traverse_to_check_balanced_hbt in C_traverse_bt_ret.
-    rewrite -> unfold_traverse_to_check_balanced_bt_node in C_traverse_bt_ret.
-    rewrite -> unfold_traverse_to_check_balanced_t in C_traverse_bt_ret.
+    rewrite -> fold_unfold_traverse_to_check_balanced_hbt in C_traverse_bt_ret.
+    rewrite -> fold_unfold_traverse_to_check_balanced_bt_node in C_traverse_bt_ret.
+    rewrite -> fold_unfold_traverse_to_check_balanced_t in C_traverse_bt_ret.
     rewrite -> H_bt11_h11 in C_traverse_bt_ret.
-    rewrite -> unfold_traverse_to_check_balanced_hbt in C_traverse_bt_ret.
-    rewrite -> unfold_traverse_to_check_balanced_bt_node in C_traverse_bt_ret.
-    rewrite -> unfold_traverse_to_check_balanced_t in C_traverse_bt_ret.
+    rewrite -> fold_unfold_traverse_to_check_balanced_hbt in C_traverse_bt_ret.
+    rewrite -> fold_unfold_traverse_to_check_balanced_bt_node in C_traverse_bt_ret.
+    rewrite -> fold_unfold_traverse_to_check_balanced_t in C_traverse_bt_ret.
     rewrite -> H_bt121_h121 in C_traverse_bt_ret.
     rewrite -> H_bt122_h122 in C_traverse_bt_ret.
     
@@ -942,9 +942,9 @@ Proof.
     
     (* continue unfolding *)
     rewrite -> H_h11_h121_diff_by_one.
-    rewrite -> unfold_traverse_to_check_balanced_hbt.
-    rewrite -> unfold_traverse_to_check_balanced_bt_node.
-    rewrite -> unfold_traverse_to_check_balanced_t.    
+    rewrite -> fold_unfold_traverse_to_check_balanced_hbt.
+    rewrite -> fold_unfold_traverse_to_check_balanced_bt_node.
+    rewrite -> fold_unfold_traverse_to_check_balanced_t.    
     rewrite -> H_bt122_h122.
     rewrite -> H_bt2_h2. 
 
@@ -1016,13 +1016,13 @@ Proof.
 
     (* unfold the goal *)
     unfold is_balanced_hbt.
-    rewrite -> unfold_traverse_to_check_balanced_hbt.
-    rewrite -> unfold_traverse_to_check_balanced_bt_node.
-    rewrite -> unfold_traverse_to_check_balanced_t.
+    rewrite -> fold_unfold_traverse_to_check_balanced_hbt.
+    rewrite -> fold_unfold_traverse_to_check_balanced_bt_node.
+    rewrite -> fold_unfold_traverse_to_check_balanced_t.
     rewrite -> H_bt11_h11.
-    rewrite -> unfold_traverse_to_check_balanced_hbt.
-    rewrite -> unfold_traverse_to_check_balanced_bt_node.
-    rewrite -> unfold_traverse_to_check_balanced_t.    
+    rewrite -> fold_unfold_traverse_to_check_balanced_hbt.
+    rewrite -> fold_unfold_traverse_to_check_balanced_bt_node.
+    rewrite -> fold_unfold_traverse_to_check_balanced_t.    
     rewrite -> H_bt12_h12.
     rewrite -> H_bt2_h2.
 
@@ -1333,12 +1333,12 @@ Proof.
                        (Node A (Triple A (HNode A h211 bt211) e21 (HNode A h212 bt212)))) e2
                     (HNode A h22 bt22)))))
       as [h_ret_bal | ] eqn : C_traverse_bt_ret.
-    rewrite -> unfold_traverse_to_check_balanced_hbt in C_traverse_bt_ret.
-    rewrite -> unfold_traverse_to_check_balanced_bt_node in C_traverse_bt_ret.
-    rewrite -> unfold_traverse_to_check_balanced_t in C_traverse_bt_ret.
-    rewrite -> unfold_traverse_to_check_balanced_hbt in C_traverse_bt_ret.
-    rewrite -> unfold_traverse_to_check_balanced_bt_node in C_traverse_bt_ret.
-    rewrite -> unfold_traverse_to_check_balanced_t in C_traverse_bt_ret.    
+    rewrite -> fold_unfold_traverse_to_check_balanced_hbt in C_traverse_bt_ret.
+    rewrite -> fold_unfold_traverse_to_check_balanced_bt_node in C_traverse_bt_ret.
+    rewrite -> fold_unfold_traverse_to_check_balanced_t in C_traverse_bt_ret.
+    rewrite -> fold_unfold_traverse_to_check_balanced_hbt in C_traverse_bt_ret.
+    rewrite -> fold_unfold_traverse_to_check_balanced_bt_node in C_traverse_bt_ret.
+    rewrite -> fold_unfold_traverse_to_check_balanced_t in C_traverse_bt_ret.    
     rewrite -> H_bt211_h211 in C_traverse_bt_ret.
     rewrite -> H_bt212_h212 in C_traverse_bt_ret.
 
@@ -1385,12 +1385,12 @@ Proof.
     
     (* with all the required hypotheses in place, unfold the goal *)
     unfold is_balanced_hbt.
-    rewrite -> unfold_traverse_to_check_balanced_hbt.
-    rewrite -> unfold_traverse_to_check_balanced_bt_node.
-    rewrite -> unfold_traverse_to_check_balanced_t.
-    rewrite -> unfold_traverse_to_check_balanced_hbt.
-    rewrite -> unfold_traverse_to_check_balanced_bt_node.
-    rewrite -> unfold_traverse_to_check_balanced_t.
+    rewrite -> fold_unfold_traverse_to_check_balanced_hbt.
+    rewrite -> fold_unfold_traverse_to_check_balanced_bt_node.
+    rewrite -> fold_unfold_traverse_to_check_balanced_t.
+    rewrite -> fold_unfold_traverse_to_check_balanced_hbt.
+    rewrite -> fold_unfold_traverse_to_check_balanced_bt_node.
+    rewrite -> fold_unfold_traverse_to_check_balanced_t.
     rewrite -> H_bt1_h1.
     rewrite -> H_bt211_h211.
     
@@ -1405,9 +1405,9 @@ Proof.
                                        C_diff_by_one_h211_h212).
 
     rewrite -> H_differ_by_one_h1_h211.
-    rewrite -> unfold_traverse_to_check_balanced_hbt.
-    rewrite -> unfold_traverse_to_check_balanced_bt_node.
-    rewrite -> unfold_traverse_to_check_balanced_t.    
+    rewrite -> fold_unfold_traverse_to_check_balanced_hbt.
+    rewrite -> fold_unfold_traverse_to_check_balanced_bt_node.
+    rewrite -> fold_unfold_traverse_to_check_balanced_t.    
     rewrite -> H_bt212_h212.
     rewrite -> H_bt22_h22.
 
@@ -1467,13 +1467,13 @@ Proof.
     
     (* with all the required hypotheses in place, unfold the goal *)
     unfold is_balanced_hbt.
-    rewrite -> unfold_traverse_to_check_balanced_hbt.
-    rewrite -> unfold_traverse_to_check_balanced_bt_node.
+    rewrite -> fold_unfold_traverse_to_check_balanced_hbt.
+    rewrite -> fold_unfold_traverse_to_check_balanced_bt_node.
 
-    rewrite -> unfold_traverse_to_check_balanced_t.
-    rewrite -> unfold_traverse_to_check_balanced_hbt.
-    rewrite -> unfold_traverse_to_check_balanced_bt_node.
-    rewrite -> unfold_traverse_to_check_balanced_t.
+    rewrite -> fold_unfold_traverse_to_check_balanced_t.
+    rewrite -> fold_unfold_traverse_to_check_balanced_hbt.
+    rewrite -> fold_unfold_traverse_to_check_balanced_bt_node.
+    rewrite -> fold_unfold_traverse_to_check_balanced_t.
     rewrite -> H_bt1_h1.
     rewrite -> H_bt21_h21.
 
@@ -1545,14 +1545,14 @@ Proof.
 
   (* prove base case for leaf *)
   - intros.
-    rewrite -> unfold_insert_bt_helper_leaf in H.
+    rewrite -> fold_unfold_insert_bt_helper_leaf in H.
     rewrite -> some_x_equal_some_y in H.
     rewrite <- H.
     right.
     unfold project_height_hbt.
     unfold is_sound_hbt in H0.
-    rewrite -> unfold_traverse_to_check_soundness_hbt in H0.
-    rewrite -> unfold_traverse_to_check_soundness_bt_leaf in H0.
+    rewrite -> fold_unfold_traverse_to_check_soundness_hbt in H0.
+    rewrite -> fold_unfold_traverse_to_check_soundness_bt_leaf in H0.
     case (0 =n= h_hbt) as [ | ] eqn : C_h_hbt.
     apply beq_nat_true in C_h_hbt.
     rewrite <- C_h_hbt.
@@ -1597,7 +1597,7 @@ Proof.
     exact (relate_heights A h_hbt h1 bt1 e h2 bt2 H_sound_hbt_org).
 
     (* unfold insert_t_helper in H_insert_t *)
-    rewrite -> unfold_insert_t_helper in H_insert_t.
+    rewrite -> fold_unfold_insert_t_helper in H_insert_t.
     case (compare x e) as [ | | ] eqn : C_comp_x_e.
     case (insert_hbt_helper A compare x (HNode A h1 bt1))
       as [[h1' bt1'] | ] eqn : C_insert_hbt1.
@@ -2518,17 +2518,17 @@ Proof.
 
     (* Specification for bt leaf constructor holds *)
   - intros h_hbt hbt' H_sound_hbt_init H_bal_hbt_init H_insert_bt.
-    rewrite -> (unfold_insert_bt_helper_leaf A compare x)
+    rewrite -> (fold_unfold_insert_bt_helper_leaf A compare x)
       in H_insert_bt.
     rewrite -> some_x_equal_some_y in H_insert_bt.
     rewrite <- H_insert_bt.
 
     unfold is_balanced_hbt.
-    rewrite -> unfold_traverse_to_check_balanced_hbt.
-    rewrite -> unfold_traverse_to_check_balanced_bt_node.
-    rewrite -> unfold_traverse_to_check_balanced_t.
-    rewrite -> unfold_traverse_to_check_balanced_hbt.
-    rewrite -> unfold_traverse_to_check_balanced_bt_leaf.
+    rewrite -> fold_unfold_traverse_to_check_balanced_hbt.
+    rewrite -> fold_unfold_traverse_to_check_balanced_bt_node.
+    rewrite -> fold_unfold_traverse_to_check_balanced_t.
+    rewrite -> fold_unfold_traverse_to_check_balanced_hbt.
+    rewrite -> fold_unfold_traverse_to_check_balanced_bt_leaf.
     unfold differ_by_one.
     rewrite -> (plus_0_l 1).
     unfold beq_nat.
@@ -2564,7 +2564,7 @@ Proof.
     destruct (relating_insertion_and_original_height A compare x)
       as [H_relating_heights_hbt _].
     
-    rewrite -> (unfold_insert_t_helper A compare x h_hbt hbt1 e hbt2)
+    rewrite -> (fold_unfold_insert_t_helper A compare x h_hbt hbt1 e hbt2)
       in H_insert_t. 
     (* Element to be inserted is Lt current element considered *)
     case (compare x e) as [ | | ] eqn : C_comp.
@@ -2615,9 +2615,9 @@ Proof.
                                               P_some_eq).
         
         unfold is_balanced_hbt.
-        rewrite -> unfold_traverse_to_check_balanced_hbt.
-        rewrite -> unfold_traverse_to_check_balanced_bt_node.
-        rewrite -> unfold_traverse_to_check_balanced_t.          
+        rewrite -> fold_unfold_traverse_to_check_balanced_hbt.
+        rewrite -> fold_unfold_traverse_to_check_balanced_bt_node.
+        rewrite -> fold_unfold_traverse_to_check_balanced_t.          
         rewrite ->  (balanced_implies_some_height A h_ret bt_ret
                                                   H_hbt_ret_is_sound
                                                   H_hbt_ret_is_balanced).
@@ -2630,9 +2630,9 @@ Proof.
         unfold project_height_hbt in C_h_ret_h1.
 
         unfold is_balanced_hbt in H_bal_t_init.
-        rewrite -> unfold_traverse_to_check_balanced_hbt in H_bal_t_init.
-        rewrite -> unfold_traverse_to_check_balanced_bt_node in H_bal_t_init.
-        rewrite -> unfold_traverse_to_check_balanced_t in H_bal_t_init.
+        rewrite -> fold_unfold_traverse_to_check_balanced_hbt in H_bal_t_init.
+        rewrite -> fold_unfold_traverse_to_check_balanced_bt_node in H_bal_t_init.
+        rewrite -> fold_unfold_traverse_to_check_balanced_t in H_bal_t_init.
         rewrite ->  (balanced_implies_some_height A h1 bt1
                                                   H_hbt1_is_sound
                                                   H_hbt1_is_balanced) in H_bal_t_init.
@@ -2707,9 +2707,9 @@ Proof.
         induction hbt2 as [h2 bt2].
 
         unfold is_balanced_hbt.
-        rewrite -> unfold_traverse_to_check_balanced_hbt.
-        rewrite -> unfold_traverse_to_check_balanced_bt_node.
-        rewrite -> unfold_traverse_to_check_balanced_t.          
+        rewrite -> fold_unfold_traverse_to_check_balanced_hbt.
+        rewrite -> fold_unfold_traverse_to_check_balanced_bt_node.
+        rewrite -> fold_unfold_traverse_to_check_balanced_t.          
         rewrite ->  (balanced_implies_some_height A h1 bt1
                                                   H_hbt1_is_sound
                                                   H_hbt1_is_balanced).
@@ -2720,9 +2720,9 @@ Proof.
         unfold project_height_hbt in C_h_ret_h2.
 
         unfold is_balanced_hbt in H_bal_t_init.
-        rewrite -> unfold_traverse_to_check_balanced_hbt in H_bal_t_init.
-        rewrite -> unfold_traverse_to_check_balanced_bt_node in H_bal_t_init.
-        rewrite -> unfold_traverse_to_check_balanced_t in H_bal_t_init.
+        rewrite -> fold_unfold_traverse_to_check_balanced_hbt in H_bal_t_init.
+        rewrite -> fold_unfold_traverse_to_check_balanced_bt_node in H_bal_t_init.
+        rewrite -> fold_unfold_traverse_to_check_balanced_t in H_bal_t_init.
         rewrite ->  (balanced_implies_some_height A h1 bt1
                                                   H_hbt1_is_sound
                                                   H_hbt1_is_balanced) in H_bal_t_init.
